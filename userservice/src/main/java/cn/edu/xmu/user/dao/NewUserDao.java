@@ -10,6 +10,8 @@ import cn.edu.xmu.user.model.bo.Customer;
 import cn.edu.xmu.user.model.po.CustomerPo;
 import cn.edu.xmu.user.model.po.CustomerPoExample;
 import cn.edu.xmu.user.model.vo.NewUserVo;
+import cn.edu.xmu.user.model.vo.CustomerRetVo;
+
 import com.google.common.base.Charsets;
 import com.google.common.hash.Funnels;
 import org.slf4j.Logger;
@@ -23,10 +25,10 @@ import org.springframework.stereotype.Repository;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 /**
- * 新用户Dao
- * @date 2020/11/10 18:41
+ * 新增用户Dao
  */
 @Repository
 public class NewUserDao implements InitializingBean {
@@ -136,9 +138,23 @@ public class NewUserDao implements InitializingBean {
 
         customerPo.setPassword(AES.encrypt(vo.getPassword(), Customer.AESPASS));
         customerPo.setRealName(AES.encrypt(vo.getRealName(), Customer.AESPASS));
+        customerPo.setGender(vo.getGender());
+
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime birthday = LocalDateTime.parse(vo.getBirthday(), df);
+        customerPo.setBirthday(birthday);
+        Byte a = 1;
+        customerPo.setState(a);
 
         try{
-            returnObject=new ReturnObject<>(customerPoMapper.selectByPrimaryKey((long) customerPoMapper.insert(customerPo)));
+            int ret = customerPoMapper.insert(customerPo);
+            if(ret!=0) {
+                CustomerPoExample example = new CustomerPoExample();
+                CustomerPoExample.Criteria criteria = example.createCriteria();
+                criteria.andUserNameEqualTo(customerPo.getUserName());
+                customerPo = customerPoMapper.selectByExample(example).get(0);
+                returnObject=new ReturnObject<>(new CustomerRetVo(customerPo));
+            }
             logger.debug("success trying to insert newUser");
         }
 
