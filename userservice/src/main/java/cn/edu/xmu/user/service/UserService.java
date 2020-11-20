@@ -8,6 +8,7 @@ import cn.edu.xmu.ooad.util.encript.AES;
 import cn.edu.xmu.user.dao.NewUserDao;
 import cn.edu.xmu.user.dao.UserDao;
 import cn.edu.xmu.user.model.bo.Customer;
+import cn.edu.xmu.user.model.po.CustomerPo;
 import cn.edu.xmu.user.model.vo.NewUserVo;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
@@ -195,6 +196,36 @@ public class UserService {
 //        String userName, String email,String mobile, Integer page, Integer pageSize
         ReturnObject<PageInfo<VoObject>> ret = userDao.getUsersMix(userName, email, mobile, page, pageSize);
         return ret;
+    }
+
+    /**
+     * 平台管理员封禁买家
+     * @param userId 用户id
+     */
+    public ReturnObject<Boolean> BanCustomer(Long userId){
+        CustomerPo customerPo = new CustomerPo();
+        customerPo.setId(userId);
+        customerPo.setState(Customer.State.FORBID.getCode().byteValue());//设置状态为封禁
+        ReturnObject retObj = userDao.modifyCustomerByPo(customerPo);
+        if (retObj.getCode() != ResponseCode.OK){
+            return retObj;
+        }
+        return new ReturnObject<>(true);
+    }
+
+    /**
+     * 平台管理员解禁买家
+     * @param userId 用户id
+     */
+    public ReturnObject<Boolean> ReleaseCustomer(Long userId){
+        CustomerPo customerPo = new CustomerPo();
+        customerPo.setId(userId);
+        customerPo.setState(Customer.State.NORM.getCode().byteValue());//设置状态为正常
+        ReturnObject retObj = userDao.modifyCustomerByPo(customerPo);
+        if (retObj.getCode() != ResponseCode.OK){
+            return retObj;
+        }
+        return new ReturnObject<>(true);
     }
 
 

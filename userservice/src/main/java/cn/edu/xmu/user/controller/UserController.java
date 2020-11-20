@@ -139,4 +139,39 @@ public class UserController {
         return Common.getPageRetObject(ret);
     }
 
+    /**
+     * 平台管理员封禁买家
+     * @param id
+     * @return
+     * @author 24320182203181
+     */
+    @ApiOperation(value = "封禁买家")
+    @Audit
+    @PutMapping("users/{id}/ban")
+    public Object BanCustomer(@PathVariable Long id){
+        ReturnObject<Boolean> success = userService.BanCustomer(id);
+        if (success.getData() == null)  {
+            return ResponseUtil.fail(success.getCode(), success.getErrmsg());
+        }else {
+            return ResponseUtil.ok();
+        }
+    }
+
+    /**
+     * 平台管理员解禁买家
+     * @param id
+     * @return
+     * @author 24320182203181
+     */
+    @ApiOperation(value = "解禁买家")
+    @Audit
+    @PutMapping("users/{id}/release")
+    public Object ReleaseCustomer(@PathVariable Long id){
+        ReturnObject<Boolean> success = userService.ReleaseCustomer(id);
+        if (success.getData() == null)  {
+            return ResponseUtil.fail(success.getCode(), success.getErrmsg());
+        }else {
+            return ResponseUtil.ok();
+        }
+    }
 }
