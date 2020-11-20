@@ -149,7 +149,7 @@ public class ControllerTest1 {
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();
 
-        System.out.println("BanCustomer: "+responseString);
+        System.out.println("BanCustomer1: "+responseString);
 
     }
     @Test
@@ -164,7 +164,7 @@ public class ControllerTest1 {
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();
 
-        System.out.println("BanCustomer: "+responseString);
+        System.out.println("BanCustomer2: "+responseString);
 
     }
 
@@ -181,7 +181,7 @@ public class ControllerTest1 {
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();
 
-        System.out.println("ReleaseCustomer: "+responseString);
+        System.out.println("ReleaseCustomer1: "+responseString);
     }
 
     @Test
@@ -196,6 +196,6 @@ public class ControllerTest1 {
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();
 
-        System.out.println("ReleaseCustomer: "+responseString);
+        System.out.println("ReleaseCustomer2: "+responseString);
     }
 }
