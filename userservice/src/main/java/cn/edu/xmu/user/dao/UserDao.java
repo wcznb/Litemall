@@ -96,4 +96,29 @@ public class UserDao {
         return new ReturnObject<>(rolePage);
     }
 
+    /**
+     * 通过用户id更新用户信息
+     *
+     * @param customerPo
+     * @return
+     */
+    public ReturnObject<Object> modifyCustomerByPo(CustomerPo customerPo){
+        try{
+            int ret = customerPoMapper.updateByPrimaryKeySelective(customerPo);
+            Long id = customerPo.getId();
+            //检查更新是否成功
+            if(ret == 0){
+                logger.info("买家不存在或已被删除：id = " + id);
+                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+            } else {
+                logger.info("买家 id = " + id + " 的资料已更新");
+                return new ReturnObject<>();
+            }
+        }
+        catch (Exception e){
+            logger.error("Internal error Happened:"+e.getMessage());
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
+        }
+    }
+
 }

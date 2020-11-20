@@ -16,8 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(classes = UserserviceApplication.class)   //标识本类是一个SpringBootTest
@@ -135,5 +135,67 @@ public class ControllerTest1 {
                 .andReturn().getResponse().getContentAsString();
         String expectedResponse="{ \"errno\": 0, \"data\": [ { \"name\": \"空状态\", \"code\": 0 }, { \"name\": \"正常\", \"code\": 1 }, { \"name\": \"封禁\", \"code\": 2 }, { \"name\": \"废弃\", \"code\": 3 } ], \"errmsg\": \"成功\" }";
         JSONAssert.assertEquals(expectedResponse,responseString,true);
+    }
+
+    @Test
+    public void BanCustomer1() throws Exception{
+        String authorization = this.login("wcwcwc","Ww123456789**");
+
+        ResultActions res = this.mvc.perform(put("/users/1/ban")
+                .header("authorization",authorization)
+                .contentType("application/json;charset=UTF-8"));
+
+        String responseString = res.andExpect(status().is(200))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+
+        System.out.println("BanCustomer1: "+responseString);
+
+    }
+    @Test
+    public void BanCustomer2() throws Exception{
+        String authorization = this.login("wcwcwc","Ww123456789**");
+
+        ResultActions res = this.mvc.perform(put("/users/20/ban")
+                .header("authorization",authorization)
+                .contentType("application/json;charset=UTF-8"));
+
+        String responseString = res.andExpect(status().is(200))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+
+        System.out.println("BanCustomer2: "+responseString);
+
+    }
+
+
+    @Test
+    public void ReleaseCustomer1() throws Exception{
+        String authorization = this.login("wcwcwc","Ww123456789**");
+
+        ResultActions res = this.mvc.perform(put("/users/1/release")
+                .header("authorization",authorization)
+                .contentType("application/json;charset=UTF-8"));
+
+        String responseString = res.andExpect(status().is(200))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+
+        System.out.println("ReleaseCustomer1: "+responseString);
+    }
+
+    @Test
+    public void ReleaseCustomer2() throws Exception{
+        String authorization = this.login("wcwcwc","Ww123456789**");
+
+        ResultActions res = this.mvc.perform(put("/users/20/release")
+                .header("authorization",authorization)
+                .contentType("application/json;charset=UTF-8"));
+
+        String responseString = res.andExpect(status().is(200))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+
+        System.out.println("ReleaseCustomer2: "+responseString);
     }
 }
