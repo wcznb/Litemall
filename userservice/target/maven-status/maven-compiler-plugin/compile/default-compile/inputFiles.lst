@@ -1,0 +1,17 @@
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\controller\UserController.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\model\po\CustomerPoExample.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\model\po\CustomerPo.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\dao\NewUserDao.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\config\RedisConfig.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\UserserviceApplication.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\model\vo\LoginVo.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\model\vo\SimpleCustomerRetVo.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\model\vo\CustomerRetVo.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\config\CorsConfig.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\config\Swagger2Configuration.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\model\bo\Customer.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\mapper\CustomerPoMapper.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\util\IpUtil.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\model\vo\NewUserVo.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\service\UserService.java
+E:\Generation\JAVAEE\1-6\other\userservice\src\main\java\cn\edu\xmu\user\dao\UserDao.java

@@ -2,6 +2,7 @@ package cn.edu.xmu.user.controller;
 
 import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.annotation.LoginUser;
+import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ResponseUtil;
@@ -10,6 +11,7 @@ import cn.edu.xmu.user.model.vo.LoginVo;
 import cn.edu.xmu.user.model.vo.NewUserVo;
 import cn.edu.xmu.user.service.UserService;
 import cn.edu.xmu.user.util.IpUtil;
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 @Api(value = "用户服务", tags = "user")
 @RestController /*Restful的Controller对象*/
@@ -102,6 +106,20 @@ public class UserController {
         }else {
             return ResponseUtil.ok();
         }
+    }
+
+//    @RequestParam(value="username") String username, @RequestParam(value="age", required=false, defaultValue="0") int age
+
+    @ApiOperation(value = "平台管理员获取所有用户列表")
+    @Audit
+    @GetMapping("users/all")
+    public Object getallusers(@RequestParam(value="userName", required=false, defaultValue="") String userName ,
+                              @RequestParam(value="email", required=false, defaultValue="") String email ,
+                              @RequestParam(value="mobile", required=false, defaultValue="") String mobile ,
+                              @RequestParam(value="page", required=false, defaultValue="1") Integer page ,
+                              @RequestParam(value="pageSize", required=false, defaultValue="20") Integer pageSize){
+        ReturnObject<PageInfo<VoObject>> ret = userService.getallusers(userName, email, mobile, page, pageSize);
+        return Common.getPageRetObject(ret);
     }
 
 }

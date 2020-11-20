@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Customer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">userservice</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.user.model.bo</a> &gt; <span class="el_source">Customer.java</span></div><h1>Customer.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.user.model.bo;
+
+import cn.edu.xmu.ooad.model.VoObject;
+import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.encript.AES;
+import cn.edu.xmu.ooad.util.encript.SHA256;
+import cn.edu.xmu.user.model.po.CustomerPo;
+import cn.edu.xmu.user.model.vo.CustomerRetVo;
+import cn.edu.xmu.user.model.vo.SimpleCustomerRetVo;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+<span class="nc bnc" id="L16" title="All 94 branches missed.">@Data</span>
+public class Customer implements VoObject {
+<span class="fc" id="L18">    public static String AESPASS = &quot;OOAD2020-11-01&quot;;</span>
+
+<span class="fc" id="L20">    private Long id;</span>
+
+<span class="fc" id="L22">    private String userName;</span>
+
+<span class="fc" id="L24">    private String password;</span>
+
+<span class="nc" id="L26">    private String mobile;</span>
+
+<span class="nc" id="L28">    private String email;</span>
+
+<span class="fc" id="L30">    private String realname;</span>
+
+<span class="nc" id="L32">    private Byte gender;</span>
+
+<span class="nc" id="L34">    private LocalDateTime birthday;</span>
+
+<span class="nc" id="L36">    private Integer point;</span>
+
+<span class="fc" id="L38">    private State state = State.NEW;</span>
+
+<span class="nc" id="L40">    private Byte beDeleted;</span>
+
+    @Override
+<span class="fc" id="L43">    public Object createVo() { return new SimpleCustomerRetVo(this); }</span>
+
+    @Override
+    public Object createSimpleVo() {
+<span class="nc" id="L47">        return null;</span>
+    }
+
+    /**
+     * 后台用户状态
+     */
+<span class="fc" id="L53">    public enum State {</span>
+<span class="fc" id="L54">        NEW(0, &quot;空状态&quot;),</span>
+<span class="fc" id="L55">        NORM(1, &quot;正常&quot;),</span>
+<span class="fc" id="L56">        FORBID(2, &quot;封禁&quot;),</span>
+<span class="fc" id="L57">        DELETE(3, &quot;废弃&quot;);</span>
+
+        private static final Map&lt;Integer, Customer.State&gt; stateMap;
+
+        static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值
+<span class="fc" id="L62">            stateMap = new HashMap();</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">            for (Customer.State enum1 : values()) {</span>
+<span class="fc" id="L64">                stateMap.put(enum1.code, enum1);</span>
+            }
+<span class="fc" id="L66">        }</span>
+
+        private int code;
+        private String description;
+
+<span class="fc" id="L71">        State(int code, String description) {</span>
+<span class="fc" id="L72">            this.code = code;</span>
+<span class="fc" id="L73">            this.description = description;</span>
+<span class="fc" id="L74">        }</span>
+
+        public static Customer.State getTypeByCode(Integer code) {
+<span class="fc" id="L77">            return stateMap.get(code);</span>
+        }
+
+        public Integer getCode() {
+<span class="nc" id="L81">            return code;</span>
+        }
+
+        public String getDescription() {
+<span class="nc" id="L85">            return description;</span>
+        }
+    }
+
+    /**
+     * 构造函数
+     * @param po Po对象
+     */
+<span class="fc" id="L93">    public Customer(CustomerPo po){</span>
+<span class="fc" id="L94">        this.id = po.getId();</span>
+<span class="fc" id="L95">        this.userName = po.getUserName();</span>
+<span class="fc" id="L96">        this.password =po.getPassword();</span>
+<span class="fc" id="L97">        this.mobile = AES.decrypt(po.getMobile(),AESPASS);</span>
+
+<span class="fc" id="L99">        this.email = AES.decrypt(po.getEmail(),AESPASS);</span>
+
+<span class="fc" id="L101">        this.realname = AES.decrypt(po.getRealName(), AESPASS);</span>
+
+<span class="fc" id="L103">        this.gender = po.getGender();</span>
+
+<span class="fc" id="L105">        this.birthday = po.getBirthday();</span>
+
+<span class="fc" id="L107">        this.point = po.getPoint();</span>
+
+<span class="fc" id="L109">        this.beDeleted = po.getBeDeleted();</span>
+
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">        if (null != po.getState()) {</span>
+<span class="fc" id="L112">            this.state = State.getTypeByCode(po.getState().intValue());</span>
+        }
+<span class="fc" id="L114">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

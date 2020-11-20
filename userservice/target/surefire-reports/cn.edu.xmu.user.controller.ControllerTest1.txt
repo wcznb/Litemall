@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: cn.edu.xmu.user.controller.ControllerTest1
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 21.578 s - in cn.edu.xmu.user.controller.ControllerTest1

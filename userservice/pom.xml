@@ -154,6 +154,7 @@
                 <configuration>
                     <includes>
                         <include>**/ControllerTest1.java</include>
+<!--                        <include>**/UserDaoTest1.java</include>-->
                     </includes>
                 </configuration>
             </plugin>

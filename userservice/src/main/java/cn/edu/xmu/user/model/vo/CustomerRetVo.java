@@ -25,4 +25,6 @@ public class CustomerRetVo {
         this.gender = customerPo.getGender().intValue()>0?"男":"女";
         this.birthday = customerPo.getBirthday().toString();
     }
+
+
 }

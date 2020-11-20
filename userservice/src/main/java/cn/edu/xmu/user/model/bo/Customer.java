@@ -6,6 +6,7 @@ import cn.edu.xmu.ooad.util.encript.AES;
 import cn.edu.xmu.ooad.util.encript.SHA256;
 import cn.edu.xmu.user.model.po.CustomerPo;
 import cn.edu.xmu.user.model.vo.CustomerRetVo;
+import cn.edu.xmu.user.model.vo.SimpleCustomerRetVo;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -39,9 +40,7 @@ public class Customer implements VoObject {
     private Byte beDeleted;
 
     @Override
-    public Object createVo() {
-        return null;
-    }
+    public Object createVo() { return new SimpleCustomerRetVo(this); }
 
     @Override
     public Object createSimpleVo() {

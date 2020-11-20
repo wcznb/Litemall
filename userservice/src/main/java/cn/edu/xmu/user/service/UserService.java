@@ -1,5 +1,6 @@
 package cn.edu.xmu.user.service;
 
+import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.JwtHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -8,6 +9,7 @@ import cn.edu.xmu.user.dao.NewUserDao;
 import cn.edu.xmu.user.dao.UserDao;
 import cn.edu.xmu.user.model.bo.Customer;
 import cn.edu.xmu.user.model.vo.NewUserVo;
+import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,6 +189,12 @@ public class UserService {
 //        }//测试使用
         redisTemplate.delete("up_" + userId);
         return new ReturnObject<>(true);
+    }
+
+    public ReturnObject<PageInfo<VoObject>> getallusers(String userName, String email,String mobile, Integer page, Integer pageSize){
+//        String userName, String email,String mobile, Integer page, Integer pageSize
+        ReturnObject<PageInfo<VoObject>> ret = userDao.getUsersMix(userName, email, mobile, page, pageSize);
+        return ret;
     }
 
 

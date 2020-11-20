@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NewUserDao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">userservice</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.user.dao</a> &gt; <span class="el_source">NewUserDao.java</span></div><h1>NewUserDao.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.user.dao;
+
+import cn.edu.xmu.ooad.util.ResponseCode;
+import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.ooad.util.bloom.BloomFilterHelper;
+import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
+import cn.edu.xmu.ooad.util.encript.AES;
+import cn.edu.xmu.user.mapper.CustomerPoMapper;
+import cn.edu.xmu.user.model.bo.Customer;
+import cn.edu.xmu.user.model.po.CustomerPo;
+import cn.edu.xmu.user.model.po.CustomerPoExample;
+import cn.edu.xmu.user.model.vo.NewUserVo;
+import cn.edu.xmu.user.model.vo.CustomerRetVo;
+
+import com.google.common.base.Charsets;
+import com.google.common.hash.Funnels;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+/**
+ * 新增用户Dao
+ */
+@Repository
+<span class="fc" id="L34">public class NewUserDao implements InitializingBean {</span>
+<span class="fc" id="L35">    private  static  final Logger logger = LoggerFactory.getLogger(NewUserDao.class);</span>
+
+    @Autowired
+    CustomerPoMapper customerPoMapper;
+    @Autowired
+    RedisTemplate redisTemplate;
+
+    RedisBloomFilter bloomFilter;
+
+    String[] fieldName;
+<span class="fc" id="L45">    final String suffixName=&quot;BloomFilter&quot;;</span>
+
+    /**
+     * 通过该参数选择是否清空布隆过滤器
+     */
+<span class="fc" id="L50">    private boolean reinitialize=true;</span>
+
+
+    /**
+     * 初始化布隆过滤器
+     * @throws Exception
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+<span class="fc" id="L59">        BloomFilterHelper bloomFilterHelper=new BloomFilterHelper&lt;&gt;(Funnels.stringFunnel(Charsets.UTF_8),1000,0.02);</span>
+<span class="fc" id="L60">        fieldName=new String[]{&quot;email&quot;,&quot;mobile&quot;,&quot;userName&quot;};</span>
+<span class="fc" id="L61">        bloomFilter=new RedisBloomFilter(redisTemplate,bloomFilterHelper);</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        if(reinitialize){</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">            for(int i=0;i&lt;fieldName.length;i++){</span>
+<span class="fc" id="L64">                redisTemplate.delete(fieldName[i]+suffixName);</span>
+            }
+        }
+
+<span class="fc" id="L68">    }</span>
+
+    /**
+     *
+     * @param po
+     * @return ReturnObject 错误返回对象
+     */
+    public ReturnObject checkBloomFilter(CustomerPo po){
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        if(bloomFilter.includeByBloomFilter(&quot;email&quot;+suffixName,po.getEmail())){</span>
+<span class="nc" id="L77">            return new ReturnObject(ResponseCode.EMAIL_REGISTERED);</span>
+        }
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        if(bloomFilter.includeByBloomFilter(&quot;mobile&quot;+suffixName,po.getMobile())){</span>
+<span class="nc" id="L80">            return new ReturnObject(ResponseCode.MOBILE_REGISTERED);</span>
+        }
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">        if(bloomFilter.includeByBloomFilter(&quot;userName&quot;+suffixName,po.getUserName())){</span>
+<span class="nc" id="L83">            return new ReturnObject(ResponseCode.USER_NAME_REGISTERED);</span>
+        }
+<span class="fc" id="L85">        return null;</span>
+
+    }
+
+    /**
+     * 由属性名及属性值设置相应布隆过滤器
+     * @param name 属性名
+     * @param po po对象
+     */
+    public void setBloomFilterByName(String name,CustomerPo po) {
+        try {
+<span class="nc" id="L96">            Field field = CustomerPo.class.getDeclaredField(name);</span>
+<span class="nc" id="L97">            Method method=po.getClass().getMethod(&quot;get&quot;+name.substring(0,1).toUpperCase()+name.substring(1));</span>
+<span class="nc" id="L98">            logger.debug(&quot;add value &quot;+method.invoke(po)+&quot; to &quot;+field.getName()+suffixName);</span>
+<span class="nc" id="L99">            bloomFilter.addByBloomFilter(field.getName()+suffixName,method.invoke(po));</span>
+        }
+<span class="nc" id="L101">        catch (Exception ex){</span>
+<span class="nc" id="L102">            logger.error(&quot;Exception happened:&quot;+ex.getMessage());</span>
+<span class="nc" id="L103">        }</span>
+<span class="nc" id="L104">    }</span>
+
+    /**
+     * 由vo创建newUser检查重复后插入
+     * @param vo vo对象
+     * @return ReturnObject
+     */
+    public ReturnObject createNewUserByVo(NewUserVo vo){
+        //logger.debug(String.valueOf(bloomFilter.includeByBloomFilter(&quot;mobileBloomFilter&quot;,&quot;FAED5EEF1C8562B02110BCA3F9165CBE&quot;)));
+        //by default,email/mobile are both needed
+<span class="fc" id="L114">        CustomerPo customerPo=new CustomerPo();</span>
+        ReturnObject returnObject;
+<span class="fc" id="L116">        customerPo.setEmail(AES.encrypt(vo.getEmail(), Customer.AESPASS));</span>
+<span class="fc" id="L117">        customerPo.setMobile(AES.encrypt(vo.getMobile(),Customer.AESPASS));</span>
+<span class="fc" id="L118">        customerPo.setUserName(vo.getUserName());</span>
+<span class="fc" id="L119">        returnObject=checkBloomFilter(customerPo);</span>
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">        if(returnObject!=null){</span>
+<span class="nc" id="L121">            logger.debug(&quot;found duplicate in bloomFilter&quot;);</span>
+<span class="nc" id="L122">            return returnObject;</span>
+        }
+
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">        if(isEmailExist(customerPo.getEmail())){</span>
+<span class="nc" id="L126">            setBloomFilterByName(&quot;email&quot;,customerPo);</span>
+<span class="nc" id="L127">            return new ReturnObject(ResponseCode.EMAIL_REGISTERED);</span>
+        }
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">        if(isMobileExist(customerPo.getMobile())){</span>
+<span class="nc" id="L130">            setBloomFilterByName(&quot;mobile&quot;,customerPo);</span>
+<span class="nc" id="L131">            return new ReturnObject(ResponseCode.MOBILE_REGISTERED);</span>
+        }
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">        if(isUserNameExist(customerPo.getUserName())){</span>
+<span class="nc" id="L134">            setBloomFilterByName(&quot;userName&quot;,customerPo);</span>
+<span class="nc" id="L135">            return new ReturnObject(ResponseCode.USER_NAME_REGISTERED);</span>
+        }
+
+
+<span class="fc" id="L139">        customerPo.setPassword(AES.encrypt(vo.getPassword(), Customer.AESPASS));</span>
+<span class="fc" id="L140">        customerPo.setRealName(AES.encrypt(vo.getRealName(), Customer.AESPASS));</span>
+<span class="fc" id="L141">        customerPo.setGender(vo.getGender());</span>
+
+<span class="fc" id="L143">        DateTimeFormatter df = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span>
+<span class="fc" id="L144">        LocalDateTime birthday = LocalDateTime.parse(vo.getBirthday(), df);</span>
+<span class="fc" id="L145">        customerPo.setBirthday(birthday);</span>
+<span class="fc" id="L146">        Byte a = 1;</span>
+<span class="fc" id="L147">        customerPo.setState(a);</span>
+
+        try{
+<span class="fc" id="L150">            int ret = customerPoMapper.insert(customerPo);</span>
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">            if(ret!=0) {</span>
+<span class="fc" id="L152">                CustomerPoExample example = new CustomerPoExample();</span>
+<span class="fc" id="L153">                CustomerPoExample.Criteria criteria = example.createCriteria();</span>
+<span class="fc" id="L154">                criteria.andUserNameEqualTo(customerPo.getUserName());</span>
+<span class="fc" id="L155">                customerPo = customerPoMapper.selectByExample(example).get(0);</span>
+<span class="fc" id="L156">                returnObject=new ReturnObject&lt;&gt;(new CustomerRetVo(customerPo));</span>
+            }
+<span class="fc" id="L158">            logger.debug(&quot;success trying to insert newUser&quot;);</span>
+        }
+
+<span class="nc" id="L161">        catch (DuplicateKeyException e){</span>
+<span class="nc" id="L162">            logger.debug(&quot;failed trying to insert newUser&quot;);</span>
+            //e.printStackTrace();
+<span class="nc" id="L164">            String info=e.getMessage();</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">            if(info.contains(&quot;user_name_uindex&quot;)){</span>
+<span class="nc" id="L166">                setBloomFilterByName(&quot;userName&quot;,customerPo);</span>
+<span class="nc" id="L167">                return new ReturnObject(ResponseCode.USER_NAME_REGISTERED);</span>
+            }
+<span class="nc bnc" id="L169" title="All 2 branches missed.">            if(info.contains(&quot;email_uindex&quot;)){</span>
+<span class="nc" id="L170">                setBloomFilterByName(&quot;email&quot;,customerPo);</span>
+<span class="nc" id="L171">                return new ReturnObject(ResponseCode.EMAIL_REGISTERED);</span>
+            }
+<span class="nc bnc" id="L173" title="All 2 branches missed.">            if(info.contains(&quot;mobile_uindex&quot;)){</span>
+<span class="nc" id="L174">                setBloomFilterByName(&quot;mobile&quot;,customerPo);</span>
+<span class="nc" id="L175">                return new ReturnObject(ResponseCode.MOBILE_REGISTERED);</span>
+            }
+
+        }
+<span class="nc" id="L179">        catch (Exception e){</span>
+<span class="nc" id="L180">            logger.error(&quot;Internal error Happened:&quot;+e.getMessage());</span>
+<span class="nc" id="L181">            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);</span>
+<span class="pc" id="L182">        }</span>
+<span class="fc" id="L183">        return returnObject;</span>
+    }
+    /**
+     * 检查用户名重复
+     * @param userName 需要检查的用户名
+     * @return boolean
+     */
+    public boolean isUserNameExist(String userName){
+<span class="fc" id="L191">        logger.debug(&quot;is checking userName in user table&quot;);</span>
+<span class="fc" id="L192">        CustomerPoExample example=new CustomerPoExample();</span>
+<span class="fc" id="L193">        CustomerPoExample.Criteria criteria=example.createCriteria();</span>
+<span class="fc" id="L194">        criteria.andUserNameEqualTo(userName);</span>
+<span class="fc" id="L195">        List&lt;CustomerPo&gt; userPos=customerPoMapper.selectByExample(example);</span>
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">        return !userPos.isEmpty();</span>
+    }
+
+    /**
+     * 检查邮箱重复
+     * @param email
+     * @return boolean
+     */
+    public boolean isEmailExist(String email){
+<span class="fc" id="L205">        logger.debug(&quot;is checking email in user table&quot;);</span>
+<span class="fc" id="L206">        CustomerPoExample example=new CustomerPoExample();</span>
+<span class="fc" id="L207">        CustomerPoExample.Criteria criteria=example.createCriteria();</span>
+<span class="fc" id="L208">        criteria.andEmailEqualTo(email);</span>
+<span class="fc" id="L209">        List&lt;CustomerPo&gt; userPos=customerPoMapper.selectByExample(example);</span>
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">        return !userPos.isEmpty();</span>
+    }
+
+    /**
+     * 检查电话重复
+     * @param mobile 电话号码
+     * @return boolean
+     * createdBy LiangJi@3229
+     */
+    public boolean isMobileExist(String mobile){
+<span class="fc" id="L220">        logger.debug(&quot;is checking mobile in user table&quot;);</span>
+<span class="fc" id="L221">        CustomerPoExample example=new CustomerPoExample();</span>
+<span class="fc" id="L222">        CustomerPoExample.Criteria criteria=example.createCriteria();</span>
+<span class="fc" id="L223">        criteria.andMobileEqualTo(mobile);</span>
+<span class="fc" id="L224">        List&lt;CustomerPo&gt; userPos=customerPoMapper.selectByExample(example);</span>
+<span class="pc bpc" id="L225" title="1 of 2 branches missed.">        return !userPos.isEmpty();</span>
+    }
+
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

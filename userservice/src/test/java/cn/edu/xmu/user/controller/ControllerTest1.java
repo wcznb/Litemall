@@ -94,6 +94,21 @@ public class ControllerTest1 {
         System.out.println("logout: "+responseString);
     }
 
+    @Test
+    public void getAllUser() throws Exception{
+        String authorization = this.login("wcwcwc","Ww123456789**");
+
+        ResultActions res = this.mvc.perform(get("/users/all?page=1&pageSize=20").header("authorization",authorization)
+                .contentType("application/json;charset=UTF-8"));
+
+        String responseString = res.andExpect(status().is(200))
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+
+        System.out.println("getAllUser() "+responseString);
+
+    }
+
     private String login(String userName, String password) throws Exception{
         LoginVo vo = new LoginVo();
         vo.setUserName(userName);
