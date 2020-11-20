@@ -7,8 +7,10 @@ import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ResponseUtil;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.user.model.bo.Customer;
 import cn.edu.xmu.user.model.vo.LoginVo;
 import cn.edu.xmu.user.model.vo.NewUserVo;
+import cn.edu.xmu.user.model.vo.StateVo;
 import cn.edu.xmu.user.service.UserService;
 import cn.edu.xmu.user.util.IpUtil;
 import com.github.pagehelper.PageInfo;
@@ -106,6 +108,21 @@ public class UserController {
         }else {
             return ResponseUtil.ok();
         }
+    }
+
+    @ApiOperation(value="获得买家的所有状态")
+    @ApiResponses({
+            @ApiResponse(code = 0,message = "成功")
+    })
+    @Audit
+    @GetMapping("users/states")
+    public Object getAllStates(){
+        Customer.State[] states=Customer.State.class.getEnumConstants();
+        List<StateVo> stateVos=new ArrayList<StateVo>();
+        for(int i=0;i<states.length;i++){
+            stateVos.add(new StateVo(states[i]));
+        }
+        return ResponseUtil.ok(new ReturnObject<List>(stateVos).getData());
     }
 
 //    @RequestParam(value="username") String username, @RequestParam(value="age", required=false, defaultValue="0") int age

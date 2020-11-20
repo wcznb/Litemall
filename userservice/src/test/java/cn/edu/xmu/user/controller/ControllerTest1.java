@@ -123,6 +123,17 @@ public class ControllerTest1 {
                 .andExpect(jsonPath("$.errmsg").value("成功"))
                 .andReturn().getResponse().getContentAsString();
         return  JacksonUtil.parseString(response, "data");
+    }
 
+
+    @Test
+    public void getAllState() throws Exception {
+        String token=login("wcwcwc9","Ww123456789**");
+        String responseString=this.mvc.perform(get("/users/states").header("authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+        String expectedResponse="{ \"errno\": 0, \"data\": [ { \"name\": \"空状态\", \"code\": 0 }, { \"name\": \"正常\", \"code\": 1 }, { \"name\": \"封禁\", \"code\": 2 }, { \"name\": \"废弃\", \"code\": 3 } ], \"errmsg\": \"成功\" }";
+        JSONAssert.assertEquals(expectedResponse,responseString,true);
     }
 }

@@ -48,8 +48,6 @@ public class UserDao {
             StringBuilder message = new StringBuilder().append("getUserByName: ").append(e.getMessage());
             logger.error(message.toString());
         }
-
-
         if (null == users || users.isEmpty()) {
             return new ReturnObject<>();
         } else {
