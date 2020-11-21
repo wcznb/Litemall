@@ -8,6 +8,7 @@ import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ResponseUtil;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.user.model.bo.Customer;
+import cn.edu.xmu.user.model.vo.CustomerSetVo;
 import cn.edu.xmu.user.model.vo.LoginVo;
 import cn.edu.xmu.user.model.vo.NewUserVo;
 import cn.edu.xmu.user.model.vo.StateVo;
@@ -172,6 +173,48 @@ public class UserController {
             return ResponseUtil.fail(success.getCode(), success.getErrmsg());
         }else {
             return ResponseUtil.ok();
+        }
+    }
+
+    /**
+     * 修改买家信息
+     *
+     * @author 24320182203284 单
+     * @param id 买家id
+     * @param vo 买家视图
+     * @return Object 买家返回视图
+     */
+    @ApiOperation(value = "修改买家信息", produces = "application/json")
+    @Audit
+    @PutMapping("/users")
+    public Object updateCustomer(@LoginUser Long id, @Validated @RequestBody CustomerSetVo vo) {
+        ReturnObject<Object> success = userService.modifyCustomer(id,vo);
+        //校验前端数据
+
+        if (success.getData() == null)  {
+            return ResponseUtil.fail(success.getCode(), success.getErrmsg());
+        }else {
+            return ResponseUtil.ok();
+        }
+    }
+    /**
+     * 查看买家信息
+     *
+     * @author 24320182203284 单
+     * @param id 买家id
+     * @return Object 买家返回视图
+     */
+    @ApiOperation(value = "查看买家信息", produces = "application/json")
+    @Audit
+    @GetMapping("/users")
+    public Object getCustomer(@LoginUser Long id) {
+        ReturnObject<Object> success = userService.getCustomer(id);
+        //校验前端数据
+
+        if (success.getData() == null)  {
+            return ResponseUtil.fail(success.getCode(), success.getErrmsg());
+        }else {
+            return Common.decorateReturnObject(success);
         }
     }
 }
