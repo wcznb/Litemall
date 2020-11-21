@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="core" />
+        <module name="timeservice" />
+        <module name="addressservice" />
+        <module name="userservice" />
+        <module name="aftersalesservice" />
+        <module name="shareservice" />
+        <module name="advertisementservice" />
+        <module name="footprintservice" />
+        <module name="favoriteservice" />
+        <module name="cartservice" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="addressservice" target="11" />
+      <module name="advertisementservice" target="11" />
+      <module name="aftersalesservice" target="11" />
+      <module name="cartservice" target="11" />
+      <module name="core" target="11" />
+      <module name="favoriteservice" target="11" />
+      <module name="footprintservice" target="11" />
+      <module name="other" target="11" />
+      <module name="shareservice" target="11" />
+      <module name="timeservice" target="11" />
+      <module name="userservice" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="addressservice" options="-parameters" />
+      <module name="advertisementservice" options="-parameters" />
+      <module name="aftersalesservice" options="-parameters" />
+      <module name="cartservice" options="-parameters" />
+      <module name="core" options="-parameters" />
+      <module name="favoriteservice" options="-parameters" />
+      <module name="footprintservice" options="-parameters" />
+      <module name="shareservice" options="-parameters" />
+      <module name="timeservice" options="-parameters" />
+      <module name="userservice" options="-parameters" />
+    </option>
+  </component>
+</project>

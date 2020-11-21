@@ -9,6 +9,7 @@ import cn.edu.xmu.user.dao.NewUserDao;
 import cn.edu.xmu.user.dao.UserDao;
 import cn.edu.xmu.user.model.bo.Customer;
 import cn.edu.xmu.user.model.po.CustomerPo;
+import cn.edu.xmu.user.model.vo.CustomerSetVo;
 import cn.edu.xmu.user.model.vo.NewUserVo;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
@@ -228,5 +229,33 @@ public class UserService {
         return new ReturnObject<>(true);
     }
 
+    public ReturnObject <Object> getCustomer( Long id) {
+        CustomerPo customerPo = new CustomerPo();
+        customerPo.setId(id);
+        ReturnObject<Object> retObj = userDao.getCustomerById(id);
+        ReturnObject<Object> retCustomer;
+        if (retObj.getCode().equals(ResponseCode.OK)) {
+            retCustomer = new ReturnObject<>(retObj.getData());
+        } else {
+            retCustomer = new ReturnObject<>(retObj.getCode(), retObj.getErrmsg());
+        }
+        return retCustomer;
+    }
+    public ReturnObject <Object> modifyCustomer( Long id, CustomerSetVo vo) {
+        CustomerPo customerPo = new CustomerPo();
+        customerPo.setId(id);
+        customerPo.setBirthday(vo.getBirthday());
+        customerPo.setGender(vo.getGender());
+        customerPo.setRealName(vo.getRealName());
+
+        ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
+        ReturnObject<Object> retCustomer;
+        if (retObj.getCode().equals(ResponseCode.OK)) {
+            retCustomer = new ReturnObject<>(retObj.getData());
+        } else {
+            retCustomer = new ReturnObject<>(retObj.getCode(), retObj.getErrmsg());
+        }
+        return retCustomer;
+    }
 
 }
