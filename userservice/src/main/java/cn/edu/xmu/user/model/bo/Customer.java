@@ -42,9 +42,22 @@ public class Customer implements VoObject {
     @Override
     public Object createVo() { return new SimpleCustomerRetVo(this); }
 
+    //createVo()挪到这里
     @Override
     public Object createSimpleVo() {
-        return null;
+
+
+        CustomerRetVo customerRetVo = new CustomerRetVo();
+
+        customerRetVo.setId(this.id);
+        customerRetVo.setUserName(this.userName);
+        customerRetVo.setRealName(this.realname);
+        customerRetVo.setEmail(this.email);
+        customerRetVo.setMobile(this.mobile);
+        customerRetVo.setGender(this.gender.intValue()>0?"男":"女");
+        customerRetVo.setBirthday(this.birthday.toString());
+
+        return customerRetVo;
     }
 
     /**

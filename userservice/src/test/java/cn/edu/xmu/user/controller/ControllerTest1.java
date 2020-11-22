@@ -198,4 +198,31 @@ public class ControllerTest1 {
 
         System.out.println("ReleaseCustomer2: "+responseString);
     }
+
+//notok
+    @Test
+    public void getUserById1() throws Exception{
+
+        String token = this.login("wcwcwc4","Ww123456789**");
+        String res = this.mvc.perform(get("/users/111").header("authorization",token))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+
+        System.out.println(res);
+    }
+
+
+
+    //ok
+    @Test
+    public void getUserById2() throws  Exception{
+        String token = this.login("wcwcwc4","Ww123456789**");
+        String res = this.mvc.perform(get("/users/2").header("authorization",token))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+
+        System.out.println(res);
+    }
 }

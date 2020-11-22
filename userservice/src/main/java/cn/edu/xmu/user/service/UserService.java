@@ -258,4 +258,31 @@ public class UserService {
         return retCustomer;
     }
 
+    /**
+     * ID获取用户信息
+     * @param id
+     * @return 用户
+     */
+    public ReturnObject<VoObject> findUserById(Long id) {
+        ReturnObject<VoObject> returnObject = null;
+
+
+        CustomerPo customerPo = userDao.findUserById(id);
+
+
+
+        if( customerPo!= null) {
+            logger.debug("findUserById : " + returnObject);
+
+            returnObject = new ReturnObject<>(new Customer(customerPo));
+
+        } else {
+            logger.debug("findUserById: Not Found");
+            returnObject = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);//返回错误码 RESOURCE_ID_NOTEXIST(504,"操作的资源id不存在"),
+
+        }
+        return returnObject;
+    }
+
+
 }

@@ -16,6 +16,11 @@ public class CustomerRetVo {
     String gender;
     String birthday;
 
+    public CustomerRetVo(){
+
+
+    }
+
     public CustomerRetVo(CustomerPo customerPo){
         this.id = customerPo.getId();
         this.userName = customerPo.getUserName();
