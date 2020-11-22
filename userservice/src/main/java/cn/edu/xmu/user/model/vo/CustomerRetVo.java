@@ -16,8 +16,15 @@ public class CustomerRetVo {
     String gender;
     String birthday;
 
-    public CustomerRetVo(){
+    public CustomerRetVo(Customer customer){
 
+        this.id = customer.getId();
+        this.userName = customer.getUserName();
+        this.realName = customer.getRealname();
+        this.email = customer.getEmail();
+        this.mobile = customer.getMobile();
+        this.gender = customer.getGender().intValue()>0?"男":"女";
+        this.birthday = customer.getBirthday().toString();
 
     }
 

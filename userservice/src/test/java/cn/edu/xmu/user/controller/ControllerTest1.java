@@ -82,7 +82,7 @@ public class ControllerTest1 {
     public void logout() throws Exception {
         ResultActions res = null;
 
-        String authorization = this.login("wcwcwc","Ww123456789**");
+        String authorization = this.login("wcwcwc9","Ww123456789**");
 
         res = this.mvc.perform(get("/users/logout").header("authorization",authorization)
                 .contentType("application/json;charset=UTF-8"));
@@ -96,7 +96,7 @@ public class ControllerTest1 {
 
     @Test
     public void getAllUser() throws Exception{
-        String authorization = this.login("wcwcwc","Ww123456789**");
+        String authorization = this.login("wcwcwc9","Ww123456789**");
 
         ResultActions res = this.mvc.perform(get("/users/all?page=1&pageSize=20").header("authorization",authorization)
                 .contentType("application/json;charset=UTF-8"));
@@ -139,7 +139,7 @@ public class ControllerTest1 {
 
     @Test
     public void BanCustomer1() throws Exception{
-        String authorization = this.login("wcwcwc","Ww123456789**");
+        String authorization = this.login("wcwcwc9","Ww123456789**");
 
         ResultActions res = this.mvc.perform(put("/users/1/ban")
                 .header("authorization",authorization)
@@ -154,7 +154,7 @@ public class ControllerTest1 {
     }
     @Test
     public void BanCustomer2() throws Exception{
-        String authorization = this.login("wcwcwc","Ww123456789**");
+        String authorization = this.login("wcwcwc9","Ww123456789**");
 
         ResultActions res = this.mvc.perform(put("/users/20/ban")
                 .header("authorization",authorization)
@@ -171,7 +171,7 @@ public class ControllerTest1 {
 
     @Test
     public void ReleaseCustomer1() throws Exception{
-        String authorization = this.login("wcwcwc","Ww123456789**");
+        String authorization = this.login("wcwcwc9","Ww123456789**");
 
         ResultActions res = this.mvc.perform(put("/users/1/release")
                 .header("authorization",authorization)
@@ -186,7 +186,7 @@ public class ControllerTest1 {
 
     @Test
     public void ReleaseCustomer2() throws Exception{
-        String authorization = this.login("wcwcwc","Ww123456789**");
+        String authorization = this.login("wcwcwc9","Ww123456789**");
 
         ResultActions res = this.mvc.perform(put("/users/20/release")
                 .header("authorization",authorization)

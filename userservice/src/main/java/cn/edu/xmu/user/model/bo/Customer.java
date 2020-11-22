@@ -42,23 +42,8 @@ public class Customer implements VoObject {
     @Override
     public Object createVo() { return new SimpleCustomerRetVo(this); }
 
-    //createVo()挪到这里
     @Override
-    public Object createSimpleVo() {
-
-
-        CustomerRetVo customerRetVo = new CustomerRetVo();
-
-        customerRetVo.setId(this.id);
-        customerRetVo.setUserName(this.userName);
-        customerRetVo.setRealName(this.realname);
-        customerRetVo.setEmail(this.email);
-        customerRetVo.setMobile(this.mobile);
-        customerRetVo.setGender(this.gender.intValue()>0?"男":"女");
-        customerRetVo.setBirthday(this.birthday.toString());
-
-        return customerRetVo;
-    }
+    public Object createSimpleVo() { return new CustomerRetVo(this); }
 
     /**
      * 后台用户状态
@@ -107,6 +92,7 @@ public class Customer implements VoObject {
         this.id = po.getId();
         this.userName = po.getUserName();
         this.password =po.getPassword();
+
         this.mobile = AES.decrypt(po.getMobile(),AESPASS);
 
         this.email = AES.decrypt(po.getEmail(),AESPASS);

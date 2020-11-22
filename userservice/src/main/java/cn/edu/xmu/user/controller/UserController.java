@@ -139,6 +139,7 @@ public class UserController {
                               @RequestParam(value="mobile", required=false, defaultValue="") String mobile ,
                               @RequestParam(value="page", required=false, defaultValue="1") Integer page ,
                               @RequestParam(value="pageSize", required=false, defaultValue="20") Integer pageSize){
+
         ReturnObject<PageInfo<VoObject>> ret = userService.getallusers(userName, email, mobile, page, pageSize);
         return Common.getPageRetObject(ret);
     }
@@ -236,10 +237,6 @@ public class UserController {
     @GetMapping("users/{id}")
 
     public Object getUserById(@PathVariable("id") Long id) {
-
-        Object returnObject = null;
-
-
         ReturnObject<VoObject> user = userService.findUserById(id);   //返回对象 创建vo对象 id获取用户信息
 
         ResponseCode code = user.getCode();

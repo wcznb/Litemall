@@ -194,7 +194,6 @@ public class UserService {
     }
 
     public ReturnObject<PageInfo<VoObject>> getallusers(String userName, String email,String mobile, Integer page, Integer pageSize){
-//        String userName, String email,String mobile, Integer page, Integer pageSize
         ReturnObject<PageInfo<VoObject>> ret = userDao.getUsersMix(userName, email, mobile, page, pageSize);
         return ret;
     }
