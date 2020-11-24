@@ -114,6 +114,10 @@ public class Customer implements VoObject {
         if (null != po.getState()) {
             this.state = State.getTypeByCode(po.getState().intValue());
         }
+
+        this.gmt_created = po.getGmtCreated();
+
+        this.gmt_modified = po.getGmtModified();
     }
 
 }

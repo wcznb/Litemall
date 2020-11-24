@@ -9,6 +9,7 @@ import cn.edu.xmu.user.dao.NewUserDao;
 import cn.edu.xmu.user.dao.UserDao;
 import cn.edu.xmu.user.model.bo.Customer;
 import cn.edu.xmu.user.model.po.CustomerPo;
+import cn.edu.xmu.user.model.vo.CustomerRetVo;
 import cn.edu.xmu.user.model.vo.CustomerSetVo;
 import cn.edu.xmu.user.model.vo.NewUserVo;
 import com.github.pagehelper.PageInfo;
@@ -224,18 +225,12 @@ public class UserService {
         return new ReturnObject<>(true);
     }
 
+    @Transactional
     public ReturnObject <Object> getCustomer( Long id) {
-        CustomerPo customerPo = new CustomerPo();
-        customerPo.setId(id);
         ReturnObject<Object> retObj = userDao.getCustomerById(id);
-        ReturnObject<Object> retCustomer;
-        if (retObj.getCode().equals(ResponseCode.OK)) {
-            retCustomer = new ReturnObject<>(retObj.getData());
-        } else {
-            retCustomer = new ReturnObject<>(retObj.getCode(), retObj.getErrmsg());
-        }
-        return retCustomer;
+        return retObj;
     }
+
     public ReturnObject <Object> modifyCustomer( Long id, CustomerSetVo vo) {
         CustomerPo customerPo = new CustomerPo();
         customerPo.setId(id);
@@ -258,24 +253,9 @@ public class UserService {
      * @param id
      * @return 用户
      */
-    public ReturnObject<VoObject> findUserById(Long id) {
-        ReturnObject<VoObject> returnObject = null;
-
-
-        CustomerPo customerPo = userDao.findUserById(id);
-
-
-
-        if( customerPo!= null) {
-            logger.debug("findUserById : " + returnObject);
-
-            returnObject = new ReturnObject<>(new Customer(customerPo));
-
-        } else {
-            logger.debug("findUserById: Not Found");
-            returnObject = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);//返回错误码 RESOURCE_ID_NOTEXIST(504,"操作的资源id不存在"),
-
-        }
+    @Transactional
+    public ReturnObject<Object> findUserById(Long id) {
+        ReturnObject<Object> returnObject = userDao.getCustomerById(id);
         return returnObject;
     }
 

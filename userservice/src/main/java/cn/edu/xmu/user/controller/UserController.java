@@ -237,22 +237,13 @@ public class UserController {
     @GetMapping("users/{id}")
 
     public Object getUserById(@PathVariable("id") Long id) {
-        ReturnObject<VoObject> user = userService.findUserById(id);   //返回对象 创建vo对象 id获取用户信息
-
-        ResponseCode code = user.getCode();
-
-        logger.debug("findUserById: user = " + user.getData() + " code = " + user.getCode());
-
-        switch (code){
-            case RESOURCE_ID_NOTEXIST:
-                httpServletResponse.setStatus(HttpStatus.NOT_FOUND.value());
-                return ResponseUtil.fail(user.getCode(), user.getErrmsg());
-            case OK:
-                CustomerRetVo customerRetVo = (CustomerRetVo)user.getData().createSimpleVo();
-                return ResponseUtil.ok(customerRetVo);
-            default:
-                return ResponseUtil.fail(code);
+        ReturnObject<Object> success = userService.findUserById(id);
+        if (success.getData() == null)  {
+            return ResponseUtil.fail(success.getCode(), success.getErrmsg());
+        }else {
+            return Common.decorateReturnObject(success);
         }
+
     }
 
 }
