@@ -92,7 +92,9 @@ public class UserDao {
             Customer customer = new Customer(po);
             ret.add(customer);
         }
+
         PageInfo<VoObject> rolePage = PageInfo.of(ret);
+
         return new ReturnObject<>(rolePage);
     }
 
@@ -132,5 +134,28 @@ public class UserDao {
         }
         Customer customer = new Customer(customerPo);
         return new ReturnObject<>(customer);
+    }
+
+    /**
+     * ID获取用户信息
+     * @author ww
+     * @param Id
+     * @return 用户
+     */
+    public CustomerPo findUserById(Long Id) {
+
+        //mybatis的逆向工程中会生成实例及实例对应的example，example用于添加条件，相当where后面的部分
+        //    xxxExample example = new xxxExample();
+        //    Criteria criteria = new Example().createCriteria();
+
+        CustomerPoExample example = new CustomerPoExample();
+        CustomerPoExample.Criteria criteria = example.createCriteria();
+        criteria.andIdEqualTo(Id);                               //    criteria.andXxxEqualTo(value)    添加xxx字段等于value条件
+
+        logger.debug("findUserById: Id =" + Id);
+
+        CustomerPo customerPo = customerPoMapper.selectByPrimaryKey(Id);//根据其主键查询，则可以用selectByPrimaryKey（）
+
+        return customerPo;
     }
 }

@@ -128,7 +128,7 @@
 
         注意，table里面很多参数都是对javaModelGenerator，context等元素的默认属性的一个复写；
         -->
-        <table tableName="other_address" domainObjectName="AddressPo"
+        <table tableName="address" domainObjectName="AddressPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false">
@@ -138,7 +138,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="other_region" domainObjectName="RegionPo"
+        <table tableName="region" domainObjectName="RegionPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false">

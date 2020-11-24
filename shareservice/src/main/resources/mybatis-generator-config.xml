@@ -129,7 +129,7 @@
         注意，table里面很多参数都是对javaModelGenerator，context等元素的默认属性的一个复写；
         -->
 
-        <table tableName="other_be_share" domainObjectName="BeSharePo"
+        <table tableName="be_share" domainObjectName="BeSharePo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -139,7 +139,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="other_share" domainObjectName="SharePo"
+        <table tableName="share" domainObjectName="SharePo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">
@@ -149,7 +149,7 @@
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
 
-        <table tableName="other_share_activity" domainObjectName="ShareActivityPo"
+        <table tableName="share_activity" domainObjectName="ShareActivityPo"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false">

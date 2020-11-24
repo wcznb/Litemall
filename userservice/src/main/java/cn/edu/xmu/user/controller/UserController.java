@@ -7,16 +7,17 @@ import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ResponseUtil;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.user.dao.UserDao;
 import cn.edu.xmu.user.model.bo.Customer;
-import cn.edu.xmu.user.model.vo.CustomerSetVo;
-import cn.edu.xmu.user.model.vo.LoginVo;
-import cn.edu.xmu.user.model.vo.NewUserVo;
-import cn.edu.xmu.user.model.vo.StateVo;
+import cn.edu.xmu.user.model.vo.*;
 import cn.edu.xmu.user.service.UserService;
 import cn.edu.xmu.user.util.IpUtil;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +37,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
     /**
      * 注册用户
      * @param vo:vo对象
@@ -136,6 +139,7 @@ public class UserController {
                               @RequestParam(value="mobile", required=false, defaultValue="") String mobile ,
                               @RequestParam(value="page", required=false, defaultValue="1") Integer page ,
                               @RequestParam(value="pageSize", required=false, defaultValue="20") Integer pageSize){
+
         ReturnObject<PageInfo<VoObject>> ret = userService.getallusers(userName, email, mobile, page, pageSize);
         return Common.getPageRetObject(ret);
     }
@@ -217,4 +221,38 @@ public class UserController {
             return Common.decorateReturnObject(success);
         }
     }
+
+    /**
+     * 查看任意用户信息
+     */
+    @ApiOperation(value="查看任意用户信息",produces="application/json")
+    @Audit
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "header",dataType = "String",name = "authorization",value = "用户token",required = true),
+            @ApiImplicitParam(paramType = "path",dataType = "Integer",name = "id",value = "用户id",required = true)
+    })
+    @ApiResponses({
+    })
+
+    @GetMapping("users/{id}")
+
+    public Object getUserById(@PathVariable("id") Long id) {
+        ReturnObject<VoObject> user = userService.findUserById(id);   //返回对象 创建vo对象 id获取用户信息
+
+        ResponseCode code = user.getCode();
+
+        logger.debug("findUserById: user = " + user.getData() + " code = " + user.getCode());
+
+        switch (code){
+            case RESOURCE_ID_NOTEXIST:
+                httpServletResponse.setStatus(HttpStatus.NOT_FOUND.value());
+                return ResponseUtil.fail(user.getCode(), user.getErrmsg());
+            case OK:
+                CustomerRetVo customerRetVo = (CustomerRetVo)user.getData().createSimpleVo();
+                return ResponseUtil.ok(customerRetVo);
+            default:
+                return ResponseUtil.fail(code);
+        }
+    }
+
 }

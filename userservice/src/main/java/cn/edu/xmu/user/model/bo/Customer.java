@@ -39,13 +39,15 @@ public class Customer implements VoObject {
 
     private Byte beDeleted;
 
+    private LocalDateTime gmt_created;
+
+    private LocalDateTime gmt_modified;
+
     @Override
     public Object createVo() { return new SimpleCustomerRetVo(this); }
 
     @Override
-    public Object createSimpleVo() {
-        return null;
-    }
+    public Object createSimpleVo() { return new CustomerRetVo(this); }
 
     /**
      * 后台用户状态
@@ -94,6 +96,7 @@ public class Customer implements VoObject {
         this.id = po.getId();
         this.userName = po.getUserName();
         this.password =po.getPassword();
+
         this.mobile = AES.decrypt(po.getMobile(),AESPASS);
 
         this.email = AES.decrypt(po.getEmail(),AESPASS);
