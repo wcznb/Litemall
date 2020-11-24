@@ -42,7 +42,7 @@ public class ControllerTest1 {
         vo.setRealName("wcwc");
         Byte a=1;
         vo.setGender(a);
-        vo.setBirthday("2017-09-28 08:34:12");
+        vo.setBirthday("2017-09-28");
 
 
 
