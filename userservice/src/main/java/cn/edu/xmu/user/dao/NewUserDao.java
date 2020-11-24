@@ -24,6 +24,7 @@ import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -109,8 +110,6 @@ public class NewUserDao implements InitializingBean {
      * @return ReturnObject
      */
     public ReturnObject createNewUserByVo(NewUserVo vo){
-        //logger.debug(String.valueOf(bloomFilter.includeByBloomFilter("mobileBloomFilter","FAED5EEF1C8562B02110BCA3F9165CBE")));
-        //by default,email/mobile are both needed
         CustomerPo customerPo=new CustomerPo();
         ReturnObject returnObject;
         customerPo.setEmail(AES.encrypt(vo.getEmail(), Customer.AESPASS));
@@ -138,10 +137,15 @@ public class NewUserDao implements InitializingBean {
 
         customerPo.setPassword(AES.encrypt(vo.getPassword(), Customer.AESPASS));
         customerPo.setRealName(AES.encrypt(vo.getRealName(), Customer.AESPASS));
+        customerPo.setPoint(0);
         customerPo.setGender(vo.getGender());
+        LocalDateTime localDateTime = LocalDateTime.now();
+        customerPo.setGmtCreated(localDateTime);
+        customerPo.setGmtModified(localDateTime);
 
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime birthday = LocalDateTime.parse(vo.getBirthday(), df);
+
+        LocalDate localDate = LocalDate.parse(vo.getBirthday(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDateTime birthday = localDate.atStartOfDay();
         customerPo.setBirthday(birthday);
         Byte a = 1;
         customerPo.setState(a);

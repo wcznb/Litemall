@@ -8,6 +8,9 @@ import cn.edu.xmu.ooad.util.encript.AES;
 import cn.edu.xmu.user.dao.NewUserDao;
 import cn.edu.xmu.user.dao.UserDao;
 import cn.edu.xmu.user.model.bo.Customer;
+import cn.edu.xmu.user.model.po.CustomerPo;
+import cn.edu.xmu.user.model.vo.CustomerRetVo;
+import cn.edu.xmu.user.model.vo.CustomerSetVo;
 import cn.edu.xmu.user.model.vo.NewUserVo;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
@@ -183,18 +186,77 @@ public class UserService {
      */
     public ReturnObject<Boolean> Logout(Long userId)
     {
-//        Set<String> keys = redisTemplate.keys("*");
-//        for(String z:keys){
-//            System.out.println("userId: "+z);
-//        }//测试使用
         redisTemplate.delete("up_" + userId);
         return new ReturnObject<>(true);
     }
 
     public ReturnObject<PageInfo<VoObject>> getallusers(String userName, String email,String mobile, Integer page, Integer pageSize){
-//        String userName, String email,String mobile, Integer page, Integer pageSize
         ReturnObject<PageInfo<VoObject>> ret = userDao.getUsersMix(userName, email, mobile, page, pageSize);
         return ret;
+    }
+
+    /**
+     * 平台管理员封禁买家
+     * @param userId 用户id
+     */
+    public ReturnObject<Boolean> BanCustomer(Long userId){
+        CustomerPo customerPo = new CustomerPo();
+        customerPo.setId(userId);
+        customerPo.setState(Customer.State.FORBID.getCode().byteValue());//设置状态为封禁
+        ReturnObject retObj = userDao.modifyCustomerByPo(customerPo);
+        if (retObj.getCode() != ResponseCode.OK){
+            return retObj;
+        }
+        return new ReturnObject<>(true);
+    }
+
+    /**
+     * 平台管理员解禁买家
+     * @param userId 用户id
+     */
+    public ReturnObject<Boolean> ReleaseCustomer(Long userId){
+        CustomerPo customerPo = new CustomerPo();
+        customerPo.setId(userId);
+        customerPo.setState(Customer.State.NORM.getCode().byteValue());//设置状态为正常
+        ReturnObject retObj = userDao.modifyCustomerByPo(customerPo);
+        if (retObj.getCode() != ResponseCode.OK){
+            return retObj;
+        }
+        return new ReturnObject<>(true);
+    }
+
+    @Transactional
+    public ReturnObject <Object> getCustomer( Long id) {
+        ReturnObject<Object> retObj = userDao.getCustomerById(id);
+        return retObj;
+    }
+
+    public ReturnObject <Object> modifyCustomer( Long id, CustomerSetVo vo) {
+        CustomerPo customerPo = new CustomerPo();
+        customerPo.setId(id);
+        customerPo.setBirthday(vo.getBirthday());
+        customerPo.setGender(vo.getGender());
+        customerPo.setRealName(vo.getRealName());
+
+        ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
+        ReturnObject<Object> retCustomer;
+        if (retObj.getCode().equals(ResponseCode.OK)) {
+            retCustomer = new ReturnObject<>(retObj.getData());
+        } else {
+            retCustomer = new ReturnObject<>(retObj.getCode(), retObj.getErrmsg());
+        }
+        return retCustomer;
+    }
+
+    /**
+     * ID获取用户信息
+     * @param id
+     * @return 用户
+     */
+    @Transactional
+    public ReturnObject<Object> findUserById(Long id) {
+        ReturnObject<Object> returnObject = userDao.getCustomerById(id);
+        return returnObject;
     }
 
 

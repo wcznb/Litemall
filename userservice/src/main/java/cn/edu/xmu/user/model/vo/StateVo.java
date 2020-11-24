@@ -13,5 +13,5 @@ public class StateVo {
         Code=Long.valueOf(state.getCode());
         name=state.getDescription();
     }
-    //测试修改，无用注释
+
 }
