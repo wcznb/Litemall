@@ -24,6 +24,7 @@ import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -142,8 +143,9 @@ public class NewUserDao implements InitializingBean {
         customerPo.setGmtCreated(localDateTime);
         customerPo.setGmtModified(localDateTime);
 
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime birthday = LocalDateTime.parse(vo.getBirthday(), df);
+
+        LocalDate localDate = LocalDate.parse(vo.getBirthday(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDateTime birthday = localDate.atStartOfDay();
         customerPo.setBirthday(birthday);
         Byte a = 1;
         customerPo.setState(a);
