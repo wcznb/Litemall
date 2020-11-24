@@ -39,6 +39,10 @@ public class Customer implements VoObject {
 
     private Byte beDeleted;
 
+    private LocalDateTime gmt_created;
+
+    private LocalDateTime gmt_modified;
+
     @Override
     public Object createVo() { return new SimpleCustomerRetVo(this); }
 

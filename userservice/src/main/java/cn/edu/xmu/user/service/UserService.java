@@ -185,10 +185,6 @@ public class UserService {
      */
     public ReturnObject<Boolean> Logout(Long userId)
     {
-//        Set<String> keys = redisTemplate.keys("*");
-//        for(String z:keys){
-//            System.out.println("userId: "+z);
-//        }//测试使用
         redisTemplate.delete("up_" + userId);
         return new ReturnObject<>(true);
     }

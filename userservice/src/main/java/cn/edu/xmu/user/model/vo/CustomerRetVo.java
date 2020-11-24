@@ -5,6 +5,8 @@ import cn.edu.xmu.user.model.bo.Customer;
 import cn.edu.xmu.user.model.po.CustomerPo;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class CustomerRetVo {
 
@@ -15,6 +17,9 @@ public class CustomerRetVo {
     String email;
     String gender;
     String birthday;
+    LocalDateTime gmt_created;
+    LocalDateTime gmt_modified;
+
 
     public CustomerRetVo(Customer customer){
 
@@ -25,6 +30,8 @@ public class CustomerRetVo {
         this.mobile = customer.getMobile();
         this.gender = customer.getGender().intValue()>0?"男":"女";
         this.birthday = customer.getBirthday().toString();
+        this.gmt_created = customer.getGmt_created();
+        this.gmt_modified = customer.getGmt_created();
 
     }
 
@@ -36,6 +43,8 @@ public class CustomerRetVo {
         this.mobile = AES.decrypt(customerPo.getMobile(), Customer.AESPASS);
         this.gender = customerPo.getGender().intValue()>0?"男":"女";
         this.birthday = customerPo.getBirthday().toString();
+        this.gmt_modified = customerPo.getGmtModified();
+        this.gmt_created = customerPo.getGmtCreated();
     }
 
 
