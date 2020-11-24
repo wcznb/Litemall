@@ -92,7 +92,9 @@ public class UserDao {
             Customer customer = new Customer(po);
             ret.add(customer);
         }
+
         PageInfo<VoObject> rolePage = PageInfo.of(ret);
+
         return new ReturnObject<>(rolePage);
     }
 
@@ -119,6 +121,19 @@ public class UserDao {
             logger.error("Internal error Happened:"+e.getMessage());
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
         }
+    }
+    /**
+     * 由用户id获得用户
+     * @param id
+     * @return
+     */
+    public ReturnObject<Object> getCustomerById(Long id) {
+        CustomerPo customerPo=customerPoMapper.selectByPrimaryKey(id);
+        if (customerPo == null) {
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        Customer customer = new Customer(customerPo);
+        return new ReturnObject<>(customer.createSimpleVo());
     }
 
 }

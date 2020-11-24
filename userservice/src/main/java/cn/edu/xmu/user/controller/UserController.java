@@ -7,15 +7,17 @@ import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ResponseUtil;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.user.dao.UserDao;
 import cn.edu.xmu.user.model.bo.Customer;
-import cn.edu.xmu.user.model.vo.LoginVo;
-import cn.edu.xmu.user.model.vo.NewUserVo;
-import cn.edu.xmu.user.model.vo.StateVo;
+import cn.edu.xmu.user.model.vo.*;
 import cn.edu.xmu.user.service.UserService;
 import cn.edu.xmu.user.util.IpUtil;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +37,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
     /**
      * 注册用户
      * @param vo:vo对象
@@ -135,6 +139,7 @@ public class UserController {
                               @RequestParam(value="mobile", required=false, defaultValue="") String mobile ,
                               @RequestParam(value="page", required=false, defaultValue="1") Integer page ,
                               @RequestParam(value="pageSize", required=false, defaultValue="20") Integer pageSize){
+
         ReturnObject<PageInfo<VoObject>> ret = userService.getallusers(userName, email, mobile, page, pageSize);
         return Common.getPageRetObject(ret);
     }
@@ -174,4 +179,71 @@ public class UserController {
             return ResponseUtil.ok();
         }
     }
+
+    /**
+     * 修改买家信息
+     *
+     * @author 24320182203284 单
+     * @param id 买家id
+     * @param vo 买家视图
+     * @return Object 买家返回视图
+     */
+    @ApiOperation(value = "修改买家信息", produces = "application/json")
+    @Audit
+    @PutMapping("/users")
+    public Object updateCustomer(@LoginUser Long id, @Validated @RequestBody CustomerSetVo vo) {
+        ReturnObject<Object> success = userService.modifyCustomer(id,vo);
+        //校验前端数据
+
+        if (success.getData() == null)  {
+            return ResponseUtil.fail(success.getCode(), success.getErrmsg());
+        }else {
+            return ResponseUtil.ok();
+        }
+    }
+    /**
+     * 查看买家信息
+     *
+     * @author 24320182203284 单
+     * @param id 买家id
+     * @return Object 买家返回视图
+     */
+    @ApiOperation(value = "查看买家信息", produces = "application/json")
+    @Audit
+    @GetMapping("/users")
+    public Object getCustomer(@LoginUser Long id) {
+        ReturnObject<Object> success = userService.getCustomer(id);
+        //校验前端数据
+
+        if (success.getData() == null)  {
+            return ResponseUtil.fail(success.getCode(), success.getErrmsg());
+        }else {
+            return Common.decorateReturnObject(success);
+        }
+    }
+
+    /**
+     * 查看任意用户信息
+     */
+    @ApiOperation(value="查看任意用户信息",produces="application/json")
+    @Audit
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "header",dataType = "String",name = "authorization",value = "用户token",required = true),
+            @ApiImplicitParam(paramType = "path",dataType = "Integer",name = "id",value = "用户id",required = true)
+    })
+    @ApiResponses({
+    })
+
+    @GetMapping("users/{id}")
+
+    public Object getUserById(@PathVariable("id") Long id) {
+        ReturnObject<Object> success = userService.findUserById(id);
+        if (success.getData() == null)  {
+            return ResponseUtil.fail(success.getCode(), success.getErrmsg());
+        }else {
+            return Common.decorateReturnObject(success);
+        }
+
+    }
+
 }

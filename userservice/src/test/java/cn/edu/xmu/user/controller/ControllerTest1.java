@@ -42,7 +42,7 @@ public class ControllerTest1 {
         vo.setRealName("wcwc");
         Byte a=1;
         vo.setGender(a);
-        vo.setBirthday("2017-09-28 08:34:12");
+        vo.setBirthday("2017-09-28");
 
 
 
@@ -62,7 +62,7 @@ public class ControllerTest1 {
     public void login1() throws Exception {
 
         LoginVo vo = new LoginVo();
-        vo.setUserName("wcwcwc9");
+        vo.setUserName("wcwcwc4");
         vo.setPassword("Ww123456789**");
 
         String requireJson = JacksonUtil.toJson(vo);
@@ -82,7 +82,7 @@ public class ControllerTest1 {
     public void logout() throws Exception {
         ResultActions res = null;
 
-        String authorization = this.login("wcwcwc","Ww123456789**");
+        String authorization = this.login("wcwcwc4","Ww123456789**");
 
         res = this.mvc.perform(get("/users/logout").header("authorization",authorization)
                 .contentType("application/json;charset=UTF-8"));
@@ -96,7 +96,7 @@ public class ControllerTest1 {
 
     @Test
     public void getAllUser() throws Exception{
-        String authorization = this.login("wcwcwc","Ww123456789**");
+        String authorization = this.login("wcwcwc4","Ww123456789**");
 
         ResultActions res = this.mvc.perform(get("/users/all?page=1&pageSize=20").header("authorization",authorization)
                 .contentType("application/json;charset=UTF-8"));
@@ -128,7 +128,7 @@ public class ControllerTest1 {
 
     @Test
     public void getAllState() throws Exception {
-        String token=login("wcwcwc9","Ww123456789**");
+        String token=login("wcwcwc4","Ww123456789**");
         String responseString=this.mvc.perform(get("/users/states").header("authorization", token))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -139,7 +139,7 @@ public class ControllerTest1 {
 
     @Test
     public void BanCustomer1() throws Exception{
-        String authorization = this.login("wcwcwc","Ww123456789**");
+        String authorization = this.login("wcwcwc4","Ww123456789**");
 
         ResultActions res = this.mvc.perform(put("/users/1/ban")
                 .header("authorization",authorization)
@@ -154,7 +154,7 @@ public class ControllerTest1 {
     }
     @Test
     public void BanCustomer2() throws Exception{
-        String authorization = this.login("wcwcwc","Ww123456789**");
+        String authorization = this.login("wcwcwc4","Ww123456789**");
 
         ResultActions res = this.mvc.perform(put("/users/20/ban")
                 .header("authorization",authorization)
@@ -171,7 +171,7 @@ public class ControllerTest1 {
 
     @Test
     public void ReleaseCustomer1() throws Exception{
-        String authorization = this.login("wcwcwc","Ww123456789**");
+        String authorization = this.login("wcwcwc4","Ww123456789**");
 
         ResultActions res = this.mvc.perform(put("/users/1/release")
                 .header("authorization",authorization)
@@ -186,7 +186,7 @@ public class ControllerTest1 {
 
     @Test
     public void ReleaseCustomer2() throws Exception{
-        String authorization = this.login("wcwcwc","Ww123456789**");
+        String authorization = this.login("wcwcwc4","Ww123456789**");
 
         ResultActions res = this.mvc.perform(put("/users/20/release")
                 .header("authorization",authorization)
@@ -197,5 +197,32 @@ public class ControllerTest1 {
                 .andReturn().getResponse().getContentAsString();
 
         System.out.println("ReleaseCustomer2: "+responseString);
+    }
+
+//notok
+    @Test
+    public void getUserById1() throws Exception{
+
+        String token = this.login("wcwcwc4","Ww123456789**");
+        String res = this.mvc.perform(get("/users/111").header("authorization",token))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+
+        System.out.println(res);
+    }
+
+
+
+    //ok
+    @Test
+    public void getUserById2() throws  Exception{
+        String token = this.login("wcwcwc4","Ww123456789**");
+        String res = this.mvc.perform(get("/users/2").header("authorization",token))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andReturn().getResponse().getContentAsString();
+
+        System.out.println(res);
     }
 }
