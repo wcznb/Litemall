@@ -1,9 +1,6 @@
 package cn.edu.xmu.user.model.bo;
 
 import cn.edu.xmu.ooad.model.VoObject;
-import cn.edu.xmu.ooad.util.Common;
-import cn.edu.xmu.ooad.util.encript.AES;
-import cn.edu.xmu.ooad.util.encript.SHA256;
 import cn.edu.xmu.user.model.po.CustomerPo;
 import cn.edu.xmu.user.model.vo.CustomerRetVo;
 import cn.edu.xmu.user.model.vo.SimpleCustomerRetVo;
@@ -15,8 +12,6 @@ import java.util.Map;
 
 @Data
 public class Customer implements VoObject {
-    public static String AESPASS = "OOAD2020-11-01";
-
     private Long id;
 
     private String userName;
@@ -35,11 +30,11 @@ public class Customer implements VoObject {
 
     private Integer point;
 
-    private State state = State.NEW;
+    private State state;
 
     private Byte beDeleted;
 
-    private LocalDateTime gmt_created;
+    private LocalDateTime gmt_create;
 
     private LocalDateTime gmt_modified;
 
@@ -47,16 +42,27 @@ public class Customer implements VoObject {
     public Object createVo() { return new SimpleCustomerRetVo(this); }
 
     @Override
-    public Object createSimpleVo() { return new CustomerRetVo(this); }
+    public Object createSimpleVo() {
+        CustomerRetVo customerRetVo = new CustomerRetVo();
+
+        customerRetVo.setId(this.id);
+        customerRetVo.setUserName(this.userName);
+        customerRetVo.setRealName(this.realname);
+        customerRetVo.setEmail(this.email);
+        customerRetVo.setMobile(this.mobile);
+        customerRetVo.setGender(this.gender.intValue()>0?"男":"女");
+        customerRetVo.setBirthday(this.birthday.toString());
+
+        return customerRetVo;
+    }
 
     /**
      * 后台用户状态
      */
     public enum State {
-        NEW(0, "空状态"),
-        NORM(1, "正常"),
-        FORBID(2, "封禁"),
-        DELETE(3, "废弃");
+        BACKGROUND(0, "后台用户"),
+        NORM(4, "正常用户"),
+        FORBID(6, "被封禁用户");
 
         private static final Map<Integer, Customer.State> stateMap;
 
@@ -97,11 +103,11 @@ public class Customer implements VoObject {
         this.userName = po.getUserName();
         this.password =po.getPassword();
 
-        this.mobile = AES.decrypt(po.getMobile(),AESPASS);
+        this.mobile = po.getMobile();
 
-        this.email = AES.decrypt(po.getEmail(),AESPASS);
+        this.email = po.getEmail();
 
-        this.realname = AES.decrypt(po.getRealName(), AESPASS);
+        this.realname = po.getRealName();
 
         this.gender = po.getGender();
 
@@ -115,7 +121,7 @@ public class Customer implements VoObject {
             this.state = State.getTypeByCode(po.getState().intValue());
         }
 
-        this.gmt_created = po.getGmtCreated();
+        this.gmt_create = po.getGmtCreate();
 
         this.gmt_modified = po.getGmtModified();
     }

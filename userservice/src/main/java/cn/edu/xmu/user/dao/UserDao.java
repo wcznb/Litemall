@@ -3,17 +3,14 @@ package cn.edu.xmu.user.dao;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.edu.xmu.ooad.util.encript.AES;
 import cn.edu.xmu.user.mapper.CustomerPoMapper;
 import cn.edu.xmu.user.model.bo.Customer;
 import cn.edu.xmu.user.model.po.CustomerPoExample;
-import cn.edu.xmu.user.model.vo.NewUserVo;
 import cn.edu.xmu.user.model.po.CustomerPo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -54,6 +51,27 @@ public class UserDao {
             Customer user = new Customer(users.get(0));
             return new ReturnObject<>(user);
         }
+    }
+
+    /**
+     * ID获取用户信息
+     * @author ww
+     * @param Id
+     * @return 用户
+     */
+    public CustomerPo findUserById(Long Id) {
+
+        //mybatis的逆向工程中会生成实例及实例对应的example，example用于添加条件，相当where后面的部分
+        //    xxxExample example = new xxxExample();
+        //    Criteria criteria = new Example().createCriteria();
+
+        CustomerPoExample example = new CustomerPoExample();
+        CustomerPoExample.Criteria criteria = example.createCriteria();
+        criteria.andIdEqualTo(Id);                               //    criteria.andXxxEqualTo(value)    添加xxx字段等于value条件
+
+        logger.debug("findUserById: Id =" + Id);
+        CustomerPo customerPo = customerPoMapper.selectByPrimaryKey(Id);//根据其主键查询，则可以用selectByPrimaryKey（）
+        return customerPo;
     }
 
     /**
@@ -105,22 +123,30 @@ public class UserDao {
      * @return
      */
     public ReturnObject<Object> modifyCustomerByPo(CustomerPo customerPo){
+        ReturnObject<Object> retObj = null;
         try{
             int ret = customerPoMapper.updateByPrimaryKeySelective(customerPo);
             Long id = customerPo.getId();
             //检查更新是否成功
             if(ret == 0){
                 logger.info("买家不存在或已被删除：id = " + id);
-                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+                retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
             } else {
                 logger.info("买家 id = " + id + " 的资料已更新");
-                return new ReturnObject<>();
+                retObj = new ReturnObject<>();
             }
         }
-        catch (Exception e){
-            logger.error("Internal error Happened:"+e.getMessage());
-            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
+        catch (DataAccessException e){
+            //数据库错误
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR,
+                    String.format("数据库错误：%s", e.getMessage()));
         }
+        catch (Exception e) {
+            // 属未知错误
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR,
+                    String.format("发生了严重的未知错误：%s", e.getMessage()));
+        }
+        return retObj;
     }
     /**
      * 由用户id获得用户

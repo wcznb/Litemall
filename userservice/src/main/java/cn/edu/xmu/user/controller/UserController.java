@@ -60,7 +60,7 @@ public class UserController {
         if(result.hasErrors()){
             return Common.processFieldErrors(result,httpServletResponse);
         }
-        ReturnObject returnObject=userService.register(vo);
+        ReturnObject returnObject= userService.register(vo);
         if(returnObject.getCode()== ResponseCode.OK){
             return ResponseUtil.ok(returnObject.getData());
         }
@@ -148,36 +148,28 @@ public class UserController {
      * 平台管理员封禁买家
      * @param id
      * @return
-     * @author 24320182203181
+     * @author 24320182203181 陈渝璇
      */
     @ApiOperation(value = "封禁买家")
     @Audit
     @PutMapping("users/{id}/ban")
-    public Object BanCustomer(@PathVariable Long id){
-        ReturnObject<Boolean> success = userService.BanCustomer(id);
-        if (success.getData() == null)  {
-            return ResponseUtil.fail(success.getCode(), success.getErrmsg());
-        }else {
-            return ResponseUtil.ok();
-        }
+    public Object banCustomer(@PathVariable Long id){
+        ReturnObject<Object> ret = userService.banCustomer(id);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
      * 平台管理员解禁买家
      * @param id
      * @return
-     * @author 24320182203181
+     * @author 24320182203181 陈渝璇
      */
     @ApiOperation(value = "解禁买家")
     @Audit
     @PutMapping("users/{id}/release")
-    public Object ReleaseCustomer(@PathVariable Long id){
-        ReturnObject<Boolean> success = userService.ReleaseCustomer(id);
-        if (success.getData() == null)  {
-            return ResponseUtil.fail(success.getCode(), success.getErrmsg());
-        }else {
-            return ResponseUtil.ok();
-        }
+    public Object releaseCustomer(@PathVariable Long id){
+        ReturnObject<Object> ret = userService.releaseCustomer(id);
+        return Common.decorateReturnObject(ret);
     }
 
     /**
@@ -235,15 +227,23 @@ public class UserController {
     })
 
     @GetMapping("users/{id}")
-
     public Object getUserById(@PathVariable("id") Long id) {
-        ReturnObject<Object> success = userService.findUserById(id);
-        if (success.getData() == null)  {
-            return ResponseUtil.fail(success.getCode(), success.getErrmsg());
-        }else {
-            return Common.decorateReturnObject(success);
-        }
+        ReturnObject<VoObject> user = userService.findUserById(id);   //返回对象 创建vo对象 id获取用户信息
 
+        ResponseCode code = user.getCode();
+
+        logger.debug("findUserById: user = " + user.getData() + " code = " + user.getCode());
+
+        switch (code){
+            case RESOURCE_ID_NOTEXIST:
+                httpServletResponse.setStatus(HttpStatus.NOT_FOUND.value());
+                return ResponseUtil.fail(user.getCode(), user.getErrmsg());
+            case OK:
+                CustomerRetVo customerRetVo = (CustomerRetVo)user.getData().createSimpleVo();
+                return ResponseUtil.ok(customerRetVo);
+            default:
+                return ResponseUtil.fail(code);
+        }
     }
 
 }
