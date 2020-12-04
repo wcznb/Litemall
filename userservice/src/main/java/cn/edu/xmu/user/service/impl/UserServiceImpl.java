@@ -1,17 +1,16 @@
-package cn.edu.xmu.user.service;
+package cn.edu.xmu.user.service.impl;
 
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.JwtHelper;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
-import cn.edu.xmu.ooad.util.encript.AES;
 import cn.edu.xmu.user.dao.NewUserDao;
 import cn.edu.xmu.user.dao.UserDao;
 import cn.edu.xmu.user.model.bo.Customer;
 import cn.edu.xmu.user.model.po.CustomerPo;
-import cn.edu.xmu.user.model.vo.CustomerRetVo;
 import cn.edu.xmu.user.model.vo.CustomerSetVo;
 import cn.edu.xmu.user.model.vo.NewUserVo;
+import cn.edu.xmu.user.service.UserService;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +28,11 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class UserService {
+public class UserServiceImpl implements UserService {
     @Value("${userservice.login.jwtExpire}")
     private Integer jwtExpireTime;
 
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     @Value("${userservice.login.multiply}")
     private Boolean canMultiplyLogin;
 
@@ -57,12 +56,13 @@ public class UserService {
      * @return ReturnObject
      * @author LiangJi3229
      */
+    @Override
     @Transactional
     public ReturnObject register(NewUserVo vo) {
         return newUserDao.createNewUserByVo(vo);
     }
 
-
+    @Override
     @Transactional
     public ReturnObject<String> login(String userName, String password, String ipAddr)
     {
@@ -72,7 +72,6 @@ public class UserService {
         }
 
         Customer user = (Customer) retObj.getData();
-        password = AES.encrypt(password, Customer.AESPASS);
         if(user == null || !password.equals(user.getPassword())){
             retObj = new ReturnObject<>(ResponseCode.AUTH_INVALID_ACCOUNT);
             return retObj;
@@ -118,7 +117,8 @@ public class UserService {
      * 禁止持有特定令牌的用户登录
      * @param jwt JWT令牌
      */
-    private void banJwt(String jwt){
+    @Override
+    public void banJwt(String jwt){
         String[] banSetName = {"BanJwt_0", "BanJwt_1"};
         long bannIndex = 0;
         if (!redisTemplate.hasKey("banIndex")){
@@ -184,13 +184,15 @@ public class UserService {
      * 用户登出
      * @param userId 用户id
      */
-    public ReturnObject<Boolean> Logout(Long userId)
+    @Override
+    public ReturnObject Logout(Long userId)
     {
         redisTemplate.delete("up_" + userId);
         return new ReturnObject<>(true);
     }
 
-    public ReturnObject<PageInfo<VoObject>> getallusers(String userName, String email,String mobile, Integer page, Integer pageSize){
+    @Override
+    public ReturnObject<PageInfo<VoObject>> getallusers(String userName, String email, String mobile, Integer page, Integer pageSize){
         ReturnObject<PageInfo<VoObject>> ret = userDao.getUsersMix(userName, email, mobile, page, pageSize);
         return ret;
     }
@@ -199,11 +201,13 @@ public class UserService {
      * 平台管理员封禁买家
      * @param userId 用户id
      */
-    public ReturnObject<Boolean> BanCustomer(Long userId){
+    @Override
+    @Transactional
+    public ReturnObject<Object> banCustomer(Long userId){
         CustomerPo customerPo = new CustomerPo();
         customerPo.setId(userId);
         customerPo.setState(Customer.State.FORBID.getCode().byteValue());//设置状态为封禁
-        ReturnObject retObj = userDao.modifyCustomerByPo(customerPo);
+        ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
         if (retObj.getCode() != ResponseCode.OK){
             return retObj;
         }
@@ -214,24 +218,28 @@ public class UserService {
      * 平台管理员解禁买家
      * @param userId 用户id
      */
-    public ReturnObject<Boolean> ReleaseCustomer(Long userId){
+    @Override
+    @Transactional
+    public ReturnObject<Object> releaseCustomer(Long userId){
         CustomerPo customerPo = new CustomerPo();
         customerPo.setId(userId);
         customerPo.setState(Customer.State.NORM.getCode().byteValue());//设置状态为正常
-        ReturnObject retObj = userDao.modifyCustomerByPo(customerPo);
+        ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
         if (retObj.getCode() != ResponseCode.OK){
             return retObj;
         }
-        return new ReturnObject<>(true);
+        return new ReturnObject<>();
     }
 
+    @Override
     @Transactional
-    public ReturnObject <Object> getCustomer( Long id) {
+    public ReturnObject<Object> getCustomer(Long id) {
         ReturnObject<Object> retObj = userDao.getCustomerById(id);
         return retObj;
     }
 
-    public ReturnObject <Object> modifyCustomer( Long id, CustomerSetVo vo) {
+    @Override
+    public ReturnObject<Object> modifyCustomer(Long id, CustomerSetVo vo) {
         CustomerPo customerPo = new CustomerPo();
         customerPo.setId(id);
         customerPo.setBirthday(vo.getBirthday());
@@ -253,11 +261,17 @@ public class UserService {
      * @param id
      * @return 用户
      */
-    @Transactional
-    public ReturnObject<Object> findUserById(Long id) {
-        ReturnObject<Object> returnObject = userDao.getCustomerById(id);
+    public ReturnObject<VoObject> findUserById(Long id) {
+        ReturnObject<VoObject> returnObject = null;
+        CustomerPo customerPo = userDao.findUserById(id);
+
+        if( customerPo!= null) {
+            logger.debug("findUserById : " + returnObject);
+            returnObject = new ReturnObject<>(new Customer(customerPo));
+        } else {
+            logger.debug("findUserById: Not Found");
+            returnObject = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);//返回错误码 RESOURCE_ID_NOTEXIST(504,"操作的资源id不存在"),
+        }
         return returnObject;
     }
-
-
 }

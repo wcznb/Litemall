@@ -4,10 +4,12 @@ import cn.edu.xmu.ooad.util.encript.AES;
 import cn.edu.xmu.user.model.bo.Customer;
 import cn.edu.xmu.user.model.po.CustomerPo;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 public class CustomerRetVo {
 
     Long id;
@@ -17,7 +19,7 @@ public class CustomerRetVo {
     String email;
     String gender;
     String birthday;
-    LocalDateTime gmt_created;
+    LocalDateTime gmt_create;
     LocalDateTime gmt_modified;
 
 
@@ -30,21 +32,21 @@ public class CustomerRetVo {
         this.mobile = customer.getMobile();
         this.gender = customer.getGender().intValue()>0?"男":"女";
         this.birthday = customer.getBirthday().toString();
-        this.gmt_created = customer.getGmt_created();
-        this.gmt_modified = customer.getGmt_created();
+        this.gmt_create = customer.getGmt_create();
+        this.gmt_modified = customer.getGmt_modified();
 
     }
 
     public CustomerRetVo(CustomerPo customerPo){
         this.id = customerPo.getId();
         this.userName = customerPo.getUserName();
-        this.realName = AES.decrypt(customerPo.getRealName(), Customer.AESPASS);
-        this.email = AES.decrypt(customerPo.getEmail(), Customer.AESPASS);
-        this.mobile = AES.decrypt(customerPo.getMobile(), Customer.AESPASS);
+        this.realName = customerPo.getRealName();
+        this.email = customerPo.getEmail();
+        this.mobile = customerPo.getMobile();
         this.gender = customerPo.getGender().intValue()>0?"男":"女";
         this.birthday = customerPo.getBirthday().toString();
         this.gmt_modified = customerPo.getGmtModified();
-        this.gmt_created = customerPo.getGmtCreated();
+        this.gmt_create = customerPo.getGmtCreate();
     }
 
 

@@ -4,11 +4,11 @@ import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.ooad.util.bloom.BloomFilterHelper;
 import cn.edu.xmu.ooad.util.bloom.RedisBloomFilter;
-import cn.edu.xmu.ooad.util.encript.AES;
 import cn.edu.xmu.user.mapper.CustomerPoMapper;
 import cn.edu.xmu.user.model.bo.Customer;
 import cn.edu.xmu.user.model.po.CustomerPo;
 import cn.edu.xmu.user.model.po.CustomerPoExample;
+import cn.edu.xmu.user.model.vo.CustomerSetVo;
 import cn.edu.xmu.user.model.vo.NewUserVo;
 import cn.edu.xmu.user.model.vo.CustomerRetVo;
 
@@ -112,8 +112,8 @@ public class NewUserDao implements InitializingBean {
     public ReturnObject createNewUserByVo(NewUserVo vo){
         CustomerPo customerPo=new CustomerPo();
         ReturnObject returnObject;
-        customerPo.setEmail(AES.encrypt(vo.getEmail(), Customer.AESPASS));
-        customerPo.setMobile(AES.encrypt(vo.getMobile(),Customer.AESPASS));
+        customerPo.setEmail(vo.getEmail());
+        customerPo.setMobile(vo.getMobile());
         customerPo.setUserName(vo.getUserName());
         returnObject=checkBloomFilter(customerPo);
         if(returnObject!=null){
@@ -135,20 +135,19 @@ public class NewUserDao implements InitializingBean {
         }
 
 
-        customerPo.setPassword(AES.encrypt(vo.getPassword(), Customer.AESPASS));
-        customerPo.setRealName(AES.encrypt(vo.getRealName(), Customer.AESPASS));
+        customerPo.setPassword(vo.getPassword());
+        customerPo.setRealName(vo.getRealName());
         customerPo.setPoint(0);
         customerPo.setGender(vo.getGender());
         LocalDateTime localDateTime = LocalDateTime.now();
-        customerPo.setGmtCreated(localDateTime);
+        customerPo.setGmtCreate(localDateTime);
         customerPo.setGmtModified(localDateTime);
 
 
         LocalDate localDate = LocalDate.parse(vo.getBirthday(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDateTime birthday = localDate.atStartOfDay();
         customerPo.setBirthday(birthday);
-        Byte a = 1;
-        customerPo.setState(a);
+        customerPo.setState(Customer.State.NORM.getCode().byteValue());
 
         try{
             int ret = customerPoMapper.insert(customerPo);
