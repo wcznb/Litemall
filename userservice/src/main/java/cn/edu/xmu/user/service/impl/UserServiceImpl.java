@@ -207,6 +207,7 @@ public class UserServiceImpl implements UserService {
         CustomerPo customerPo = new CustomerPo();
         customerPo.setId(userId);
         customerPo.setState(Customer.State.FORBID.getCode().byteValue());//设置状态为封禁
+        customerPo.setGmtModified(LocalDateTime.now());
         ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
         if (retObj.getCode() != ResponseCode.OK){
             return retObj;
@@ -224,6 +225,7 @@ public class UserServiceImpl implements UserService {
         CustomerPo customerPo = new CustomerPo();
         customerPo.setId(userId);
         customerPo.setState(Customer.State.NORM.getCode().byteValue());//设置状态为正常
+        customerPo.setGmtModified(LocalDateTime.now());
         ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
         if (retObj.getCode() != ResponseCode.OK){
             return retObj;
