@@ -12,8 +12,5 @@ public class AddressDaoTest {
     @Autowired
     AddressDao addressDao;
 
-    @Test
-    public void test1(){
-        addressDao.test();
-    }
+
 }

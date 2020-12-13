@@ -1,5 +1,6 @@
 package cn.edu.xmu.advertisement.model.po;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -655,52 +656,52 @@ public class AdvertisementPoExample {
             return (Criteria) this;
         }
 
-        public Criteria andBeginDateEqualTo(LocalDateTime value) {
+        public Criteria andBeginDateEqualTo(LocalDate value) {
             addCriterion("begin_date =", value, "beginDate");
             return (Criteria) this;
         }
 
-        public Criteria andBeginDateNotEqualTo(LocalDateTime value) {
+        public Criteria andBeginDateNotEqualTo(LocalDate value) {
             addCriterion("begin_date <>", value, "beginDate");
             return (Criteria) this;
         }
 
-        public Criteria andBeginDateGreaterThan(LocalDateTime value) {
+        public Criteria andBeginDateGreaterThan(LocalDate value) {
             addCriterion("begin_date >", value, "beginDate");
             return (Criteria) this;
         }
 
-        public Criteria andBeginDateGreaterThanOrEqualTo(LocalDateTime value) {
+        public Criteria andBeginDateGreaterThanOrEqualTo(LocalDate value) {
             addCriterion("begin_date >=", value, "beginDate");
             return (Criteria) this;
         }
 
-        public Criteria andBeginDateLessThan(LocalDateTime value) {
+        public Criteria andBeginDateLessThan(LocalDate value) {
             addCriterion("begin_date <", value, "beginDate");
             return (Criteria) this;
         }
 
-        public Criteria andBeginDateLessThanOrEqualTo(LocalDateTime value) {
+        public Criteria andBeginDateLessThanOrEqualTo(LocalDate value) {
             addCriterion("begin_date <=", value, "beginDate");
             return (Criteria) this;
         }
 
-        public Criteria andBeginDateIn(List<LocalDateTime> values) {
+        public Criteria andBeginDateIn(List<LocalDate> values) {
             addCriterion("begin_date in", values, "beginDate");
             return (Criteria) this;
         }
 
-        public Criteria andBeginDateNotIn(List<LocalDateTime> values) {
+        public Criteria andBeginDateNotIn(List<LocalDate> values) {
             addCriterion("begin_date not in", values, "beginDate");
             return (Criteria) this;
         }
 
-        public Criteria andBeginDateBetween(LocalDateTime value1, LocalDateTime value2) {
+        public Criteria andBeginDateBetween(LocalDate value1, LocalDate value2) {
             addCriterion("begin_date between", value1, value2, "beginDate");
             return (Criteria) this;
         }
 
-        public Criteria andBeginDateNotBetween(LocalDateTime value1, LocalDateTime value2) {
+        public Criteria andBeginDateNotBetween(LocalDate value1, LocalDate value2) {
             addCriterion("begin_date not between", value1, value2, "beginDate");
             return (Criteria) this;
         }
@@ -715,113 +716,113 @@ public class AdvertisementPoExample {
             return (Criteria) this;
         }
 
-        public Criteria andEndDateEqualTo(LocalDateTime value) {
+        public Criteria andEndDateEqualTo(LocalDate value) {
             addCriterion("end_date =", value, "endDate");
             return (Criteria) this;
         }
 
-        public Criteria andEndDateNotEqualTo(LocalDateTime value) {
+        public Criteria andEndDateNotEqualTo(LocalDate value) {
             addCriterion("end_date <>", value, "endDate");
             return (Criteria) this;
         }
 
-        public Criteria andEndDateGreaterThan(LocalDateTime value) {
+        public Criteria andEndDateGreaterThan(LocalDate value) {
             addCriterion("end_date >", value, "endDate");
             return (Criteria) this;
         }
 
-        public Criteria andEndDateGreaterThanOrEqualTo(LocalDateTime value) {
+        public Criteria andEndDateGreaterThanOrEqualTo(LocalDate value) {
             addCriterion("end_date >=", value, "endDate");
             return (Criteria) this;
         }
 
-        public Criteria andEndDateLessThan(LocalDateTime value) {
+        public Criteria andEndDateLessThan(LocalDate value) {
             addCriterion("end_date <", value, "endDate");
             return (Criteria) this;
         }
 
-        public Criteria andEndDateLessThanOrEqualTo(LocalDateTime value) {
+        public Criteria andEndDateLessThanOrEqualTo(LocalDate value) {
             addCriterion("end_date <=", value, "endDate");
             return (Criteria) this;
         }
 
-        public Criteria andEndDateIn(List<LocalDateTime> values) {
+        public Criteria andEndDateIn(List<LocalDate> values) {
             addCriterion("end_date in", values, "endDate");
             return (Criteria) this;
         }
 
-        public Criteria andEndDateNotIn(List<LocalDateTime> values) {
+        public Criteria andEndDateNotIn(List<LocalDate> values) {
             addCriterion("end_date not in", values, "endDate");
             return (Criteria) this;
         }
 
-        public Criteria andEndDateBetween(LocalDateTime value1, LocalDateTime value2) {
+        public Criteria andEndDateBetween(LocalDate value1, LocalDate value2) {
             addCriterion("end_date between", value1, value2, "endDate");
             return (Criteria) this;
         }
 
-        public Criteria andEndDateNotBetween(LocalDateTime value1, LocalDateTime value2) {
+        public Criteria andEndDateNotBetween(LocalDate value1, LocalDate value2) {
             addCriterion("end_date not between", value1, value2, "endDate");
             return (Criteria) this;
         }
 
-        public Criteria andRepeatIsNull() {
-            addCriterion("repeat is null");
+        public Criteria andRepeatsIsNull() {
+            addCriterion("repeats is null");
             return (Criteria) this;
         }
 
-        public Criteria andRepeatIsNotNull() {
-            addCriterion("repeat is not null");
+        public Criteria andRepeatsIsNotNull() {
+            addCriterion("repeats is not null");
             return (Criteria) this;
         }
 
-        public Criteria andRepeatEqualTo(Byte value) {
-            addCriterion("repeat =", value, "repeat");
+        public Criteria andRepeatsEqualTo(Byte value) {
+            addCriterion("repeats =", value, "repeats");
             return (Criteria) this;
         }
 
-        public Criteria andRepeatNotEqualTo(Byte value) {
-            addCriterion("repeat <>", value, "repeat");
+        public Criteria andRepeatsNotEqualTo(Byte value) {
+            addCriterion("repeats <>", value, "repeats");
             return (Criteria) this;
         }
 
-        public Criteria andRepeatGreaterThan(Byte value) {
-            addCriterion("repeat >", value, "repeat");
+        public Criteria andRepeatsGreaterThan(Byte value) {
+            addCriterion("repeats >", value, "repeats");
             return (Criteria) this;
         }
 
-        public Criteria andRepeatGreaterThanOrEqualTo(Byte value) {
-            addCriterion("repeat >=", value, "repeat");
+        public Criteria andRepeatsGreaterThanOrEqualTo(Byte value) {
+            addCriterion("repeats >=", value, "repeats");
             return (Criteria) this;
         }
 
-        public Criteria andRepeatLessThan(Byte value) {
-            addCriterion("repeat <", value, "repeat");
+        public Criteria andRepeatsLessThan(Byte value) {
+            addCriterion("repeats <", value, "repeats");
             return (Criteria) this;
         }
 
-        public Criteria andRepeatLessThanOrEqualTo(Byte value) {
-            addCriterion("repeat <=", value, "repeat");
+        public Criteria andRepeatsLessThanOrEqualTo(Byte value) {
+            addCriterion("repeats <=", value, "repeats");
             return (Criteria) this;
         }
 
-        public Criteria andRepeatIn(List<Byte> values) {
-            addCriterion("repeat in", values, "repeat");
+        public Criteria andRepeatsIn(List<Byte> values) {
+            addCriterion("repeats in", values, "repeats");
             return (Criteria) this;
         }
 
-        public Criteria andRepeatNotIn(List<Byte> values) {
-            addCriterion("repeat not in", values, "repeat");
+        public Criteria andRepeatsNotIn(List<Byte> values) {
+            addCriterion("repeats not in", values, "repeats");
             return (Criteria) this;
         }
 
-        public Criteria andRepeatBetween(Byte value1, Byte value2) {
-            addCriterion("repeat between", value1, value2, "repeat");
+        public Criteria andRepeatsBetween(Byte value1, Byte value2) {
+            addCriterion("repeats between", value1, value2, "repeats");
             return (Criteria) this;
         }
 
-        public Criteria andRepeatNotBetween(Byte value1, Byte value2) {
-            addCriterion("repeat not between", value1, value2, "repeat");
+        public Criteria andRepeatsNotBetween(Byte value1, Byte value2) {
+            addCriterion("repeats not between", value1, value2, "repeats");
             return (Criteria) this;
         }
 
@@ -955,63 +956,63 @@ public class AdvertisementPoExample {
             return (Criteria) this;
         }
 
-        public Criteria andGmtCreatedIsNull() {
-            addCriterion("gmt_created is null");
+        public Criteria andGmtCreateIsNull() {
+            addCriterion("gmt_create is null");
             return (Criteria) this;
         }
 
-        public Criteria andGmtCreatedIsNotNull() {
-            addCriterion("gmt_created is not null");
+        public Criteria andGmtCreateIsNotNull() {
+            addCriterion("gmt_create is not null");
             return (Criteria) this;
         }
 
-        public Criteria andGmtCreatedEqualTo(LocalDateTime value) {
-            addCriterion("gmt_created =", value, "gmtCreated");
+        public Criteria andGmtCreateEqualTo(LocalDateTime value) {
+            addCriterion("gmt_create =", value, "gmtCreate");
             return (Criteria) this;
         }
 
-        public Criteria andGmtCreatedNotEqualTo(LocalDateTime value) {
-            addCriterion("gmt_created <>", value, "gmtCreated");
+        public Criteria andGmtCreateNotEqualTo(LocalDateTime value) {
+            addCriterion("gmt_create <>", value, "gmtCreate");
             return (Criteria) this;
         }
 
-        public Criteria andGmtCreatedGreaterThan(LocalDateTime value) {
-            addCriterion("gmt_created >", value, "gmtCreated");
+        public Criteria andGmtCreateGreaterThan(LocalDateTime value) {
+            addCriterion("gmt_create >", value, "gmtCreate");
             return (Criteria) this;
         }
 
-        public Criteria andGmtCreatedGreaterThanOrEqualTo(LocalDateTime value) {
-            addCriterion("gmt_created >=", value, "gmtCreated");
+        public Criteria andGmtCreateGreaterThanOrEqualTo(LocalDateTime value) {
+            addCriterion("gmt_create >=", value, "gmtCreate");
             return (Criteria) this;
         }
 
-        public Criteria andGmtCreatedLessThan(LocalDateTime value) {
-            addCriterion("gmt_created <", value, "gmtCreated");
+        public Criteria andGmtCreateLessThan(LocalDateTime value) {
+            addCriterion("gmt_create <", value, "gmtCreate");
             return (Criteria) this;
         }
 
-        public Criteria andGmtCreatedLessThanOrEqualTo(LocalDateTime value) {
-            addCriterion("gmt_created <=", value, "gmtCreated");
+        public Criteria andGmtCreateLessThanOrEqualTo(LocalDateTime value) {
+            addCriterion("gmt_create <=", value, "gmtCreate");
             return (Criteria) this;
         }
 
-        public Criteria andGmtCreatedIn(List<LocalDateTime> values) {
-            addCriterion("gmt_created in", values, "gmtCreated");
+        public Criteria andGmtCreateIn(List<LocalDateTime> values) {
+            addCriterion("gmt_create in", values, "gmtCreate");
             return (Criteria) this;
         }
 
-        public Criteria andGmtCreatedNotIn(List<LocalDateTime> values) {
-            addCriterion("gmt_created not in", values, "gmtCreated");
+        public Criteria andGmtCreateNotIn(List<LocalDateTime> values) {
+            addCriterion("gmt_create not in", values, "gmtCreate");
             return (Criteria) this;
         }
 
-        public Criteria andGmtCreatedBetween(LocalDateTime value1, LocalDateTime value2) {
-            addCriterion("gmt_created between", value1, value2, "gmtCreated");
+        public Criteria andGmtCreateBetween(LocalDateTime value1, LocalDateTime value2) {
+            addCriterion("gmt_create between", value1, value2, "gmtCreate");
             return (Criteria) this;
         }
 
-        public Criteria andGmtCreatedNotBetween(LocalDateTime value1, LocalDateTime value2) {
-            addCriterion("gmt_created not between", value1, value2, "gmtCreated");
+        public Criteria andGmtCreateNotBetween(LocalDateTime value1, LocalDateTime value2) {
+            addCriterion("gmt_create not between", value1, value2, "gmtCreate");
             return (Criteria) this;
         }
 
