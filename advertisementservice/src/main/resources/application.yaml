@@ -11,6 +11,12 @@ server:
       max: 1000
 
 spring:
+  servlet:
+    multipart:
+      enabled: true #开启文件上传
+      max-file-size: 500MB
+      max-request-size: 500MB
+
   application:
     name: advertisement-service
   profiles:
@@ -53,6 +59,11 @@ spring:
         max-wait: -1
     # 连接超时时间（毫秒）
     timeout: 5000
+minio:
+  endpoint: http://114.215.198.238:4505 #Minio服务所在地址
+  bucketName: img #存储桶名称
+  accessKey: sunseaiot #访问的key
+  secretKey: sunseaiot #访问的秘钥
 
 mybatis:
   #po对象的包
@@ -72,6 +83,13 @@ privilegeservice:
   lockerExpireTime: 30
   #图片存储位置
   imglocation: ./img
+
+#  #dav信息配置
+#  dav:
+#    username: admin
+#    password: other
+#    baseUrl: http://192.168.43.34:8888/webdav/
+
   user:
     # user的权限字在Redis中失效秒数
     expiretime: 600
