@@ -1,5 +1,6 @@
 package cn.edu.xmu.share.model.vo;
 
+import cn.edu.xmu.provider.model.vo.GoodsSkuSimpleRetVo;
 import cn.edu.xmu.share.model.bo.Share;
 import cn.edu.xmu.share.model.bo.Sku;
 import lombok.Data;
@@ -11,7 +12,7 @@ import java.util.List;
 public class SharesRetVo{
     Long id;
     Long sharerId;
-    List<Sku> sku;
+    GoodsSkuSimpleRetVo sku;
     Integer quantity;
     LocalDateTime gmtCreate;
 

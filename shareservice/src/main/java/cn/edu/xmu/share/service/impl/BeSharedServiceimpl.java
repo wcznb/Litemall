@@ -54,18 +54,6 @@ public class BeSharedServiceimpl implements BeSharedService {
             BeShared beShared = new BeShared(po);
             ret.add(beShared);
         }
-//        PageInfo<VoObject> rolePage = PageInfo.of(ret);
-
-//        List<VoObject> ret = null;
-//        if(beSharePos!=null){
-//            ret = new ArrayList<>(beSharePos.size());
-//            for(BeSharePo po:beSharePos){
-//                BeShared beShared = new BeShared(po);
-//                ret.add(beShared);
-//            }
-//        }else {
-//            ret = new ArrayList<>();
-//        }
         PageInfo<VoObject> pageInfo = PageInfo.of(ret);
         return new ReturnObject<>(pageInfo);
     }
