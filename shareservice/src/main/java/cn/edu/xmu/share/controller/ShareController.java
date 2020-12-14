@@ -57,7 +57,8 @@ public class ShareController {
         userId = 9L;
         return Common.decorateReturnObject(sharesService.addShareService(id, userId));
     }
-    /**修改位置：service层调用内部方法获取shopId
+    /**
+     * http://127.0.0.1:8080/skus/300/shares
      * -------------------------------------------------------------------------需要修改----------------------------------------------
      */
 
@@ -86,7 +87,7 @@ public class ShareController {
         return Common.getPageRetObject(sharesService.getOwnSharesService(userId, goodsSkuId, beginTime, endTime, page, pageSize));
     }
 
-    /**完成用户后进行解析token获得userId
+    /**完成用户后进行解析token
      * 测试用例
      * http://127.0.0.1:8080/shares
      * http://127.0.0.1:8080/shares?pageSize=10&page=1&goodsSpuId=442
@@ -96,10 +97,10 @@ public class ShareController {
      */
 
 
-    /**-------------------------------------------------------------------------需要修改---------------------------------------------
+    /**-------------------------------------------------------------------------可写测试用例---------------------------------------------
      * 商家查询分享
-     * @param id 店铺id
-     * @param userId 用户id
+     * @param did 店铺id
+     * @param id skuid
      * @param page 页
      * @param pageSize 页尺寸
      */
@@ -110,14 +111,12 @@ public class ShareController {
     @ApiResponses({
     })
 //    @Audit
-    @GetMapping("shops/{id}/shares")
-    public Object getsharesByShop(@PathVariable Long id,
-                                  @RequestParam(value="skuId", required=false, defaultValue="") Long  skuId,
+    @GetMapping("/shops/{did}/skus/{id}/shares")
+    public Object getsharesByShop(@PathVariable Long did,
+                                  @PathVariable Long id,
                                   @RequestParam(value="page", required=false, defaultValue="1") Integer page ,
-                                  @RequestParam(value="pageSize", required=false, defaultValue="20") Integer pageSize,
-                                  @LoginUser @ApiIgnore @RequestParam(required = false, defaultValue = "0") Long userId){
-        userId = 2L;//暂时写死，过后完成用户修改
-        return Common.getPageRetObject(sharesService.getSharesBySpuIdService(id, skuId, userId, page, pageSize));
+                                  @RequestParam(value="pageSize", required=false, defaultValue="20") Integer pageSize){
+        return Common.getPageRetObject(sharesService.getSharesBySpuIdService(did, id, page, pageSize));
     }
 
 
@@ -125,34 +124,9 @@ public class ShareController {
      * service：调用接口获取店铺商品skuId列表，或验证spuId是店铺的商品,以及userid和shopId是否匹配
      * http://127.0.0.1:8080/shops/1/shares?spuId=521
      * http://127.0.0.1:8080/shops/1/shares
-     * -------------------------------------------------------------------------需要修改----------------------------------------------
+     * -------------------------------------------------------------------------可写测试用例----------------------------------------------
      */
 
-
-    /**-------------------------------------------------------------------------已经删除---------------------------------------------
-     * 新增分享成功
-     * @param ShareIdMap
-     * @parm spuId
-     * @param userId
-     * @return  Object
-     */
-//    @ApiOperation(value="新增分享成功")
-//    @ApiImplicitParams({
-//    })
-//    @ApiResponses({
-//    })
-////    @Audit
-//    @PostMapping("goods/{spuId}/beshared")
-//    public Object addbeshared(@NotBlank @RequestBody Map<String, Long> ShareIdMap,
-//                              @PathVariable Long spuId,
-//                              @LoginUser @ApiIgnore @RequestParam(required = false, defaultValue = "0") Long userId){
-//        Long sharerId = ShareIdMap.get("shareId");
-////        return Common.decorateReturnObject(sharesService.addShareService(sharesVo));
-//        return Common.decorateReturnObject(beSharedService.addBeshared(sharerId, spuId, userId));
-//    }
-    /**修改位置：service层调用内部方法获取shopId
-     * -------------------------------------------------------------------------已经删除----------------------------------------------
-     */
 
     /**-------------------------------------------------------------------------需要修改---------------------------------------------
      * 获取自己分享成功

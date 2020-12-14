@@ -1,7 +1,10 @@
 package cn.edu.xmu.provider.server;
+import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.provider.model.bo.GoodsSKU;
 import cn.edu.xmu.provider.model.vo.CouponActivityVo;
 import cn.edu.xmu.provider.model.vo.GoodsCartVo;
+import cn.edu.xmu.provider.model.vo.GoodsSkuSimpleRetVo;
+
 
 import java.util.List;
 
@@ -9,17 +12,24 @@ public interface GoodsService {
 
     /**
      * @description: 获取SKU的BO对象
-     * @author: Feiyan Liu
-     * @date: Created at 2020/12/8 19:54
+     * @author: Wc
+     * @date: Created at 2020/12/14
      */
-    GoodsSKU getGoodsSkuById(Long skuid);
+    ReturnObject<GoodsSkuSimpleRetVo> getGoodsSkuById(Long skuid);
 
     /**
      * @description: 通过SKU Id获取价格
-     * @author: Feiyan Liu
-     * @date: Created at 2020/12/8 19:54
+     * @author: Wc
+     * @date: Created at 2020/12/14
      */
     Integer getPriceBySkuId(Long skuId);
+
+    /**
+     * @description: 通过skuid列表获取GoodsSkuSimpleRetVo
+     * @author: Wc
+     * @date: Created at 2020/12/14
+     */
+    ReturnObject<List<GoodsSkuSimpleRetVo>> getGoodsSkuListById(List<Long> skuid);
 
     /**
      * @description:判断sku是否是此商店的商品

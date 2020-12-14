@@ -9,6 +9,8 @@ import cn.edu.xmu.share.model.bo.ShareActivity;
 import cn.edu.xmu.share.model.po.ShareActivityPo;
 import cn.edu.xmu.share.model.po.SharePo;
 import cn.edu.xmu.share.model.po.SharePoExample;
+import cn.edu.xmu.share.model.vo.SharesRetVo;
+import cn.edu.xmu.share.model.vo.SharesSimpleRetVo;
 import cn.edu.xmu.share.model.vo.SharesVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -87,8 +89,8 @@ public class SharesDao {
 
 
 
-    public ReturnObject<Object> addShares(Long id, Long userId, Long shareActivateId){
-        ReturnObject<Object> retObj=null;
+    public ReturnObject<Share> addShares(Long id, Long userId, Long shareActivateId){
+        ReturnObject<Share> retObj=null;
         SharePoExample example = new SharePoExample();
         SharePoExample.Criteria criteria = example.createCriteria();
         criteria.andGoodsSkuIdEqualTo(id);
@@ -98,7 +100,7 @@ public class SharesDao {
         List<SharePo> sharePos = sharePoMapper.selectByExample(example);
         if(!sharePos.isEmpty()){
             Share share = new Share(sharePos.get(0));
-            retObj = new ReturnObject<>(share.createVo());
+            retObj = new ReturnObject<>(share);
         }else{
 
             SharePo sharePo = new SharePo();
@@ -114,7 +116,7 @@ public class SharesDao {
                     retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("新增失败：" + sharePo.getClass()));
                 } else {
                     Share share = new Share(sharePo);
-                    retObj = new ReturnObject<>(share.createSimpleVo());
+                    retObj = new ReturnObject<Share>(share);
                 }
             }
             catch (DataAccessException e) {
