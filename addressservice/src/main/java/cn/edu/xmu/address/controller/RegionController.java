@@ -9,6 +9,8 @@ import cn.edu.xmu.ooad.util.ReturnObject;
 import com.fasterxml.jackson.databind.util.ObjectBuffer;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,21 +30,20 @@ public class RegionController {
     private HttpServletResponse httpServletResponse;
 
     @PostMapping("regions/{id}/subregions")
-    public Object addRegion(@Validated @RequestBody NewRegionVo newRegionVo, @PathVariable ("id") Long id, BindingResult result){
-
-        if(result.hasErrors()){
-            return Common.processFieldErrors(result,httpServletResponse);
+    public Object addRegion( @PathVariable ("id") Long id,@Validated @RequestBody NewRegionVo newRegionVo, BindingResult result){
+        Object obj = Common.processFieldErrors(result, httpServletResponse);
+        if(obj != null){
+            return obj;
         }
 
         ReturnObject returnObject=regionService.addRegion(newRegionVo,id);
 
+        if(returnObject.getCode()== ResponseCode.OK){
+            return new ResponseEntity(ResponseUtil.ok(), HttpStatus.CREATED);
+        }
         return Common.decorateReturnObject(returnObject);
     }
 
-    @GetMapping("test")
-    public Object test(){
-        return ResponseUtil.ok();
-    }
     @PutMapping("regions/{id}")
     public Object updateRegion(@Validated @RequestBody NewRegionVo newRegionVo,@PathVariable ("id") Long id, BindingResult result){
 

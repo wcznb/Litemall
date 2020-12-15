@@ -12,6 +12,8 @@ import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,22 +41,18 @@ public class AddressController {
      */
     @Audit
     @PostMapping("addresses")
-    public Object addAddress(@Validated @RequestBody NewAddressVo vo, BindingResult result){
-        //using @LoginUser to get userId need fix
-        Long userId= Long.valueOf(01);
-
-        if(result.hasErrors()){
-            return Common.processFieldErrors(result,httpServletResponse);
+    public Object addAddress(@LoginUser Long userId ,@Validated @RequestBody NewAddressVo vo,BindingResult result,HttpServletResponse httpServletResponse){
+        Object obj = Common.processFieldErrors(result, httpServletResponse);
+        if(obj != null){
+            return obj;
         }
 
         ReturnObject returnObject=addressService.addAddress(vo,userId);
 
         if(returnObject.getCode()== ResponseCode.OK){
-            return ResponseUtil.ok(returnObject.getData());
+            return new ResponseEntity(ResponseUtil.ok(returnObject.getData()), HttpStatus.CREATED);
         }
-        else {
-            return ResponseUtil.fail(returnObject.getCode());
-        }
+        return Common.decorateReturnObject(returnObject);
 
     }
 
@@ -63,22 +61,20 @@ public class AddressController {
      *
      * @return 地址列表
      */
-    //need fix customer id
     @Audit
     @GetMapping("addresses")
-    public Object getAllAddressById(
+    public Object getAllAddressById(@LoginUser Long userId ,
             @RequestParam(required = false, defaultValue = "1")  Integer page,
             @RequestParam(required = false, defaultValue = "10")  Integer pagesize
     ){
 
-        Long id= Long.valueOf(1);
         Object object = null;
 
         if(page <= 0 || pagesize <= 0) {
             object = Common.getNullRetObj(new ReturnObject<>(ResponseCode.FIELD_NOTVALID), httpServletResponse);
         } else {
 
-            ReturnObject<PageInfo<VoObject>> returnObject = addressService.getAllAddressById(id,page, pagesize);
+            ReturnObject<PageInfo<VoObject>> returnObject = addressService.getAllAddressById(userId,page, pagesize);
 
             object = Common.getPageRetObject(returnObject);
         }
@@ -107,9 +103,8 @@ public class AddressController {
      */
     @Audit
     @PutMapping("addresses/{id}/default")
-    public Object setAddressAsDefault(@PathVariable Long id){
-        Long customerId=1L;
-        ReturnObject<Boolean> success = addressService.setAddressAsDefault(id,customerId);
+    public Object setAddressAsDefault(@LoginUser Long userId ,@PathVariable Long id){
+        ReturnObject<Boolean> success = addressService.setAddressAsDefault(id,userId);
         return Common.decorateReturnObject(success);
     }
 

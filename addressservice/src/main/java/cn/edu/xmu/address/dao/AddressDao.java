@@ -51,7 +51,7 @@ public class AddressDao {
 
             if(!regionDao.isExist(regionId)){
 
-                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,String.format("添加失败,地区"+id+"不存在"));
+                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
 
             }else if(!regionDao.isAble(regionId)){
 
@@ -75,7 +75,7 @@ public class AddressDao {
                     int ret = addressPoMapper.insertSelective(po);
                     if (ret == 0) {
 
-                        returnObject = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("新增失败："));
+                        returnObject = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
 
                     } else {
 
@@ -251,7 +251,7 @@ public class AddressDao {
 
                 if (ret == 0) {
 
-                    retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("地址id不存在：" + id));
+                    retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
 
                 } else {
 
@@ -261,7 +261,7 @@ public class AddressDao {
 
 
         }else {
-            retObj= new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("地址id不存在：" + id));
+            retObj= new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
 
         return retObj;
