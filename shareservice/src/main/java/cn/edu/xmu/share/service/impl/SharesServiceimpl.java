@@ -35,28 +35,30 @@ public class SharesServiceimpl implements SharesService {
     @Autowired
     ShareActivityDao shareActivityDao;
 
-    @DubboReference(version = "1.1.1")
+    @DubboReference(version = "1.2.1")
     GoodsService goodsService;
 
     @Override
     @Transactional
     public ReturnObject<SharesRetVo> addShareService(Long id, Long userId) {
 
+        ReturnObject<GoodsSkuSimpleRetVo> skuSimpleRetVoReturnObject = goodsService.getGoodsSkuById(id);
+        if(skuSimpleRetVoReturnObject.getCode()!= ResponseCode.OK){
+            return new ReturnObject<>(skuSimpleRetVoReturnObject.getCode());
+        }
+
         Long shareActivateId = shareActivityDao.getShareActivityByspuId(id);
+        if(shareActivateId==null) return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,"无上线分享活动");;
         ReturnObject<Share> retVoReturnObject = sharesDao.addShares(id, userId, shareActivateId);
 
         if(retVoReturnObject.getCode()== ResponseCode.OK){
             Share share = retVoReturnObject.getData();
-            ReturnObject<GoodsSkuSimpleRetVo> skuSimpleRetVoReturnObject = goodsService.getGoodsSkuById(share.getGoodsSkuId());
-            if(skuSimpleRetVoReturnObject.getCode()== ResponseCode.OK){
-                share.setSku(skuSimpleRetVoReturnObject.getData());
-                return new ReturnObject<>(share.createVo());
-            }else{
-                return new ReturnObject<>(skuSimpleRetVoReturnObject.getCode(),skuSimpleRetVoReturnObject.getErrmsg());
-            }
+
+            share.setSku(skuSimpleRetVoReturnObject.getData());
+            return new ReturnObject<>(share.createVo());
         }
 
-        return new ReturnObject<>(retVoReturnObject.getCode(),retVoReturnObject.getErrmsg());
+        return new ReturnObject<>(retVoReturnObject.getCode());
 
     }
 
@@ -66,29 +68,66 @@ public class SharesServiceimpl implements SharesService {
         ListToMap listToMap = new ListToMap();
         LocalDateTime begintime=null;
         LocalDateTime endtime=null;
-        if(!beginTime.equals(""))  begintime = ExchangeDate.StringToDateTime(beginTime).get(true);
-        if(!endTime.equals("")) endtime = ExchangeDate.StringToDateTime(endTime).get(true);
+        if(!beginTime.equals(""))  {
+            begintime = ExchangeDate.StringToDateTime(beginTime).get(true);
+            if(begintime==null){
+                List<VoObject> ret = new ArrayList<>(0);
+                PageInfo<VoObject> sharesPage = PageInfo.of(ret);
+                sharesPage.setPageSize(pageSize);
+                sharesPage.setPageNum(page);
+            }
+        }
+        if(!endTime.equals("")) {
+            endtime = ExchangeDate.StringToDateTime(endTime).get(true);
+            if(endtime==null){
+                List<VoObject> ret = new ArrayList<>(0);
+                PageInfo<VoObject> sharesPage = PageInfo.of(ret);
+                sharesPage.setPageSize(pageSize);
+                sharesPage.setPageNum(page);
+            }
+        }
+        if(begintime!=null&&endtime!=null&&begintime.isAfter(endtime)){
+            List<VoObject> ret = new ArrayList<>(0);
+            PageInfo<VoObject> sharesPage = PageInfo.of(ret);
+            sharesPage.setPageSize(pageSize);
+            sharesPage.setPageNum(page);
+        }
         List<SharePo> sharePos =  sharesDao.getOwnShares(userId, goodsId, begintime, endtime, page, pageSize);
 
-        List<Long> ids = new ArrayList<>(sharePos.size());
-        //通过skuid列表获取sku
-        for(SharePo sharePo:sharePos){
-            ids.add(sharePo.getGoodsSkuId());
-        }
-
-        ReturnObject<List<GoodsSkuSimpleRetVo>> skuSimpleRetVos = goodsService.getGoodsSkuListById(ids);
-        if(skuSimpleRetVos.getCode()==ResponseCode.OK){
-            List<VoObject> ret = new ArrayList<>(sharePos.size());
-            Map<Long, GoodsSkuSimpleRetVo>  idMapGoodsSku = listToMap.GoodsSkuSimpleRetVoListToMap(skuSimpleRetVos.getData());
+        List<VoObject> ret = new ArrayList<>(sharePos.size());
+        if(sharePos.size()==0){//
             for (SharePo po : sharePos) {
-                Share share = new Share(po,idMapGoodsSku.get(po.getGoodsSkuId()));
+                Share share = new Share(po);
                 ret.add(share);
             }
             PageInfo<VoObject> sharesPage = PageInfo.of(ret);
-
+            sharesPage.setPageSize(pageSize);
+            sharesPage.setPageNum(page);
             return  new ReturnObject<>(sharesPage);
+
+        }else{
+            List<Long> ids = new ArrayList<>(sharePos.size());
+            //通过skuid列表获取sku
+            for(SharePo sharePo:sharePos){
+                ids.add(sharePo.getGoodsSkuId());
+            }
+            ReturnObject<List<GoodsSkuSimpleRetVo>> skuSimpleRetVos = goodsService.getGoodsSkuListById(ids);
+            if(skuSimpleRetVos.getCode()==ResponseCode.OK){
+
+                Map<Long, GoodsSkuSimpleRetVo>  idMapGoodsSku = listToMap.GoodsSkuSimpleRetVoListToMap(skuSimpleRetVos.getData());
+                for (SharePo po : sharePos) {
+                    Share share = new Share(po,idMapGoodsSku.get(po.getGoodsSkuId()));
+                    ret.add(share);
+                }
+                PageInfo<VoObject> sharesPage = PageInfo.of(ret);
+                sharesPage.setPageSize(pageSize);
+                sharesPage.setPageNum(page);
+                return  new ReturnObject<>(sharesPage);
+
+            }
+            return new ReturnObject<>(skuSimpleRetVos.getCode());
         }
-        return new ReturnObject<>(skuSimpleRetVos.getCode(), skuSimpleRetVos.getErrmsg());
+
     }
 
     @Override
@@ -107,7 +146,7 @@ public class SharesServiceimpl implements SharesService {
                 PageInfo<VoObject> sharesPage = PageInfo.of(ret);
                 return new ReturnObject<>(sharesPage);
             }else{
-                return new ReturnObject<>(skuSimpleRetVoReturnObject.getCode(), skuSimpleRetVoReturnObject.getErrmsg());
+                return new ReturnObject<>(skuSimpleRetVoReturnObject.getCode());
             }
 
         }

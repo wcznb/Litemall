@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class CartGetVo {
     @NotNull
-    private Long goodSkuID;
+    private Long goodsSkuId;
 
     @NotNull
     private Integer quantity;

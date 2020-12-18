@@ -2,7 +2,8 @@ package cn.edu.xmu.provider.model.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author Yancheng Lai
@@ -11,16 +12,8 @@ import java.time.LocalDateTime;
  **/
 
 @Data
-public class GoodsCartVo {
-    Integer id;
-    Long goodsSkuId;
+public class GoodsCartVo implements Serializable {
     String skuName;
-    String spuName;
-    String quantity;
-    Integer price;
-    //List<CouponActivity> couponActivityList;
-    LocalDateTime gmtCreate;
-    LocalDateTime gmtModified;
-
-    public GoodsCartVo(){}
+    Long skuId;
+    List<CouponActivityVo> couponActivity;
 }

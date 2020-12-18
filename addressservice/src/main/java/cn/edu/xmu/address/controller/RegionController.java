@@ -29,7 +29,7 @@ public class RegionController {
     @Autowired
     private HttpServletResponse httpServletResponse;
 
-    @PostMapping("regions/{id}/subregions")
+    @PostMapping("shops/{did}/regions/{id}/subregions")
     public Object addRegion( @PathVariable ("id") Long id,@Validated @RequestBody NewRegionVo newRegionVo, BindingResult result){
         Object obj = Common.processFieldErrors(result, httpServletResponse);
         if(obj != null){
@@ -41,10 +41,14 @@ public class RegionController {
         if(returnObject.getCode()== ResponseCode.OK){
             return new ResponseEntity(ResponseUtil.ok(), HttpStatus.CREATED);
         }
+        if(returnObject.getCode()==ResponseCode.REGION_OBSOLETE){
+            return new ResponseEntity(ResponseUtil.fail(ResponseCode.REGION_OBSOLETE), HttpStatus.BAD_REQUEST);
+        }
+
         return Common.decorateReturnObject(returnObject);
     }
 
-    @PutMapping("regions/{id}")
+    @PutMapping("shops/{did}/regions/{id}")
     public Object updateRegion(@Validated @RequestBody NewRegionVo newRegionVo,@PathVariable ("id") Long id, BindingResult result){
 
         if(result.hasErrors()){
@@ -52,26 +56,32 @@ public class RegionController {
         }
 
         ReturnObject returnObject=regionService.updateRegion(newRegionVo,id);
-
+        if(returnObject.getCode()==ResponseCode.REGION_OBSOLETE){
+            return new ResponseEntity(ResponseUtil.fail(ResponseCode.REGION_OBSOLETE), HttpStatus.BAD_REQUEST);
+        }
         return Common.decorateReturnObject(returnObject);
 
     }
 
 
-    @DeleteMapping("regions/{id}")
+    @DeleteMapping("shops/{did}/regions/{id}")
     public Object disableRegion(@PathVariable ("id") Long id){
 
         ReturnObject returnObject=regionService.disableRegion(id);
-
+        if(returnObject.getCode()== ResponseCode.REGION_OBSOLETE){
+            return new ResponseEntity(ResponseUtil.fail(ResponseCode.REGION_OBSOLETE),HttpStatus.BAD_REQUEST);
+        }
         return Common.decorateReturnObject(returnObject);
 
     }
 
-    @GetMapping("regions/{id}/ancestor")
+    @GetMapping("region/{id}/ancestor")
     public Object getAncestorRegion(@PathVariable("id") Long id){
 
         ReturnObject returnObject=regionService.getAncestorRegion(id);
-
+        if(returnObject.getCode()==ResponseCode.REGION_OBSOLETE){
+            return new ResponseEntity(ResponseUtil.fail(ResponseCode.REGION_OBSOLETE), HttpStatus.BAD_REQUEST);
+        }
         return Common.decorateReturnObject(returnObject);
     }
 

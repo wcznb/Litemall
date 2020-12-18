@@ -36,13 +36,13 @@ private Byte beDefault;
 
     private LocalDate endDate;
 
-    private  Byte repeates;
+    private  Byte repeate;
 
 private String message;
 
-private LocalDateTime gmt_created;
+private LocalDateTime gmtCreate;
 
-private LocalDateTime gmt_modified;
+private LocalDateTime gmtModified;
 
 
     @Override
@@ -110,6 +110,7 @@ private LocalDateTime gmt_modified;
      */
     public Advertisement(AdvertisementPo po){
 
+        this.link = po.getLink();
           this.beDefault = po.getBeDefault();
           this.beginDate = po.getBeginDate();
           this.content = po.getContent();
@@ -117,11 +118,11 @@ private LocalDateTime gmt_modified;
           this.id = po.getId();
           this.imageUrl = po.getImageUrl();
           this.message = po.getMessage();
-          this.repeates = po.getRepeats();
+          this.repeate = po.getRepeats();
           this.segId = po.getSegId();
           this.weight = po.getWeight();
-          this.gmt_created = po.getGmtCreate();
-          this.gmt_modified = po.getGmtModified();
+          this.gmtCreate = po.getGmtCreate();
+          this.gmtModified = po.getGmtModified();
         if (null != po.getState()) {
             this.state = State.getTypeByCode(po.getState().intValue());
         }

@@ -1,15 +1,17 @@
 package cn.edu.xmu.favorite.service.impl;
 
 import cn.edu.xmu.favorite.dao.FavoriteDao;
-import cn.edu.xmu.favorite.rpcclient.GoodsClient;
 import cn.edu.xmu.favorite.model.bo.Favorite;
-import cn.edu.xmu.favorite.model.bo.GoodSku;
 import cn.edu.xmu.favorite.model.po.FavoritePo;
 import cn.edu.xmu.favorite.service.FavoriteService;
+import cn.edu.xmu.favorite.util.ListToMap;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.provider.model.vo.GoodsSkuSimpleRetVo;
+import cn.edu.xmu.provider.server.GoodsService;
 import com.github.pagehelper.PageInfo;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author 陈渝璇
@@ -32,8 +36,8 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Autowired
     private FavoriteDao favoriteDao;
 
-    @Autowired
-    private GoodsClient goodsClient;
+    @DubboReference(version = "1.1.1")
+    GoodsService goodsService;
 
     @Override
     public ReturnObject<PageInfo<VoObject>> findPageOfFavorites(Long userId, int pageNum, int pageSize){
@@ -42,20 +46,32 @@ public class FavoriteServiceImpl implements FavoriteService {
             //搜索成功
             PageInfo<FavoritePo> favoritePoPage = favoritePoRetObj.getData();
             List<FavoritePo> favoritePos = favoritePoPage.getList();
+
+            //用skuids获取map<skuid,goodsSkuSimpleRetVo>
+            List<Long> skuIds = favoritePos.stream().map(favoritePo->favoritePo.getGoodsSkuId()).collect(Collectors.toList());
+            //从商品模块获得信息，调用内部接口
+            ReturnObject<List<GoodsSkuSimpleRetVo>> retSkuSimpleRetVos = null;
+            if(skuIds.size()!=0)
+                retSkuSimpleRetVos = goodsService.getGoodsSkuListById(skuIds);
             List<VoObject> retObj = new ArrayList<>(favoritePos.size());
-            for(FavoritePo favoritePo : favoritePos){
-                Favorite favorite = new Favorite(favoritePo);
-                //从商品模块获得信息
-                GoodSku goodSku = goodsClient.getGoodsSku(favoritePo.getGoodsSkuId());
-                favorite.setGoodSku(goodSku);
-                retObj.add(favorite);
+            if(retSkuSimpleRetVos == null||retSkuSimpleRetVos.getCode() == ResponseCode.OK){
+                if(retSkuSimpleRetVos != null){
+                    ListToMap listToMap = new ListToMap();
+                    Map<Long,GoodsSkuSimpleRetVo> idMapGoodsSku = listToMap.GoodsSkuSimpleRetVoListToMap(retSkuSimpleRetVos.getData());
+                    for(FavoritePo po : favoritePos){
+                        Favorite favorite = new Favorite(idMapGoodsSku.get(po.getGoodsSkuId()),po);
+                        retObj.add(favorite);
+                    }
+                }
+                PageInfo<VoObject> favoritePage = new PageInfo<>(retObj);
+                favoritePage.setPages(favoritePoPage.getPages());
+                favoritePage.setPageNum(favoritePoPage.getPageNum());
+                favoritePage.setPageSize(favoritePoPage.getPageSize());
+                favoritePage.setTotal(favoritePoPage.getTotal());
+                return new ReturnObject<>(favoritePage);
+            } else{
+                return new ReturnObject<>(retSkuSimpleRetVos.getCode());
             }
-            PageInfo<VoObject> favoritePage = new PageInfo<>(retObj);
-            favoritePage.setPages(favoritePoPage.getPages());
-            favoritePage.setPageNum(favoritePoPage.getPageNum());
-            favoritePage.setPageSize(favoritePoPage.getPageSize());
-            favoritePage.setTotal(favoritePoPage.getTotal());
-            return new ReturnObject<>(favoritePage);
         }
         return new ReturnObject<>(favoritePoRetObj.getCode());
     }
@@ -76,9 +92,15 @@ public class FavoriteServiceImpl implements FavoriteService {
             //插入成功，组合信息
             FavoritePo po = favoritePoRet.getData();
             Favorite favorite = new Favorite(po);
-            GoodSku goodSku = goodsClient.getGoodsSku(skuId);
-            favorite.setGoodSku(goodSku);
-            return new ReturnObject<>(favorite);
+            //从商品模块获得信息
+            ReturnObject<GoodsSkuSimpleRetVo> skuSimpleRetVoReturnObject = goodsService.getGoodsSkuById(skuId);
+            if(skuSimpleRetVoReturnObject.getCode() == ResponseCode.OK){
+                favorite.setGoodsSku(skuSimpleRetVoReturnObject.getData());
+                return new ReturnObject<>(favorite);
+            }else{
+                return new ReturnObject<>(skuSimpleRetVoReturnObject.getCode());
+            }
+
         }
         return new ReturnObject<>(favoritePoRet.getCode());
     }

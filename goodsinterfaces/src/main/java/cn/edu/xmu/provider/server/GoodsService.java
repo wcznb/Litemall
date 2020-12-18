@@ -22,7 +22,7 @@ public interface GoodsService {
      * @author: Wc
      * @date: Created at 2020/12/14
      */
-    Integer getPriceBySkuId(Long skuId);
+    Long getPriceBySkuId(Long skuId);
 
     /**
      * @description: 通过skuid列表获取GoodsSkuSimpleRetVo
@@ -37,6 +37,35 @@ public interface GoodsService {
      * @date: Created at 2020/12/8 19:46
      */
     Boolean checkSkuIdByShopId(Long shopId,Long skuId);
+
+    /**
+     * 给购物车部分使用其1（用户获取购物车列表)
+     * @param skuIds
+     * @return
+     */
+    ReturnObject<List<GoodsCartVo>> getGoodsCartListBySkuIdList(List<Long> skuIds);
+
+    /**
+     * 给购物车部分使用其2（用户增加商品进入购物车）
+     * @param skuId
+     * @return
+     */
+    ReturnObject<GoodsCartVo> getGoodsCartBySkuId(Long skuId);
+
+    /**
+     * 给购物车部分使用3，判断两个skuId是否属于同一家店
+     * @param skuId1
+     * @param skuId2
+     * @return
+     */
+    ReturnObject<Boolean> checkSkuIdsFromASpu(Long skuId1, Long skuId2);
+
+    /**
+     * 给购物车部分使用4，判断通过skuid获取商品originalPrice
+     * @param skuId
+     * @return
+     */
+    ReturnObject<Long> getOriginalPriceBySkuId(Long skuId);
 
     /**
      * @description: 通过店铺id获取SKU Id列表
@@ -65,5 +94,5 @@ public interface GoodsService {
      * @author: Feiyan Liu
      * @date: Created at 2020/12/10 19:34
      */
-    CouponActivityVo getCouponActivityIdBySkuId(Long id);
+    List<CouponActivityVo> getCouponActivityIdBySkuId(Long id);
 }

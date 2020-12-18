@@ -1,5 +1,6 @@
 package cn.edu.xmu.provider.model.bo;
 
+import cn.edu.xmu.provider.model.po.CouponActivityPo;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -43,5 +44,10 @@ public class CouponActivity implements Serializable {
             return description;
         }
     }
-    public CouponActivity(){};
+    public CouponActivity(CouponActivityPo po){
+        this.beginTime=po.getBeginTime();
+        this.endTime=po.getEndTime();
+        this.id=po.getId();
+        this.name=po.getName();
+    }
 }

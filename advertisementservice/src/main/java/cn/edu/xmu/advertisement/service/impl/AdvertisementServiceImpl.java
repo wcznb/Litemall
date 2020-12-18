@@ -5,6 +5,7 @@ import cn.edu.xmu.advertisement.dao.NewAdvertisementDao;
 import cn.edu.xmu.advertisement.model.bo.Advertisement;
 import cn.edu.xmu.advertisement.model.po.AdvertisementPo;
 
+import cn.edu.xmu.advertisement.model.po.AdvertisementPoExample;
 import cn.edu.xmu.advertisement.model.po.TimeSegmentPo;
 import cn.edu.xmu.advertisement.model.vo.AdvertisementMessageVo;
 import cn.edu.xmu.advertisement.model.vo.AdvertisementRetVo;
@@ -48,7 +49,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 //    @Value("${privilegeservice.imglocation}")
 //    private String imgLocation;
 
-//    @Value("${privilegeservice.dav.username}")
+    //    @Value("${privilegeservice.dav.username}")
 //    private String davUsername;
 //
 //    @Value("${privilegeservice.dav.password}")
@@ -56,16 +57,14 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 //
 //    @Value("${privilegeservice.dav.baseUrl}")
 //    private String baseUrl;
-@Value("${minio.endpoint}")
-private  String ENDPOINT;
+    @Value("${minio.endpoint}")
+    private String ENDPOINT;
     @Value("${minio.bucketName}")
-    private  String BUCKETNAME;
+    private String BUCKETNAME;
     @Value("${minio.accessKey}")
-    private  String ACCESSKEY;
+    private String ACCESSKEY;
     @Value("${minio.secretKey}")
-    private  String SECRETKEY;
-
-
+    private String SECRETKEY;
 
 
     /**
@@ -75,24 +74,41 @@ private  String ENDPOINT;
      */
     @Override
     @Transactional
-    public ReturnObject<Boolean> becomeDefault(Long id) {
+    public ReturnObject becomeDefault(Long id) {
 
         AdvertisementPo advertisementPo1 = advertisementDao.findAdById(id);
 
-        if(advertisementPo1==null)
-            return  new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        if (advertisementPo1 == null)
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
 
         AdvertisementPo advertisementPo = new AdvertisementPo();
         advertisementPo.setId(id);
         Byte bedefaults = 1;
         Byte notbedefaults = 0;
 
-        //该广告一开始是非默认广告或未设置广告是否默认
-        if(advertisementPo1.getBeDefault()==bedefaults){
+        ReturnObject returnObject2;
+
+        //该广告一开始是默认广告
+        if (advertisementPo1.getBeDefault() == bedefaults) {
 
             advertisementPo.setBeDefault(notbedefaults);  //默认-》非默认
-        }
-        else{
+        } else {
+
+//            AdvertisementPo advertisementPo2 = advertisementDao.getAdByExmple();
+//            //查询数据库中的默认广告，将其设置为非默认
+//            if(advertisementPo2!=null) {
+//                Long default_id = advertisementPo2.getId();
+//                AdvertisementPo advertisementPo3 = new AdvertisementPo();
+//
+//                advertisementPo3.setId(default_id);
+//                advertisementPo3.setBeDefault(notbedefaults);
+//                //将默认广告改为非默认广告，全平台只有一个默认广告
+//                returnObject2 = advertisementDao.modifyAdvertiseDefault(advertisementPo3);
+//
+//                if (returnObject2.getCode() != ResponseCode.OK)
+//                    return returnObject2;
+//            }
+
             advertisementPo.setBeDefault(bedefaults); //非默认-》默认
 
         }
@@ -102,7 +118,7 @@ private  String ENDPOINT;
         if (retObj.getCode() != ResponseCode.OK) {
             return retObj;
         }
-        return new ReturnObject<>(true);
+        return new ReturnObject<>(ResponseCode.OK);
     }
 
 
@@ -118,19 +134,18 @@ private  String ENDPOINT;
 
         advertisementPo.setId(id);
 
-         AdvertisementPo advertisementPo1 = advertisementDao.findAdById(id);
+        AdvertisementPo advertisementPo1 = advertisementDao.findAdById(id);
 
-         if(advertisementPo1==null){
+        if (advertisementPo1 == null) {
 
-             return  new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
-         }
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
         //只有上架态才能转为下架态  上架-》下架
-        if(advertisementPo1.getState()!=Advertisement.State.SHELF.getCode().byteValue()){
+        //已经包含只有上架的广告才能下架
+        if (advertisementPo1.getState() != Advertisement.State.SHELF.getCode().byteValue()) {
 
             return new ReturnObject<>(ResponseCode.ADVERTISEMENT_STATENOTALLOW);   //608 广告状态禁止
-        }
-
-        else {
+        } else {
 
             advertisementPo.setState(Advertisement.State.OFFSHELF.getCode().byteValue());//设置状态设为下架
 
@@ -158,20 +173,18 @@ private  String ENDPOINT;
 
         advertisementPo.setId(id);
 
-         AdvertisementPo advertisementPo1 = advertisementDao.findAdById(id);
+        AdvertisementPo advertisementPo1 = advertisementDao.findAdById(id);
 
-        if(advertisementPo1==null){
+        if (advertisementPo1 == null) {
 
-            return  new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
         //只有下架态才能转为上架态  下架-》上架
-        //上架态的广告？？上架-》上架
-        if(advertisementPo1.getState()!=Advertisement.State.OFFSHELF.getCode().byteValue()){
+        //上架态的广告？？上架-》上架(已经包含只有下架的广告才能上架)
+        if (advertisementPo1.getState() != Advertisement.State.OFFSHELF.getCode().byteValue()) {
 
             return new ReturnObject<>(ResponseCode.ADVERTISEMENT_STATENOTALLOW);   //608 广告状态禁止
-        }
-
-        else {
+        } else {
 
             advertisementPo.setState(Advertisement.State.SHELF.getCode().byteValue());//设置状态设为下架
 
@@ -205,7 +218,7 @@ private  String ENDPOINT;
      */
     @Override
     @Transactional
-    public ReturnObject <Object> messageAd( Long id, AdvertisementMessageVo vo){
+    public ReturnObject<Object> messageAd(Long id, AdvertisementMessageVo vo) {
 
         AdvertisementPo advertisementPo = new AdvertisementPo();
 
@@ -214,19 +227,27 @@ private  String ENDPOINT;
         AdvertisementPo advertisementPo1 = advertisementDao.findAdById(id);
 
         //判断id是否存在 404 504
-        if(advertisementPo1==null){
+        if (advertisementPo1 == null) {
 
-            return  new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
 //只有审核态才能被审核 否则 608
-        if(advertisementPo1.getState()!=Advertisement.State.MESSAGES.getCode().byteValue()){
+        if (advertisementPo1.getState() != Advertisement.State.MESSAGES.getCode().byteValue()) {
 
             return new ReturnObject<>(ResponseCode.ADVERTISEMENT_STATENOTALLOW);   //608 广告状态禁止
-        }
+        } else {
 
-        else{
+            if(vo.getMessage()==null)
+                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+            if (vo.getConclusion() == null)
+                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+
+            //vo.getConclusion=1/0可以吗？？？
+//            if(vo.getConclusion()!=true||vo.getConclusion()!=false)
+//                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+
 //审核通过，则将审核附加的话传到相应的广告上，并且将审核通过的广告置为下架态
-            if(vo.getConclusion()) {
+            if (vo.getConclusion() == true) {
 
                 advertisementPo.setMessage(vo.getMessage());
                 advertisementPo.setState(Advertisement.State.OFFSHELF.getCode().byteValue());
@@ -235,17 +256,17 @@ private  String ENDPOINT;
                 if (retObj.getCode() != ResponseCode.OK) {
                     return retObj;
                 }
-                return new ReturnObject<>(true);
-            }
-            else{
+                return new ReturnObject<>(ResponseCode.OK);
+            } else if (vo.getConclusion() == false) {
 
                 //广告审核不通过，返回ok，但不会修改广告
-                return new ReturnObject<>(true);
+                return new ReturnObject<>(ResponseCode.OK);
 
-            }
+            } else
+                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
 
 
-            }
+        }
 
     }
 
@@ -256,27 +277,43 @@ private  String ENDPOINT;
      */
     @Override
     @Transactional
-    public ReturnObject <Object> messageUpdate( Long id, AdvertisementUpdateVo vo){
+    public ReturnObject<Object> messageUpdate(Long id, AdvertisementUpdateVo vo) {
 
 
         //判断id存不存在，返回404.路径id不存在 504
         //处于待审核态的广告允许修改吗
 
         ReturnObject<Advertisement> r = advertisementDao.getAdByID(id);
-        if(r.getCode()==ResponseCode.RESOURCE_ID_NOTEXIST)
+        if (r.getCode() == ResponseCode.RESOURCE_ID_NOTEXIST)
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+
+        //传入的boby为空
+        if (vo == null)
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
 
 
         AdvertisementPo advertisementPo = new AdvertisementPo();
         advertisementPo.setId(id);
 
+        try {
+            //String->Localdata 赋值广告开始结束时间 类型LocalData
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate begindata1 = LocalDate.parse(vo.getBeginDate(), fmt);
+            LocalDate enddata1 = LocalDate.parse(vo.getEndDate(), fmt);
 
-        //String->Localdata 赋值广告开始结束时间 类型LocalData
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate begindata1 = LocalDate.parse(vo.getBeginDate(), fmt);
-        LocalDate enddata1 = LocalDate.parse(vo.getEndDate(), fmt);
-        advertisementPo.setBeginDate(begindata1);
-        advertisementPo.setEndDate(enddata1);
+            if (begindata1.isAfter(enddata1))
+                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+//            if(enddata1.isBefore(LocalDate.now()))
+//                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+
+            advertisementPo.setBeginDate(begindata1);
+            advertisementPo.setEndDate(enddata1);
+
+
+        } catch (Exception e) {
+
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+        }
 
         //Boolean->Byte
         Byte a = 1;
@@ -284,11 +321,16 @@ private  String ENDPOINT;
         Byte c = vo.getRepeat() ? a : b;
         advertisementPo.setRepeats(c);
 
-        if(vo.getLink()!=null)
-        advertisementPo.setLink(vo.getLink());
-        if(vo.getWeight()!=null)  //判别非空 进行类型转换   String->Integer
-        advertisementPo.setWeight(Integer.valueOf(vo.getWeight()));
-        if(vo.getContent()!=null)
+        if (vo.getLink() != null)
+            advertisementPo.setLink(vo.getLink());
+
+        if (vo.getWeight() != null) {  //判别非空 进行类型转换   String->Integer
+            if (vo.getWeight() < 0)
+                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+            else
+                advertisementPo.setWeight(vo.getWeight());
+        }
+        if (vo.getContent() != null)
             advertisementPo.setContent(vo.getContent());
 
         //更新广告状态为待审核
@@ -299,9 +341,9 @@ private  String ENDPOINT;
         if (retObj.getCode() != ResponseCode.OK) {
             return retObj;
         }
-        return new ReturnObject<>(true);
+        return new ReturnObject<>(ResponseCode.OK);
 
-        }
+    }
 
     /**
      * 在广告时段下新建广告
@@ -310,11 +352,10 @@ private  String ENDPOINT;
      */
     @Override
     @Transactional
-    public ReturnObject createUnderSegID(Long tid,NewAdvertisementVo vo) {
+    public ReturnObject createUnderSegID(Long tid, NewAdvertisementVo vo) {
 
-        return newAdvertisementDao.createNewAdByVo(tid,vo);
+        return newAdvertisementDao.createNewAdByVo(tid, vo);
     }
-
 
 
     /**
@@ -324,10 +365,10 @@ private  String ENDPOINT;
      */
     @Override
     @Transactional
-    public ReturnObject addAdBySegID(Long tid,Long id) {
+    public ReturnObject addAdBySegID(Long tid, Long id) {
 
 
-        return advertisementDao.addAdBySegId(tid,id);
+        return advertisementDao.addAdBySegId(tid, id);
     }
 
     /**
@@ -337,18 +378,17 @@ private  String ENDPOINT;
      */
     @Override
     @Transactional
-    public ReturnObject<PageInfo<VoObject>> getAdBySegId(Long id, Integer page, Integer pageSize,String beginDate,String endDate){
-        ReturnObject<PageInfo<VoObject>> ret = advertisementDao.getAdBySegID(id, page, pageSize,beginDate,endDate);
+    public ReturnObject<PageInfo<VoObject>> getAdBySegId(Long id, Integer page, Integer pageSize, String beginDate, String endDate) {
+        ReturnObject<PageInfo<VoObject>> ret = advertisementDao.getAdBySegID(id, page, pageSize, beginDate, endDate);
         return ret;
     }
 
     /**
      * 管理员查看当前时段的广告
-     *
      */
     @Override
     @Transactional
-    public   ReturnObject<List> getCurrentAd() {
+    public ReturnObject<List> getCurrentAd() {
 
         return advertisementDao.getCurrentAd();
     }
@@ -356,32 +396,33 @@ private  String ENDPOINT;
 
     /**
      * 上传图片
-     * @param id: 广告id
+     *
+     * @param id:            广告id
      * @param multipartFile: 文件
      * @return
      */
     @Override
     @Transactional
-    public ReturnObject uploadImg(Long id, MultipartFile multipartFile){
+    public ReturnObject uploadImg(Long id, MultipartFile multipartFile) {
 
         ReturnObject<Advertisement> advertisementReturnObject = advertisementDao.getAdByID(id);
 
-        if(advertisementReturnObject.getCode() == ResponseCode.RESOURCE_ID_NOTEXIST) {
+        if (advertisementReturnObject.getCode() == ResponseCode.RESOURCE_ID_NOTEXIST) {
             return advertisementReturnObject;
         }
         Advertisement advertisement = advertisementReturnObject.getData();
 
         ReturnObject returnObject = new ReturnObject();
-        try{
-            returnObject = ImgUploads.remoteSaveImg(multipartFile,2,ACCESSKEY, SECRETKEY,BUCKETNAME,ENDPOINT);
+        try {
+            returnObject = ImgUploads.remoteSaveImg(multipartFile, 2, ACCESSKEY, SECRETKEY, BUCKETNAME, ENDPOINT);
 
             //文件上传错误
-            if(returnObject.getCode()!=ResponseCode.OK){
+            if (returnObject.getCode() != ResponseCode.OK) {
                 logger.debug(returnObject.getErrmsg());
                 return returnObject;
             }
 
-            String oldFilename =advertisement.getImageUrl();
+            String oldFilename = advertisement.getImageUrl();
             advertisement.setImageUrl(returnObject.getData().toString());
 
             advertisement.setState(Advertisement.State.MESSAGES);//更新广告状态为审核
@@ -389,8 +430,8 @@ private  String ENDPOINT;
             ReturnObject updateReturnObject = advertisementDao.updateAdImg(advertisement);//插入新的图片
 
             //数据库更新失败，需删除新增的图片
-            if(updateReturnObject.getCode()==ResponseCode.FIELD_NOTVALID){
-               ImgUploads.deleteRemoteImg(returnObject.getData().toString(),ACCESSKEY, SECRETKEY,BUCKETNAME,ENDPOINT);
+            if (updateReturnObject.getCode() == ResponseCode.FIELD_NOTVALID) {
+                ImgUploads.deleteRemoteImg(returnObject.getData().toString(), ACCESSKEY, SECRETKEY, BUCKETNAME, ENDPOINT);
                 return updateReturnObject;
             }
 
@@ -399,12 +440,11 @@ private  String ENDPOINT;
 
 
             //数据库更新成功需删除旧图片，未设置则不删除
-            if(oldFilename!=null) {
-                ImgUploads.deleteRemoteImg(oldFilename, ACCESSKEY, SECRETKEY,BUCKETNAME,ENDPOINT);
+            if (oldFilename != null) {
+                ImgUploads.deleteRemoteImg(oldFilename, ACCESSKEY, SECRETKEY, BUCKETNAME, ENDPOINT);
             }
-        }
-        catch (IOException e){
-            logger.debug("uploadImg: I/O Error:" + ENDPOINT+BUCKETNAME);
+        } catch (IOException e) {
+            logger.debug("uploadImg: I/O Error:" + ENDPOINT + BUCKETNAME);
             return new ReturnObject(ResponseCode.FILE_NO_WRITE_PERMISSION);
         }
         return returnObject;
@@ -413,16 +453,16 @@ private  String ENDPOINT;
 
     /**
      * 时段删除，将删除时段的广告seg_id置为0
+     *
      * @param seg_id: 时段id
      * @return
      */
     @Transactional
-    public ReturnObject deleteSegIDThenZero(Long seg_id){
+    public ReturnObject deleteSegIDThenZero(Long seg_id) {
 
         return advertisementDao.deleteSegIDThenZero(seg_id);
 
     }
-
 
 
 }

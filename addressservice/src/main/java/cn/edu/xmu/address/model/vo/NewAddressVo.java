@@ -15,7 +15,8 @@ public class NewAddressVo {
     private String detail;
     @NotEmpty(message = "字段不合法")
     private String consignee;
-    @Pattern(regexp="^[1]([3][0-9]{1}|59|58|88|89)[0-9]{8}$",message = "字段不合法")
+    @NotEmpty
+    @Pattern(regexp="^1[0-9]{10}$",message = "字段不合法")
     private String mobile;
 
 }

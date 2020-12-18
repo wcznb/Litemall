@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface AddressService {
     ReturnObject<NewAddressRetVo> addAddress(NewAddressVo vo, Long id);
     ReturnObject<PageInfo<VoObject>> getAllAddressById(Long id, Integer page, Integer pagesize);
-    ReturnObject<Object> updateAddress(Long id , NewAddressVo vo);
+    ReturnObject<Object> updateAddress(Long userId, Long id , NewAddressVo vo);
     ReturnObject<Boolean> setAddressAsDefault(Long id,Long customerId);
     ReturnObject deleteAddress(Long id);
 

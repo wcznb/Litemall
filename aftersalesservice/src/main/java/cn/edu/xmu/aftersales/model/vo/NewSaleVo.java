@@ -19,6 +19,7 @@ public class NewSaleVo {
     @Range(message = "只能有0 1 2三种售后", min = 0, max = 3)
     private Byte type;
     @NotNull(message = "数量不能为空")
+    @Range(message="数量必须大于0",min=1)
      private Integer quantity;
     @NotBlank(message = "申请理由不能为空")
      private String reason;

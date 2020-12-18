@@ -6,6 +6,7 @@ import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
@@ -13,7 +14,10 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 商品收藏服务
@@ -50,8 +54,10 @@ public class FavoriteController {
     @ApiOperation(value = "买家收藏商品")
     @Audit
     @PostMapping("/goods/{skuId}")
-    public Object insertFavorite(@LoginUser Long userId,@PathVariable Long skuId){
+    public Object insertFavorite(@LoginUser Long userId, @PathVariable Long skuId, HttpServletResponse httpServletResponse){
         ReturnObject<VoObject> retObj = favoriteService.insertFavorite(userId, skuId);
+        if (retObj.getCode() == ResponseCode.OK)
+            httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.getRetObject(retObj);
     }
 

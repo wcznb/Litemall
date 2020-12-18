@@ -19,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 /**
  * @author shyanne 3184
@@ -52,6 +51,9 @@ public class AddressController {
         if(returnObject.getCode()== ResponseCode.OK){
             return new ResponseEntity(ResponseUtil.ok(returnObject.getData()), HttpStatus.CREATED);
         }
+        if(returnObject.getCode()==ResponseCode.REGION_OBSOLETE||returnObject.getCode()==ResponseCode.RESOURCE_ID_NOTEXIST){
+            return new ResponseEntity(ResponseUtil.fail(ResponseCode.FIELD_NOTVALID), HttpStatus.BAD_REQUEST);
+        }
         return Common.decorateReturnObject(returnObject);
 
     }
@@ -64,17 +66,17 @@ public class AddressController {
     @Audit
     @GetMapping("addresses")
     public Object getAllAddressById(@LoginUser Long userId ,
-            @RequestParam(required = false, defaultValue = "1")  Integer page,
-            @RequestParam(required = false, defaultValue = "10")  Integer pagesize
+            @RequestParam(required = true , defaultValue = "1")  Integer page,
+            @RequestParam(required = true, defaultValue = "10")  Integer pageSize
     ){
 
         Object object = null;
 
-        if(page <= 0 || pagesize <= 0) {
+        if(page <= 0 || pageSize <= 0) {
             object = Common.getNullRetObj(new ReturnObject<>(ResponseCode.FIELD_NOTVALID), httpServletResponse);
         } else {
 
-            ReturnObject<PageInfo<VoObject>> returnObject = addressService.getAllAddressById(userId,page, pagesize);
+            ReturnObject<PageInfo<VoObject>> returnObject = addressService.getAllAddressById(userId,page, pageSize);
 
             object = Common.getPageRetObject(returnObject);
         }
@@ -89,9 +91,21 @@ public class AddressController {
      */
     @Audit
     @PutMapping("addresses/{id}")
-    public Object updateAddress(@PathVariable Long id,@Validated @RequestBody NewAddressVo newAddressVo){
-        ReturnObject success = addressService.updateAddress(id,newAddressVo);
-        System.out.print(success);
+    public Object updateAddress(@PathVariable Long id,@LoginUser Long userId,@Validated @RequestBody NewAddressVo newAddressVo,BindingResult result,HttpServletResponse httpServletResponse){
+        Object obj = Common.processFieldErrors(result, httpServletResponse);
+        if(obj != null){
+            return obj;
+        }
+        ReturnObject success = addressService.updateAddress(userId,id,newAddressVo);
+        if(success.getCode()==ResponseCode.RESOURCE_ID_OUTSCOPE){
+            return new ResponseEntity(ResponseUtil.ok(), HttpStatus.FORBIDDEN);
+
+        }
+        if(success.getCode()==ResponseCode.REGION_OBSOLETE||success.getCode()==ResponseCode.RESOURCE_ID_NOTEXIST){
+            return new ResponseEntity(ResponseUtil.fail(ResponseCode.FIELD_NOTVALID), HttpStatus.BAD_REQUEST);
+        }
+
+
         return Common.decorateReturnObject(success);
 
     }
@@ -105,6 +119,13 @@ public class AddressController {
     @PutMapping("addresses/{id}/default")
     public Object setAddressAsDefault(@LoginUser Long userId ,@PathVariable Long id){
         ReturnObject<Boolean> success = addressService.setAddressAsDefault(id,userId);
+        if(success.getCode()==ResponseCode.RESOURCE_ID_OUTSCOPE){
+            return new ResponseEntity(ResponseUtil.fail(ResponseCode.RESOURCE_ID_OUTSCOPE), HttpStatus.FORBIDDEN);
+        }
+        if(success.getCode()==ResponseCode.REGION_OBSOLETE){
+            return new ResponseEntity(ResponseUtil.ok(), HttpStatus.BAD_REQUEST);
+        }
+
         return Common.decorateReturnObject(success);
     }
 

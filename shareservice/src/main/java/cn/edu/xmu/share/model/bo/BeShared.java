@@ -1,6 +1,7 @@
 package cn.edu.xmu.share.model.bo;
 
 import cn.edu.xmu.ooad.model.VoObject;
+import cn.edu.xmu.provider.model.vo.GoodsSkuSimpleRetVo;
 import cn.edu.xmu.share.model.po.BeSharePo;
 import cn.edu.xmu.share.model.vo.BeSharedRetVo;
 import lombok.Data;
@@ -21,7 +22,7 @@ public class BeShared implements VoObject {
     LocalDateTime gmtCreate;
     LocalDateTime gmtModified;
     Long shareActivityId;
-    List<Sku> sku;
+    GoodsSkuSimpleRetVo sku;
 
     @Override
     public BeSharedRetVo createVo() {
@@ -46,7 +47,7 @@ public class BeShared implements VoObject {
         this.shareActivityId = beSharePo.getShareActivityId();
     }
 
-    public BeShared(BeSharePo beSharePo, List<Sku> sku){
+    public BeShared(BeSharePo beSharePo, GoodsSkuSimpleRetVo sku){
         this.id = beSharePo.getId();
         this.goodsSpuId = beSharePo.getGoodsSkuId();
         this.shareId = beSharePo.getShareId();

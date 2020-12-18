@@ -107,7 +107,7 @@ public class AddressDao {
 
 
 
-    public ReturnObject<PageInfo<VoObject>> getALlAddressByUserid(Long customerId, Integer page, Integer pagesize){
+    public ReturnObject<PageInfo<AddressPo>> getALlAddressByUserid(Long customerId, Integer page, Integer pagesize){
 
         AddressPoExample example = new AddressPoExample();
         AddressPoExample.Criteria criteria = example.createCriteria();
@@ -126,24 +126,29 @@ public class AddressDao {
 
         }
 
-        List<VoObject> ret = new ArrayList<>(pos.size());
+        PageInfo<AddressPo> footPrintsPoPage = PageInfo.of(pos);
+        return new ReturnObject<>(footPrintsPoPage);
 
-        for (AddressPo po : pos) {
-
-            Address retVo = new Address(po);
-            retVo.setState(regionDao.getStateByRegionId(retVo.getRegionId()));
-            ret.add(retVo);
-
-        }
-
-        PageInfo<VoObject> addressPage = PageInfo.of(ret);
-
-        return new ReturnObject<>(addressPage);
     }
 
-    public ReturnObject<Object> updateAddress(Long id,NewAddressVo vo){
+    public ReturnObject<Object> updateAddress(Long userId,Long id,NewAddressVo vo){
 
-        AddressPo addressPo=new AddressPo();
+        AddressPo check = addressPoMapper.selectByPrimaryKey(id);
+        if(check==null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        if(!check.getCustomerId().equals(userId)){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
+        }
+        if(!regionDao.isExist(vo.getRegionId())){
+
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+
+        }else if(!regionDao.isAble(vo.getRegionId())) {
+
+            return new ReturnObject<>(ResponseCode.REGION_OBSOLETE);
+        }
+            AddressPo addressPo=new AddressPo();
         addressPo=addressPoMapper.selectByPrimaryKey(id);
 
         if(addressPo==null){
@@ -183,6 +188,15 @@ public class AddressDao {
 
 
     public ReturnObject<Object> setAddressAsDefault(Long id,Long customerId){
+
+
+        AddressPo check = addressPoMapper.selectByPrimaryKey(id);
+        if(check==null){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        }
+        if(!(check.getCustomerId().equals(customerId))){
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
+        }
 
         AddressPo addressPo=new AddressPo();
         addressPo.setId(id);
@@ -266,5 +280,6 @@ public class AddressDao {
 
         return retObj;
     }
+
 
 }

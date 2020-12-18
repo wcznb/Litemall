@@ -44,28 +44,14 @@ public class FootprintDao {
      * createdBy 陈渝璇 2020-11-25
      * modifiedBy 陈渝璇 2020-11-26
      */
-    public ReturnObject<PageInfo<FootprintPo>> findPageOfFootprints(Long userId, String beginTime, String endTime, Integer page, Integer pageSize){
+    public ReturnObject<PageInfo<FootprintPo>> findPageOfFootprints(Long userId, LocalDateTime beginTime, LocalDateTime endTime, Integer page, Integer pageSize){
         FootprintPoExample footPrintPoExample = new FootprintPoExample();
-        LocalDateTime bgt,et;
-
         //添加条件
         FootprintPoExample.Criteria criteria = footPrintPoExample.createCriteria();
         if(userId!=null)
             criteria.andCustomerIdEqualTo(userId);
         //时间条件处理
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        if(beginTime!=null){
-            bgt= LocalDateTime.parse(beginTime, fmt);
-        } else{
-            bgt = LocalDateTime.parse("1900-1-1 00:00:00", fmt);
-        }
-        if(endTime!=null){
-            et = LocalDateTime.parse(endTime, fmt);
-        } else{
-            et = LocalDateTime.parse("3000-12-31 23:59:59", fmt);
-        }
-        criteria.andGmtCreateLessThanOrEqualTo(et);
-        criteria.andGmtCreateGreaterThanOrEqualTo(bgt);
+        criteria.andGmtCreateBetween(beginTime,endTime);
         //分页查询
         PageHelper.startPage(page, pageSize);
         List<FootprintPo> footprintPos = null;

@@ -15,6 +15,12 @@ spring:
     name: favorite-service
   profiles:
     active: dev
+  cloud:
+    nacos:
+      username: nacos
+      password: 1-6123
+      discovery:
+        server-addr: 114.215.198.238:8848
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
@@ -65,7 +71,7 @@ mybatis:
     #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
 
-privilegeservice:
+favoriteservice:
   #是否对数据库中的未初始化的数据初始化
   initialization: false
   #分布式锁失效时间（秒）
@@ -88,6 +94,15 @@ privilegeservice:
 #pagehelper分页插件配置
 pagehelper:
   helper-dialect: mysql
+
+dubbo:
+  registry:
+    address: nacos://114.215.198.238:8848
+  cloud:
+    subscribed-services: spring-cloud-alibaba-dubbo-server
+  protocols:
+    dubbo:
+      port: 18888
 
 
 

@@ -56,12 +56,13 @@ public class UserController {
             @ApiResponse(code = 404, message = "参数不合法")
     })
     @PostMapping("users")
-    public Object register(@Validated @RequestBody NewUserVo vo, BindingResult result){
+    public Object register(@Validated @RequestBody NewUserVo vo, BindingResult result,HttpServletResponse httpServletResponse){
         if(result.hasErrors()){
             return Common.processFieldErrors(result,httpServletResponse);
         }
         ReturnObject returnObject= userService.register(vo);
         if(returnObject.getCode()== ResponseCode.OK){
+            httpServletResponse.setStatus(HttpServletResponse.SC_CREATED);
             return ResponseUtil.ok(returnObject.getData());
         }
         else return ResponseUtil.fail(returnObject.getCode());
@@ -91,6 +92,7 @@ public class UserController {
         if(jwt.getData() == null){
             return ResponseUtil.fail(jwt.getCode(), jwt.getErrmsg());
         }else{
+            httpServletResponse.setStatus(HttpServletResponse.SC_CREATED);
             return ResponseUtil.ok(jwt.getData());
         }
     }
@@ -129,7 +131,7 @@ public class UserController {
         return ResponseUtil.ok(new ReturnObject<List>(stateVos).getData());
     }
 
-//    @RequestParam(value="username") String username, @RequestParam(value="age", required=false, defaultValue="0") int age
+
 
     @ApiOperation(value = "平台管理员获取所有用户列表")
     @Audit

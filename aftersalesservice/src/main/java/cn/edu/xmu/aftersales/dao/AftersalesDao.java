@@ -2,7 +2,7 @@ package cn.edu.xmu.aftersales.dao;
 
 import cn.edu.xmu.aftersales.mapper.AftersaleServicePoMapper;
 import cn.edu.xmu.aftersales.model.bo.AftersalesBo;
-import cn.edu.xmu.aftersales.model.bo.adminSaleBo;
+import cn.edu.xmu.aftersales.model.bo.querySaleBo;
 import cn.edu.xmu.aftersales.model.po.AftersaleServicePo;
 import cn.edu.xmu.aftersales.model.po.AftersaleServicePoExample;
 import cn.edu.xmu.aftersales.model.vo.checkVo;
@@ -38,7 +38,7 @@ public class AftersalesDao implements InitializingBean {
      */
     public ReturnObject<AftersalesBo> insertSale(AftersalesBo aftersalesBo) {
 
-        //调订单模块 看此orderitemId是否存在
+
         AftersaleServicePo po = aftersalesBo.gotSalePo();
         ReturnObject<AftersalesBo> retObj = null;
         try {
@@ -47,7 +47,6 @@ public class AftersalesDao implements InitializingBean {
                 //失败了
                 //日志
                 retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("新增售后单失败" + po.getOrderItemId()));
-
             } else {
                 //日志
                 aftersalesBo.setId(po.getId());
@@ -67,38 +66,20 @@ public class AftersalesDao implements InitializingBean {
 
 
     /**
-     * 买家查询所有售后单 调用订单模块
+     * 买家查询所有售后单
      */
-    public ReturnObject<PageInfo<VoObject>> getSales(Long userId,Long spuId,Long skuId,String beginTime,String endTime,Integer page,Integer pageSize,Byte type,Byte state){
+    public ReturnObject<List<querySaleBo>> getSales(Long userId,LocalDateTime beginTime,LocalDateTime endTime,Integer page,Integer pageSize,Byte type,Byte state){
         AftersaleServicePoExample example=new AftersaleServicePoExample();
         AftersaleServicePoExample.Criteria criteria=example.createCriteria();
 
-
         criteria.andBeDeletedNotEqualTo((byte)1);
+        criteria.andCustomerIdEqualTo(userId);
 
-        criteria.andCustomerIdEqualTo(Long.valueOf(userId));
-
-        List<Long> orderItemIds=new ArrayList<>();
-        if(spuId!=null){
-            //根据spuId查询orderItemId 订单模块
-
-            orderItemIds.add(Long.valueOf(1));
-            orderItemIds.add(Long.valueOf(2));
-            orderItemIds.add(Long.valueOf(3));
-            criteria.andOrderItemIdIn(orderItemIds);
-        }if(skuId!=null){
-            //根据skuId查询orderItemId  订单模块
-
-            orderItemIds.add(Long.valueOf(4));
-            criteria.andOrderItemIdIn(orderItemIds);
+        if(beginTime!=null){
+            criteria.andGmtCreateGreaterThanOrEqualTo(beginTime);
         }
-
-
-        if(beginTime!=null&&!beginTime.equals(" ")){
-            criteria.andGmtCreateGreaterThanOrEqualTo(LocalDateTime.parse(beginTime));
-        }
-        if(endTime!=null&&!endTime.equals(" ")){
-            criteria.andGmtCreateLessThanOrEqualTo(LocalDateTime.parse(endTime));
+        if(endTime!=null){
+            criteria.andGmtCreateLessThanOrEqualTo(beginTime);
         }
         if(type!=null)
             criteria.andTypeEqualTo(type);
@@ -108,68 +89,42 @@ public class AftersalesDao implements InitializingBean {
         if(page!=null&&pageSize!=null)
         PageHelper.startPage(page,pageSize);
         List<AftersaleServicePo> pos=null;
+        ReturnObject<List<querySaleBo>> ret=null;
 
         try{
             pos=aftersaleServicePoMapper.selectByExample(example);
+
         }catch (DataAccessException e){
 //            logger.error("selectAllRole: DataAccessException:" + e.getMessage());
-            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
+            ret= new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
 
-        List<VoObject> ret=new ArrayList<>(pos.size());
-        if(pos.size()==0){
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,"不存在满足条件的售后单");
-        }
-        for(AftersaleServicePo sale:pos){
-            Long orderItemId=sale.getOrderItemId();
-            //订单模块 根据orderItemId查询spuId skuId orderId skuName
-            Long skuid=Long.valueOf(1);
-            Long orderId=Long.valueOf(1);
-            String skuName="华为";
+            List<querySaleBo> bos=new ArrayList<>(pos.size());
+            for (AftersaleServicePo sale : pos) {
+                querySaleBo bo = new querySaleBo(sale);
+                bos.add(bo);
+            }
+            ret=new ReturnObject<>(bos);
 
-            AftersalesBo bo=new AftersalesBo(sale);
-            bo.setOrderId(orderId);
-            bo.setSkuId(skuid);
-            bo.setSkuName(skuName);
-            ret.add(bo);
-        }
-        PageInfo<VoObject> salePage=PageInfo.of(ret);
-        return new ReturnObject<>(salePage);
+        return ret;
     }
 
 
     /**
      * 管理员查看售后单
      */
-    public ReturnObject<PageInfo<VoObject>> getSalesByShopId( Long shopId, Long spuId, Long skuId, String beginTime, String endTime, Integer page, Integer pageSize, Byte type, Byte state){
+    public ReturnObject<List<querySaleBo>> getSalesByShopId(Long shopId, LocalDateTime beginTime, LocalDateTime endTime, Integer page, Integer pageSize, Byte type, Byte state){
         AftersaleServicePoExample example=new AftersaleServicePoExample();
         AftersaleServicePoExample.Criteria criteria=example.createCriteria();
 
         criteria.andBeDeletedNotEqualTo((byte)1);
-
         criteria.andShopIdEqualTo(shopId);
 
-        List<Long> orderItemIds=new ArrayList<>();
-        if(spuId!=null){
-            //根据spuId查询orderItemId 订单模块
-
-            orderItemIds.add(Long.valueOf(1));
-            orderItemIds.add(Long.valueOf(2));
-            orderItemIds.add(Long.valueOf(3));
-            criteria.andOrderItemIdIn(orderItemIds);
-        }if(skuId!=null){
-            //根据skuId查询orderItemId  订单模块
-
-            orderItemIds.add(Long.valueOf(4));
-            criteria.andOrderItemIdIn(orderItemIds);
+        if(beginTime!=null){
+            criteria.andGmtCreateGreaterThanOrEqualTo(beginTime);
         }
-
-
-        if(beginTime!=null&&!beginTime.equals(" ")){
-            criteria.andGmtCreateGreaterThanOrEqualTo(LocalDateTime.parse(beginTime));
-        }
-        if(endTime!=null&&!endTime.equals(" ")){
-            criteria.andGmtCreateLessThanOrEqualTo(LocalDateTime.parse(endTime));
+        if(endTime!=null){
+            criteria.andGmtCreateLessThanOrEqualTo(endTime);
         }
         if(type!=null)
             criteria.andTypeEqualTo(type);
@@ -178,31 +133,25 @@ public class AftersalesDao implements InitializingBean {
 
         if(page!=null&&pageSize!=null)
             PageHelper.startPage(page,pageSize);
-        List<AftersaleServicePo> pos=null;
 
+        List<AftersaleServicePo> pos=null;
+        ReturnObject<List<querySaleBo>> ret=null;
         try{
             pos=aftersaleServicePoMapper.selectByExample(example);
+
         }catch (DataAccessException e){
 //            logger.error("selectAllRole: DataAccessException:" + e.getMessage());
-            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
+            ret= new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
 
-        if(pos.size()==0){
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,"不存在满足条件的售后单");
-        }
-        List<VoObject> ret=new ArrayList<>(pos.size());
-        for(AftersaleServicePo sale:pos){
-            Long orderItemId=sale.getOrderItemId();
-            //订单模块 根据orderItemId查询spuId skuId orderId skuName
+            List<querySaleBo> bos=new ArrayList<>(pos.size());
+            for (AftersaleServicePo sale : pos) {
+                querySaleBo bo = new querySaleBo(sale);
+                bos.add(bo);
+            }
+            ret=new ReturnObject<>(bos);
 
-            Long orderId=Long.valueOf(1);
-
-           adminSaleBo bo=new adminSaleBo(sale);
-            bo.setOrderId(orderId);
-            ret.add(bo);
-        }
-        PageInfo<VoObject> salePage=PageInfo.of(ret);
-        return new ReturnObject<>(salePage);
+        return ret;
     }
 
     /**
@@ -211,40 +160,22 @@ public class AftersalesDao implements InitializingBean {
     public ReturnObject<AftersalesBo> findById(Long userId, Long id) {
 
         ReturnObject<AftersalesBo> retObj = null;
-        AftersaleServicePoExample example = new AftersaleServicePoExample();
-        AftersaleServicePoExample.Criteria criteria = example.createCriteria();
-        criteria.andIdEqualTo(id);
-        criteria.andBeDeletedEqualTo((byte) 0);
+
         try {
-            List<AftersaleServicePo> po = aftersaleServicePoMapper.selectByExample(example);
-            if (po.size() == 0) {
+            AftersaleServicePo po = aftersaleServicePoMapper.selectByPrimaryKey(id);
+            if (po==null||po.getBeDeleted()==1) {
                 return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
             } else {
-                criteria.andCustomerIdEqualTo(userId);
-                List<AftersaleServicePo> pos = aftersaleServicePoMapper.selectByExample(example);
-                if(pos.size()==0){
+                if(po.getCustomerId()!=userId)
                     return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
-                }else{
-                    for (AftersaleServicePo servicePo : pos) {
-                        AftersalesBo bo = new AftersalesBo(servicePo);
-                        //订单模块内部接口
-                        Long orderItemId = servicePo.getOrderItemId();
-                        Long orderId = Long.valueOf(1);
-                        Long skuId = Long.valueOf(1);
-                        String skuName = "手机";
-                        String orderSn = "1111";
-                        //组装bo
-                        bo.setSkuId(skuId);
-                        bo.setSkuName(skuName);
-                        bo.setOrderId(orderId);
-                        bo.setOrderSn(orderSn);
+                else{
+                        AftersalesBo bo = new AftersalesBo(po);
                         retObj = new ReturnObject<>(bo);
-                    }
                 }
             }
         } catch (DataAccessException e) {
             //日志
-            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("数据库错误：%s", e.getMessage()));
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         } catch (Exception e) {
             retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
@@ -257,6 +188,7 @@ public class AftersalesDao implements InitializingBean {
     public ReturnObject<AftersalesBo> modify(Long id, Long userId, AftersalesBo bo) {
         AftersaleServicePo po = bo.gotSalePo();
         po.setState((byte) 0);
+        po.setGmtModified(LocalDateTime.now());
         ReturnObject<AftersalesBo> retObj = null;
         try {
             AftersaleServicePoExample example = new AftersaleServicePoExample();
@@ -286,7 +218,7 @@ public class AftersalesDao implements InitializingBean {
                 retObj = new ReturnObject<>(ResponseCode.OK);
             }
         } catch (DataAccessException e) {
-            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("数据库错误：%s", e.getMessage()));
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         } catch (Exception e) {
             retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
@@ -317,13 +249,13 @@ public class AftersalesDao implements InitializingBean {
                         if (sale.getState()==(byte)0||sale.getState()==(byte)1) //售后单还没有完成
                         {
                             sale.setState((byte) 7);
-                        } else if(sale.getState()==(byte)8) {
+                        } else if(sale.getState()==(byte)8||sale.getState()==(byte)7) {
                             sale.setBeDeleted((byte) 1);
                         }else{
                             return new ReturnObject<>(ResponseCode.AFTERSALE_STATENOTALLOW);
                         }
                         sale.setGmtModified(LocalDateTime.now());
-                        criteria.andStateIn(List.of((byte)0,(byte)1,(byte)8));
+                        criteria.andStateIn(List.of((byte)0,(byte)1,(byte)8,(byte)7));
                         int ret = aftersaleServicePoMapper.updateByExampleSelective(sale, example);
                         if (ret == 0) {
                             //日志
@@ -335,7 +267,7 @@ public class AftersalesDao implements InitializingBean {
                 }
             }
         } catch (DataAccessException e) {
-            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("数据库错误：%s", e.getMessage()));
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         } catch (Exception e) {
             retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库发生错误：%s", e.getMessage()));
         }
@@ -365,7 +297,7 @@ public class AftersalesDao implements InitializingBean {
                 for(AftersaleServicePo sale:pos){
                     if(sale.getCustomerId()!=userId)
                         return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
-                    if(sale.getBeDeleted()==(byte)1||sale.getState()!=(byte)1){
+                    if(sale.getState()!=(byte)1){
                         retObj = new ReturnObject<>(ResponseCode.AFTERSALE_STATENOTALLOW);
                         return retObj;
                     }
@@ -382,7 +314,7 @@ public class AftersalesDao implements InitializingBean {
                 retObj = new ReturnObject<>(ResponseCode.OK);
             }
         }catch (DataAccessException e) {
-            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("数据库错误：%s", e.getMessage()));
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         } catch (Exception e) {
             retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
@@ -427,7 +359,7 @@ public class AftersalesDao implements InitializingBean {
                 retObj = new ReturnObject<>(ResponseCode.OK);
             }
         } catch (DataAccessException e) {
-            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("数据库发生错误:%s", e.getMessage()));
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库发生错误:%s", e.getMessage()));
         } catch (Exception e) {
             retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库发生错误%s", e.getMessage()));
         }
@@ -435,43 +367,31 @@ public class AftersalesDao implements InitializingBean {
     }
 
     /**
-     * 买家根据售后单id和店铺Id查询售后单信息
+     * 管理员根据售后单id和店铺Id查询售后单信息
      */
-    public ReturnObject<VoObject> search(Long userId, Long shopId, Long id) {
+    public ReturnObject<AftersalesBo> search(Long shopId, Long id) {
         AftersaleServicePoExample example = new AftersaleServicePoExample();
         AftersaleServicePoExample.Criteria criteria = example.createCriteria();
 
-
-        criteria.andCustomerIdEqualTo(userId);
-        criteria.andShopIdEqualTo(shopId);
+        criteria.andBeDeletedNotEqualTo((byte)1);
         criteria.andIdEqualTo(id);
 
-        ReturnObject<VoObject> retObj = null;
+        ReturnObject<AftersalesBo> retObj = null;
         try {
             List<AftersaleServicePo> po = aftersaleServicePoMapper.selectByExample(example);
             if (po.size() == 0) {
-                retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("查询售后单失败，id=%d,shopId=%d,customerId=%d", id, shopId, userId));
+                retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("查询售后单失败，id=%d,shopId=%d", id, shopId));
             } else {
                 for (AftersaleServicePo sale : po) {
+                    if(sale.getShopId()!=shopId)
+                        return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
                     AftersalesBo bo = new AftersalesBo(sale);
-                    //调用订单模块
-                    Long orderItemId = sale.getOrderItemId();
-                    //.......
-                    String skuName = "手机";
-                    Long skuId = Long.valueOf(1);
-                    String orderSn = "1231212";
-                    Long orderId = Long.valueOf(1);
-                    bo.setSkuName(skuName);
-                    bo.setSkuId(skuId);
-                    bo.setOrderSn(orderSn);
-                    bo.setOrderId(orderId);
-
                     retObj = new ReturnObject<>(bo);
                 }
             }
         } catch (DataAccessException e) {
             //日志
-            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("数据库错误：%s", e.getMessage()));
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         } catch (Exception e) {
             retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
@@ -485,10 +405,12 @@ public class AftersalesDao implements InitializingBean {
         Boolean confirm = vo.isConfirm();
         String conclusion = vo.getConclusion();
         Long price=vo.getPrice();
+        Byte newType=vo.getType();
+
 
         AftersaleServicePoExample example = new AftersaleServicePoExample();
         AftersaleServicePoExample.Criteria criteria = example.createCriteria();
-        criteria.andShopIdEqualTo(shopId);
+        criteria.andBeDeletedNotEqualTo((byte)1);
         criteria.andIdEqualTo(id);
         try{
             List<AftersaleServicePo> pos=aftersaleServicePoMapper.selectByExample(example);
@@ -496,20 +418,29 @@ public class AftersalesDao implements InitializingBean {
                 return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,String.format("此售后订单不存在"));
             }else{
                 for(AftersaleServicePo po:pos){
-                    if(po.getBeDeleted()==(byte)1||po.getState()!=0){
+                    if(po.getShopId()!=shopId)
+                        return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
+                    if(po.getState()!=0)
                         return new ReturnObject<>(ResponseCode.AFTERSALE_STATENOTALLOW);
+                    if(vo.isConfirm()) {
+
+                        if (((po.getType() == 1 || newType == 1) && (price == null || price > 0)) || ((po.getType() == 2 || newType == 2) && (price == null || price < 0)))//不是修改为维修 价格不对
+                            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+                        }
                     }
                 }
-            }
         }catch (DataAccessException e) {
             //日志
-           return  new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("数据库错误：%s", e.getMessage()));
+           return  new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         } catch (Exception e) {
            return  new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
 
         AftersaleServicePo po = new AftersaleServicePo();
         if (confirm == true) {
+            if(po.getType()!=null){
+                po.setType(vo.getType());
+            }
             po.setState((byte) 1);
             po.setConclusion(conclusion);
             if(price!=null){
@@ -517,13 +448,15 @@ public class AftersalesDao implements InitializingBean {
             }
         } else {
             po.setState((byte) 6);
+            if(vo.getPrice()!=null){
+                po.setRefund(vo.getPrice());
+            }
             po.setConclusion(conclusion);
         }
 
         //防止其他进程在此之前修改
-        criteria.andBeDeletedNotEqualTo((byte)1);
         criteria.andStateEqualTo((byte)0);
-
+        po.setGmtModified(LocalDateTime.now());
         ReturnObject<VoObject> retObj = null;
         try {
             int ret = aftersaleServicePoMapper.updateByExampleSelective(po, example);
@@ -534,7 +467,7 @@ public class AftersalesDao implements InitializingBean {
             }
         } catch (DataAccessException e) {
             //日志
-            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("数据库错误：%s", e.getMessage()));
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         } catch (Exception e) {
             retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
@@ -549,7 +482,6 @@ public class AftersalesDao implements InitializingBean {
         AftersaleServicePoExample example=new AftersaleServicePoExample();
         AftersaleServicePoExample.Criteria criteria=example.createCriteria();
 
-        criteria.andShopIdEqualTo(shopId);
         criteria.andIdEqualTo(id);
         criteria.andBeDeletedNotEqualTo((byte)1);
         ReturnObject<VoObject> retObj=null;
@@ -559,11 +491,13 @@ public class AftersalesDao implements InitializingBean {
                 retObj=new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,String.format("此售后单不存在，id=%d,shopId=%d",id,shopId));
             }else{
                 for(AftersaleServicePo sale:po){
+                    if(sale.getShopId()!=shopId)
+                        return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
                     if(sale.getState()!=2){
                         return new ReturnObject<>(ResponseCode.AFTERSALE_STATENOTALLOW);
                     }
                     if(vo.isConfirm()) {
-                        if (sale.getType() == (byte) 0) {
+                        if (sale.getType() == (byte) 0||sale.getType()==(byte)2) {
                             sale.setState((byte) 4);
                             sale.setConclusion(vo.getConclusion());
                         } else {
@@ -586,7 +520,7 @@ public class AftersalesDao implements InitializingBean {
             }
         }catch (DataAccessException e) {
             //日志
-            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("数据库错误：%s", e.getMessage()));
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         } catch (Exception e) {
             retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
@@ -596,19 +530,15 @@ public class AftersalesDao implements InitializingBean {
     /**
      * 店家寄出维修好（调换）的货物
      */
-    public ReturnObject<VoObject> deliverProduct(Long shopId,Long id,String logSn){
-        AftersaleServicePo po=new AftersaleServicePo();
-        po.setShopLogSn(logSn);
-        po.setState((byte)5);
+    public ReturnObject<AftersalesBo> deliverProduct(Long shopId,Long id){
+
 
         AftersaleServicePoExample example=new AftersaleServicePoExample();
         AftersaleServicePoExample.Criteria criteria=example.createCriteria();
-
         criteria.andBeDeletedNotEqualTo((byte)1);
         criteria.andIdEqualTo(id);
-        criteria.andShopIdEqualTo(shopId);
 
-        ReturnObject<VoObject> retObj=null;
+        ReturnObject<AftersalesBo> retObj=null;
         try {
 
             List<AftersaleServicePo> pos = aftersaleServicePoMapper.selectByExample(example);
@@ -616,22 +546,36 @@ public class AftersalesDao implements InitializingBean {
                 retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("此售后单不存在，id=%d,shopId=%d", id, shopId));
             } else {
                 for (AftersaleServicePo sale : pos) {
+                    if(sale.getShopId()!=shopId)
+                        return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
                     if (sale.getState() != 4) {
                         return new ReturnObject<>(ResponseCode.AFTERSALE_STATENOTALLOW);
                     } else {
-                        criteria.andStateEqualTo((byte) 4);
-                        int ret = aftersaleServicePoMapper.updateByExampleSelective(po, example);
-                        if (ret == 0) {
-                            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("店家寄出商品失败，id=%d,logSn=%s", id, logSn));
-                        } else {
-                            retObj = new ReturnObject<>(ResponseCode.OK);
+                        return new ReturnObject<>(new AftersalesBo(sale));
                         }
                     }
                 }
-            }
-        } catch (DataAccessException e) {
+            } catch (DataAccessException e) {
             //日志
-            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("数据库错误：%s", e.getMessage()));
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
+        } catch (Exception e) {
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
+        }
+        return retObj;
+    }
+
+    public ReturnObject<VoObject> updatedeliver(AftersalesBo bo) {
+        AftersaleServicePo po=bo.gotSalePo();
+        ReturnObject<VoObject> retObj=null;
+        try{
+            int ret=aftersaleServicePoMapper.updateByPrimaryKeySelective(po);
+            if(ret==0){
+                retObj=new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
+            }
+            else retObj=new ReturnObject<>(ResponseCode.OK);
+        }catch (DataAccessException e) {
+            //日志
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         } catch (Exception e) {
             retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }

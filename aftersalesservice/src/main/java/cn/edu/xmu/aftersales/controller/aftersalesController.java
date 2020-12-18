@@ -47,7 +47,6 @@ public class aftersalesController {
     @ApiResponses({
             @ApiResponse(code=0,message = "成功")
     })
-    @Audit
     @GetMapping("aftersales/states")
     public Object getSaleState(){
         AftersalesBo.State[] states=AftersalesBo.State.class.getEnumConstants();
@@ -86,18 +85,23 @@ public class aftersalesController {
     @ApiOperation(value="买家查询所有的售后单信息（可根据售后类型和状态选择）")
     @Audit
     @GetMapping("/aftersales")
-    public Object getSale(@LoginUser Long userId,@RequestParam(value="spuId",required = false,defaultValue = " ")Long spuId,
-                          @RequestParam(value="skuId",required = false,defaultValue = " ")Long skuId,
-                          @RequestParam(value = "beginTime",required = false,defaultValue = " ")String beginTime,
-                          @RequestParam(value="endTime",required = false,defaultValue = " ")String endTime,
-                          @RequestParam(value="page",required = false,defaultValue = " ")Integer page,
-                          @RequestParam(value="pageSize",required = false,defaultValue = " ")Integer pageSize,
-                          @RequestParam(value="type",required = false,defaultValue = " ")Byte type,
-                          @RequestParam(value="state",required = false,defaultValue = " ")Byte state
+    public Object getSale(@LoginUser Long userId,
+                          @RequestParam(value = "beginTime",required = false,defaultValue = "")String beginTime,
+                          @RequestParam(value="endTime",required = false,defaultValue = "")String endTime,
+                          @RequestParam(value="page",required = false,defaultValue = "1")Integer page,
+                          @RequestParam(value="pageSize",required = false,defaultValue = "10")Integer pageSize,
+                          @RequestParam(value="type",required = false,defaultValue = "")Byte type,
+                          @RequestParam(value="state",required = false,defaultValue = "")Byte state
                           ){
 
-        ReturnObject<PageInfo<VoObject>> retObj=afterSaleService.getSale(userId,spuId,skuId,beginTime,endTime,page,pageSize,type,state);
-        return Common.getPageRetObject(retObj);
+        ReturnObject<PageInfo<VoObject>> retObject=afterSaleService.getSale(userId,beginTime,endTime,page,pageSize,type,state);
+
+        if (retObject.getCode() == ResponseCode.OK) {
+            return Common.getPageRetObject(retObject);
+        } else {
+            return  Common.decorateReturnObject(retObject);
+        }
+
     }
 
 
@@ -108,16 +112,20 @@ public class aftersalesController {
     @Audit
     @GetMapping("/shops/{id}/aftersales")
     public Object getSaleByShop(@LoginUser Long userId,@PathVariable("id")Long shopId,
-                                @RequestParam(value="spuId",required = false,defaultValue = " ")Long spuId,
-                                @RequestParam(value="skuId",required = false,defaultValue = " ")Long skuId,
-                                @RequestParam(value = "beginTime",required = false,defaultValue = " ")String beginTime,
-                                @RequestParam(value="endTime",required = false,defaultValue = " ")String endTime,
-                                @RequestParam(value="page",required = false,defaultValue = " ")Integer page,
-                                @RequestParam(value="pageSize",required = false,defaultValue = " ")Integer pageSize,
-                                @RequestParam(value="type",required = false,defaultValue = " ")Byte type,
-                                @RequestParam(value="state",required = false,defaultValue = " ")Byte state){
-        ReturnObject<PageInfo<VoObject>> retObj=afterSaleService.getSaleByShop(shopId,spuId,skuId,beginTime,endTime,page,pageSize,type,state);
-        return Common.getPageRetObject(retObj);
+                                @RequestParam(value = "beginTime",required = false,defaultValue = "")String beginTime,
+                                @RequestParam(value="endTime",required = false,defaultValue = "")String endTime,
+                                @RequestParam(value="page",required = false,defaultValue = "1")Integer page,
+                                @RequestParam(value="pageSize",required = false,defaultValue = "10")Integer pageSize,
+                                @RequestParam(value="type",required = false,defaultValue = "")Byte type,
+                                @RequestParam(value="state",required = false,defaultValue = "")Byte state){
+
+
+        ReturnObject<PageInfo<VoObject>> retObject=afterSaleService.getSaleByShop(shopId,beginTime,endTime,page,pageSize,type,state);
+        if (retObject.getCode() == ResponseCode.OK) {
+            return Common.getPageRetObject(retObject);
+        } else {
+            return  Common.decorateReturnObject(retObject);
+        }
     }
 
     /**
@@ -216,8 +224,12 @@ public class aftersalesController {
     @Audit
     @GetMapping("/shops/{shopId}/aftersales/{id}")
     public Object searchSale(@LoginUser Long userId,@PathVariable("shopId")Long shopId,@PathVariable("id")Long id){
-        ReturnObject<VoObject> ret=afterSaleService.searchSale(userId, shopId, id);
-        return Common.getRetObject(ret);
+        ReturnObject<VoObject> ret=afterSaleService.searchSale(shopId, id);
+        if (ret.getCode() == ResponseCode.OK) {
+            return Common.getRetObject(ret);
+        } else {
+            return Common.decorateReturnObject(ret);
+        }
     }
 
     /**
@@ -226,15 +238,19 @@ public class aftersalesController {
     @ApiOperation(value="管理员同意/不同意（退款，换货，维修）")
     @Audit
     @PutMapping("/shops/{shopId}/aftersales/{id}/confirm")
-    public Object agreeRequest(@LoginUser Long userId,@PathVariable("shopId")Long shopId,@PathVariable("id")Long id,@RequestBody checkVo vo,BindingResult bindingResult, HttpServletResponse httpServletResponse){
+    public Object agreeRequest(@LoginUser Long userId,@PathVariable("shopId")Long shopId,@Validated @PathVariable("id")Long id,@RequestBody checkVo vo,BindingResult bindingResult, HttpServletResponse httpServletResponse){
 
         Object obj = Common.processFieldErrors(bindingResult, httpServletResponse);
         if(obj != null){
             return obj;
         }
 
-        ReturnObject<VoObject> retObj=afterSaleService.agreeRequest(shopId, id, vo);
-        return Common.getRetObject(retObj);
+        ReturnObject<VoObject> returnObject=afterSaleService.agreeRequest(shopId, id, vo);
+        if (returnObject.getCode() == ResponseCode.OK) {
+            return Common.getRetObject(returnObject);
+        } else {
+            return Common.decorateReturnObject(returnObject);
+        }
     }
 
     /**
@@ -244,15 +260,19 @@ public class aftersalesController {
     @ApiOperation(value="店家确认收到买家的退（换）货")
     @Audit
     @PutMapping("/shops/{shopId}/aftersales/{id}/receive")
-    public Object receive(@PathVariable("shopId")Long shopId,@PathVariable("id")Long id,@RequestBody confirmVo vo,BindingResult bindingResult, HttpServletResponse httpServletResponse){
+    public Object receive(@PathVariable("shopId")Long shopId,@PathVariable("id")Long id,@Validated @RequestBody confirmVo vo,BindingResult bindingResult, HttpServletResponse httpServletResponse){
 
         Object obj = Common.processFieldErrors(bindingResult, httpServletResponse);
         if(obj != null){
             return obj;
         }
 
-        ReturnObject<VoObject> retObj=afterSaleService.receive(shopId, id, vo);
-        return Common.getRetObject(retObj);
+        ReturnObject<VoObject> returnObject=afterSaleService.receive(shopId, id, vo);
+        if (returnObject.getCode() == ResponseCode.OK) {
+            return Common.getRetObject(returnObject);
+        } else {
+            return Common.decorateReturnObject(returnObject);
+        }
     }
 
     /**
@@ -261,15 +281,14 @@ public class aftersalesController {
     @ApiOperation(value="店家寄出维修好（调换）的货物")
     @Audit
     @PutMapping("/shops/{shopId}/aftersales/{id}/deliver")
-    public Object deliver(@PathVariable("shopId")Long shopId,@PathVariable("id")Long id,@RequestBody LogSnVo vo,BindingResult bindingResult, HttpServletResponse httpServletResponse){
+    public Object deliver(@PathVariable("shopId")Long shopId,@PathVariable("id")Long id,@RequestBody shopLogSnVo vo){
 
-        Object obj = Common.processFieldErrors(bindingResult, httpServletResponse);
-        if(obj != null){
-            return obj;
+        ReturnObject<VoObject> returnObject=afterSaleService.deliver(shopId,id,vo);
+        if (returnObject.getCode() == ResponseCode.OK) {
+            return Common.getRetObject(returnObject);
+        } else {
+            return Common.decorateReturnObject(returnObject);
         }
-
-        String logSn=vo.getLogSn();
-        ReturnObject<VoObject> retObj=afterSaleService.deliver(shopId,id,logSn);
-        return Common.getRetObject(retObj);
     }
+
 }

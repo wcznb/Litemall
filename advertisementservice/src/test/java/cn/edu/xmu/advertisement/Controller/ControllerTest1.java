@@ -5,6 +5,7 @@ import cn.edu.xmu.advertisement.model.vo.AdvertisementMessageVo;
 import cn.edu.xmu.advertisement.model.vo.AdvertisementUpdateVo;
 import cn.edu.xmu.advertisement.model.vo.NewAdvertisementVo;
 import cn.edu.xmu.ooad.util.JacksonUtil;
+import cn.edu.xmu.ooad.util.JwtHelper;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
@@ -36,10 +37,19 @@ public class ControllerTest1 {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerTest1.class);
 
+
+
+    private final String creatTestToken(Long userId, Long departId, int expireTime) {
+        String token = new JwtHelper().createToken(userId, departId, expireTime);
+        logger.debug(token);
+        return token;
+    }
+
     @Test
     public void becomeDefault() throws Exception {
 
-        ResultActions res = this.mvc.perform(put("/advertisement/125/default")
+      // String token = creatTestToken(1L, 1L, 1000);
+        ResultActions res = this.mvc.perform(put("/shops/0/advertisement/122/default")
 //                .header("authorization",authorization)
                 .contentType("application/json;charset=UTF-8"));
 
@@ -120,7 +130,7 @@ public class ControllerTest1 {
         advertisementUpdateVo.setContent("ww");
         advertisementUpdateVo.setLink("123546");
      //   advertisementUpdateVo.setSeg_id("3");
-        advertisementUpdateVo.setWeight("2");
+        advertisementUpdateVo.setWeight(2);
 
         String contentJson = JacksonUtil.toJson(advertisementUpdateVo);
 
@@ -188,7 +198,7 @@ public class ControllerTest1 {
     @Test
     public void getAdBySegID() throws Exception{
 
-        ResultActions res = this.mvc.perform(get("/timesegments/16/advertisement?page=1&pageSize=4")
+        ResultActions res = this.mvc.perform(get("/shops/0/timesegments/12/advertisement?page=1&pagesize=8")
                 //.header("authorization",authorization)
                 .contentType("application/json;charset=UTF-8"));
 
