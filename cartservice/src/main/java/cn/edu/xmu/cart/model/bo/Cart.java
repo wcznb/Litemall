@@ -2,8 +2,10 @@ package cn.edu.xmu.cart.model.bo;
 
 import cn.edu.xmu.cart.model.po.CartPo;
 import cn.edu.xmu.cart.model.vo.CartRetVo;
-import cn.edu.xmu.cart.model.vo.GoodsVo;
 import cn.edu.xmu.ooad.model.VoObject;
+import cn.edu.xmu.provider.model.vo.CouponActivityVo;
+import cn.edu.xmu.provider.model.vo.GoodsCartVo;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,11 +13,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 public class Cart implements VoObject {
     private Long id;
 
-    private Long goodSkuId;
+    private Long goodsSkuId;
 
     private String skuName;
 
@@ -23,7 +26,7 @@ public class Cart implements VoObject {
 
     private Long price;
 
-    private List<CouponActivity> couponActivity;
+    private List<CouponActivityVo> couponActivity;
 
     private LocalDateTime gmtCreate;
 
@@ -31,15 +34,16 @@ public class Cart implements VoObject {
 
     public Cart(CartPo cartPo){
         this.id=cartPo.getId();
-        this.goodSkuId=cartPo.getGoodsSkuId();
+        this.price=cartPo.getPrice();
+        this.goodsSkuId=cartPo.getGoodsSkuId();
         this.quantity=cartPo.getQuantity();
         this.gmtCreate=cartPo.getGmtCreate();
         this.gmtModified=cartPo.getGmtModified();
     }
 
-    public void setGoods(GoodsVo goodsVo){
-        this.skuName = goodsVo.getSkuName();
-        this.couponActivity = goodsVo.getCouponActivity();
+    public void setGoods(GoodsCartVo goodsCartVo){
+        this.skuName = goodsCartVo.getSkuName();
+        this.couponActivity = goodsCartVo.getCouponActivity();
     }
     @Override
     public Object createVo() {

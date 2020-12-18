@@ -1,5 +1,6 @@
 package cn.edu.xmu.share.model.vo;
 
+import cn.edu.xmu.provider.model.vo.GoodsSkuSimpleRetVo;
 import cn.edu.xmu.share.model.bo.BeShared;
 import cn.edu.xmu.share.model.bo.Sku;
 import cn.edu.xmu.share.model.po.BeSharePo;
@@ -12,7 +13,7 @@ import java.util.List;
 public class BeSharedRetVo {
 
     Long id;
-    List<Sku> sku;
+    GoodsSkuSimpleRetVo sku;
     Long sharerId;
     Long customerId;
     Long orderId;

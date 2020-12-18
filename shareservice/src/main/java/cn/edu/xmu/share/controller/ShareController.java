@@ -2,24 +2,35 @@ package cn.edu.xmu.share.controller;
 
 import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.annotation.LoginUser;
+import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
+import cn.edu.xmu.ooad.util.ResponseUtil;
 import cn.edu.xmu.ooad.util.ReturnObject;
+import cn.edu.xmu.share.model.bo.ShareActivity;
 import cn.edu.xmu.share.model.vo.ShareActivityVo;
+import cn.edu.xmu.share.model.vo.SharesRetVo;
 import cn.edu.xmu.share.model.vo.SharesVo;
+import cn.edu.xmu.share.model.vo.StateVo;
 import cn.edu.xmu.share.service.BeSharedService;
 import cn.edu.xmu.share.service.ShareActivityService;
 import cn.edu.xmu.share.service.SharesService;
 
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.*;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,7 +50,19 @@ public class ShareController {
     @Autowired
     BeSharedService beSharedService;
 
-    /**-------------------------------------------------------------------------需要修改---------------------------------------------
+
+    @GetMapping("/advertisement/states")
+    public Object getShareActivity(){
+        ShareActivity.State[] states=ShareActivity.State.class.getEnumConstants();
+        List<StateVo> stateVos=new ArrayList<StateVo>();
+        for(int i=0;i<states.length;i++){
+            stateVos.add(new StateVo(states[i]));
+        }
+        return ResponseUtil.ok(new ReturnObject<List>(stateVos).getData());
+    }
+
+
+    /**-------------------------------------------------------------------------需要修改-1---------------------------------------------
      * 新增分享,生成分享链接
      * @param id
      * @param userId
@@ -50,12 +73,17 @@ public class ShareController {
     })
     @ApiResponses({
     })
-//    @Audit
+    @Audit
     @PostMapping("skus/{id}/shares")
     public Object addshares(@PathVariable Long id,
-                            @LoginUser @ApiIgnore @RequestParam(required = false, defaultValue = "") Long userId){
-        userId = 9L;
-        return Common.decorateReturnObject(sharesService.addShareService(id, userId));
+                            @LoginUser @ApiIgnore @RequestParam(required = false, defaultValue = "") Long userId,
+                            HttpServletResponse response){
+
+        ReturnObject<SharesRetVo> ret = sharesService.addShareService(id, userId);
+        if(ret.getCode()==ResponseCode.OK){
+            response.setStatus(HttpStatus.SC_CREATED);
+        }
+        return Common.decorateReturnObject(ret);
     }
     /**
      * http://127.0.0.1:8080/skus/300/shares
@@ -64,7 +92,7 @@ public class ShareController {
 
 
 
-    /**-------------------------------------------------------------------------需要修改---------------------------------------------
+    /**-------------------------------------------------------------------------需要修改-1---------------------------------------------
      * 买家查询分享
      * @param
      */
@@ -74,17 +102,22 @@ public class ShareController {
     })
     @ApiResponses({
     })
-//    @Audit
+    @Audit
     @GetMapping("shares")
-    public Object getownshares(@LoginUser @ApiIgnore @RequestParam(required = false, defaultValue ="") Long userId,
+    public Object getownshares(@LoginUser @ApiIgnore @RequestParam(required = true, defaultValue ="") Long userId,
                                @RequestParam(value="goodsSkuId", required=false, defaultValue="") Long  goodsSkuId,
                                @RequestParam(value="beginTime", required=false, defaultValue="") String beginTime ,
                                @RequestParam(value="endTime", required=false, defaultValue="") String endTime ,
                                @RequestParam(value="page", required=false, defaultValue="1") Integer page ,
-                               @RequestParam(value="pageSize", required=false, defaultValue="20") Integer pageSize){
+                               @RequestParam(value="pageSize", required=false, defaultValue="10") Integer pageSize,
+                               HttpServletResponse response){
 
-        userId = 9L;//暂时写死，过后完成用户修改
-        return Common.getPageRetObject(sharesService.getOwnSharesService(userId, goodsSkuId, beginTime, endTime, page, pageSize));
+
+        ReturnObject<PageInfo<VoObject>> ret = sharesService.getOwnSharesService(userId, goodsSkuId, beginTime, endTime, page, pageSize);
+        if(ret.getCode()!=ResponseCode.OK){
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+        }
+        return Common.getPageRetObject(ret);
     }
 
     /**完成用户后进行解析token
@@ -97,7 +130,7 @@ public class ShareController {
      */
 
 
-    /**-------------------------------------------------------------------------可写测试用例---------------------------------------------
+    /**-------------------------------------------------------------------------可写测试用例-1---------------------------------------------
      * 商家查询分享
      * @param did 店铺id
      * @param id skuid
@@ -110,12 +143,12 @@ public class ShareController {
     })
     @ApiResponses({
     })
-//    @Audit
+    @Audit
     @GetMapping("/shops/{did}/skus/{id}/shares")
     public Object getsharesByShop(@PathVariable Long did,
                                   @PathVariable Long id,
                                   @RequestParam(value="page", required=false, defaultValue="1") Integer page ,
-                                  @RequestParam(value="pageSize", required=false, defaultValue="20") Integer pageSize){
+                                  @RequestParam(value="pageSize", required=false, defaultValue="10") Integer pageSize){
         return Common.getPageRetObject(sharesService.getSharesBySpuIdService(did, id, page, pageSize));
     }
 
@@ -138,29 +171,30 @@ public class ShareController {
     })
     @ApiResponses({
     })
-//    @Audit
+    @Audit
     @GetMapping("beshared")
     public Object getbeshared(@LoginUser @ApiIgnore @RequestParam(required = false, defaultValue = "0") Long userId,
                               @RequestParam(value="skuId", required=false, defaultValue="") Long  skuId,
                               @RequestParam(value="beginTime", required=false, defaultValue="") String beginTime ,
                               @RequestParam(value="endTime", required=false, defaultValue="") String endTime ,
                               @RequestParam(value="page", required=false, defaultValue="1") Integer page ,
-                              @RequestParam(value="pageSize", required=false, defaultValue="20") Integer pageSize){
+                              @RequestParam(value="pageSize", required=false, defaultValue="10") Integer pageSize){
 
-        userId=10000000L;
         return Common.getPageRetObject(beSharedService.getOwnBeshared(userId, skuId, beginTime, endTime, page, pageSize));
     }
     /**controller登录
      * http://127.0.0.1:8080/beshared
      * http://127.0.0.1:8080/beshared?spuId=577
      * http://127.0.0.1:8080/beshared?endTime=2020-12-03 00:00:00
+     * 操作资源不存在即ids.size=0
+     * 存在问题nacos，数据太多发不过来
      * -------------------------------------------------------------------------需要修改----------------------------------------------
      */
 
     /**-------------------------------------------------------------------------需要修改---------------------------------------------
      * 管理查询所有分享成功记录
+     * @param did
      * @param id
-     * @param skuId
      * @param beginTime
      * @param endTime
      * @param page
@@ -172,16 +206,16 @@ public class ShareController {
     })
     @ApiResponses({
     })
-//    @Audit
-    @GetMapping("/shops/{id}/beshared")
-    public Object getShopBeShared(@PathVariable Long id,
-                              @RequestParam(value="skuId", required=false, defaultValue="") Long  skuId,
+    @Audit
+    @GetMapping("/shops/{did}/skus/{id}/beshared")
+    public Object getShopBeShared(@PathVariable Long did,
+                              @PathVariable Long id,
                               @RequestParam(value="beginTime", required=false, defaultValue="") String beginTime ,
                               @RequestParam(value="endTime", required=false, defaultValue="") String endTime ,
                               @RequestParam(value="page", required=false, defaultValue="1") Integer page ,
-                              @RequestParam(value="pageSize", required=false, defaultValue="20") Integer pageSize){
+                              @RequestParam(value="pageSize", required=false, defaultValue="10") Integer pageSize){
 
-        return Common.getPageRetObject(beSharedService.getShopBeshared(id, skuId, beginTime, endTime, page, pageSize));
+        return Common.getPageRetObject(beSharedService.getShopBeshared(did, id, beginTime, endTime, page, pageSize));
     }
     /**service层获取店铺spuid，管理员0查询所有没做判断
      * http://127.0.0.1:8080/shops/0/beshared?endTime=2020-12-03 00:00:00&pageSize=30
@@ -192,10 +226,11 @@ public class ShareController {
 
 
 
-    /**-------------------------------------------------------------------------需要修改---------------------------------------------
+
+    /**-------------------------------------------------------------------------可写测试---------------------------------------------
      * 新增分享活动
      * @param vo:vo对象
-     * @param result 检查结果
+     * @param 检查结果
      * @return  Object
      */
     @ApiOperation(value="平台或店家创建新的分享活动")
@@ -203,28 +238,33 @@ public class ShareController {
     })
     @ApiResponses({
     })
-//    @Audit
-    @PostMapping("/shops/{shopId}/goods/{skuId}/shareactivities")
-    public Object addshareactivity(@Validated @RequestBody ShareActivityVo vo, BindingResult result, @PathVariable Long shopId, @PathVariable Long skuId){
-        if (result.hasErrors()) {
-            ReturnObject<Object> ret = new ReturnObject<>(ResponseCode.SHAREACT_CONFLICT);
-            return Common.decorateReturnObject(ret);
+    @Audit
+    @PostMapping("/shops/{shopId}/skus/{id}/shareactivities")
+    public Object addshareactivity( @PathVariable Long shopId,
+                                    @PathVariable Long id,
+                                    @Validated @RequestBody ShareActivityVo vo,BindingResult bindingResult,
+                                    HttpServletResponse response){
+        if(bindingResult.hasErrors()){
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
         }
-        ReturnObject<Object> ret = shareActivityService.addShareActivityService(shopId, skuId, vo);
+
+        ReturnObject<Object> ret = shareActivityService.addShareActivityService(shopId, id, vo);
+        if(ret.getCode()==ResponseCode.OK){
+            response.setStatus(HttpStatus.SC_CREATED);
+        }else{
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+        }
         return Common.decorateReturnObject(ret);
     }
-    /**修改位置：service层验证skuId、shopId是否存在、通过调用其他组的api
-     * http://127.0.0.1:8080/shops/0/goods/274/shareactivities
-     * {"beginTime":"2045-12-08 17:34:35",
-     * "endTime":"2045-11-08 17:34:35",
-     * "strategy":"asdsad"
-     * }
-     * -------------------------------------------------------------------------需要修改----------------------------------------------
+    /**
+     * -------------------------------------------------------------------------可写测试----------------------------------------------
      */
 
 
 
 
+    /**-------------------------------------------------------------------------可写测试---------------------------------------------
     /**
      * 获取分享活动
      * @param shopId
@@ -242,15 +282,16 @@ public class ShareController {
     })
     @ApiResponses({
     })
-//    @Audit
+    @Audit
     @GetMapping("shareactivities")
     public Object getshareactivity(@RequestParam(value="shopId", required=false, defaultValue="") Long shopId ,
                                    @RequestParam(value="skuId", required=false, defaultValue="") Long  skuId,
                                    @RequestParam(value="page", required=false, defaultValue="1") Integer page ,
-                                   @RequestParam(value="pageSize", required=false, defaultValue="20") Integer pageSize){
+                                   @RequestParam(value="pageSize", required=false, defaultValue="10") Integer pageSize){
 
         return Common.getPageRetObject(shareActivityService.getShareActivitiesService(shopId, skuId, page, pageSize));
     }
+    /**-------------------------------------------------------------------------可写测试---------------------------------------------
 
 
 
@@ -269,14 +310,24 @@ public class ShareController {
     })
     @ApiResponses({
     })
-//    @Audit
+    @Audit
     @PutMapping("/shops/{shopId}/shareactivities/{id}")
     public Object modifyshareactivity(@Validated @RequestBody ShareActivityVo shareActivityVo, BindingResult bindingResult,
                                       @PathVariable Long shopId ,
-                                      @PathVariable Long id){
-        return Common.decorateReturnObject(shareActivityService.modifyShareActivityService(shopId, id, shareActivityVo));
+                                      @PathVariable Long id,
+                                      HttpServletResponse response){
+        if(bindingResult.hasErrors()){
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            return Common.decorateReturnObject(new ReturnObject(ResponseCode.FIELD_NOTVALID));
+        }
+        ReturnObject<Object> ret = shareActivityService.modifyShareActivityService(shopId, id, shareActivityVo);
+        if(ret.getCode()!=ResponseCode.OK){
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+        }
+        return Common.decorateReturnObject(ret);
     }
     /**
+     * 判断时间是否合法·
      * http://127.0.0.1:8080/shops/0/shareactivities/303068
      * {"beginTime":"2078-12-08 17:34:35",
      * "endTime":"2079-12-08 17:34:35",
@@ -308,11 +359,16 @@ public class ShareController {
     })
     @ApiResponses({
     })
-//    @Audit
+    @Audit
     @DeleteMapping("/shops/{shopId}/shareactivities/{id}")
     public Object deleteshareactivity(@PathVariable Long shopId ,
-                                      @PathVariable Long id){
-        return Common.decorateReturnObject(shareActivityService.deleteShareActivityService(shopId, id));
+                                      @PathVariable Long id,
+                                      HttpServletResponse response){
+        ReturnObject<Object> ret = shareActivityService.deleteShareActivityService(shopId, id);
+        if(ret.getCode()==ResponseCode.RESOURCE_ID_OUTSCOPE){
+            response.setStatus(HttpStatus.SC_FORBIDDEN);
+        }
+        return Common.decorateReturnObject(ret);
     }
 
 
@@ -330,7 +386,7 @@ public class ShareController {
     })
     @ApiResponses({
     })
-//    @Audit
+    @Audit
     @PutMapping("/shops/{shopId}/shareactivities/{id}/online")
     public Object putshareactivityonline(@PathVariable Long shopId,
                                       @PathVariable Long id){

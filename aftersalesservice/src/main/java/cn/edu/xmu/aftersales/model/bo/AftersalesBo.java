@@ -17,8 +17,6 @@ public class AftersalesBo implements VoObject {
 
     private Long orderId;
 
-    private String orderSn;
-
     private Long orderItemId;
 
     private Long skuId;
@@ -155,11 +153,13 @@ public class AftersalesBo implements VoObject {
     public AftersalesBo(AftersaleServicePo po){
         this.setId(po.getId());
         this.setOrderItemId(po.getOrderItemId());
+        this.setOrderId(po.getOrderId());
         this.setCustomerId(po.getCustomerId());
         this.setShopId(po.getShopId());
         this.setServiceSn(po.getServiceSn());
         this.setType(AftersalesBo.saleType.getTypeByCode(Integer.valueOf(po.getType())));
         this.setReason(po.getReason());
+        this.setConclusion(po.getConclusion());
         this.setConclusion(po.getConclusion());
         this.setRefund(po.getRefund());
         this.setQuantity(po.getQuantity());
@@ -183,6 +183,7 @@ public class AftersalesBo implements VoObject {
         if(this.id!=null){
             po.setId(this.id);
         }
+
         po.setOrderItemId(this.getOrderItemId());
         po.setCustomerId(this.customerId);
         po.setShopId(this.shopId);

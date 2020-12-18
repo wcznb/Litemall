@@ -24,5 +24,5 @@ public class CouponActivityVo implements Serializable {
         this.endTime=po.getEndTime();
         this.name=po.getName();
     }
-public CouponActivityVo(){}
+    public CouponActivityVo(){}
 }

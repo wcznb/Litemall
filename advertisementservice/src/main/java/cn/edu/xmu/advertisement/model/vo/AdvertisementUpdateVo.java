@@ -8,7 +8,7 @@ public class AdvertisementUpdateVo {
     String content;
     String beginDate;
     String endDate;
-    String weight;
+    Integer weight;
     Boolean repeat;
     String link;
 

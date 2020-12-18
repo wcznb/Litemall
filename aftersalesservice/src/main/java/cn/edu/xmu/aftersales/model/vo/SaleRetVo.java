@@ -10,12 +10,11 @@ public class SaleRetVo {
 
     Long id;
     Long orderId;
-    String orderSn;
     Long orderItemId;
     Long skuId;
     String skuName;
     Long customerId;
-    String shopId;
+    Long shopId;
     String serviceSn;
     Byte type;
     String reason;
@@ -31,8 +30,10 @@ public class SaleRetVo {
 
     public SaleRetVo(AftersaleServicePo po) {
         this.id = po.getId();
+        this.orderItemId=po.getOrderItemId();
         this.customerId = po.getCustomerId();
-        this.shopId = String.valueOf(po.getShopId());
+        this.shopId = po.getShopId();
+        this.serviceSn=po.getServiceSn();
         this.type = po.getType();
         this.reason = po.getReason();
         this.refund = po.getRefund();
@@ -41,6 +42,8 @@ public class SaleRetVo {
         this.detail = po.getDetail();
         this.consignee = po.getConsignee();
         this.mobile=po.getMobile();
+        this.customerLogSn=po.getCustomerLogSn();
+        this.shopLogSn=po.getShopLogSn();
         this.state = po.getState();
     }
 
@@ -51,9 +54,8 @@ public class SaleRetVo {
         this.serviceSn=bo.getServiceSn();
         this.skuId=bo.getSkuId();
         this.skuName=bo.getSkuName();
-        this.orderSn=bo.getOrderSn();
         this.customerId = bo.getCustomerId();
-        this.shopId = String.valueOf(bo.getShopId());
+        this.shopId = bo.getShopId();
         this.type = bo.getType().getCode().byteValue();
         this.reason = bo.getReason();
         this.refund = bo.getRefund();

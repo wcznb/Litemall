@@ -6,6 +6,8 @@ import cn.edu.xmu.share.model.vo.ShareActivityRetVo;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 public class ShareActivity implements VoObject {
@@ -28,6 +30,46 @@ public class ShareActivity implements VoObject {
     LocalDateTime gmtModified;
 
     Byte state;//        "状态：0 待发布，1 发布"
+
+    /**
+     * 后台用户状态
+     */
+    public enum State {
+
+        ONLINE(1,"上线"),
+        OFFLINE(0, "下线");
+
+        private static final Map<Integer, ShareActivity.State> stateMap;
+
+        static { //由类加载机制，静态块初始加载对应的枚举属性到map中，而不用每次取属性时，遍历一次所有枚举值
+            stateMap = new HashMap();
+            for (ShareActivity.State enum1 : values()) {
+                stateMap.put(enum1.code, enum1);
+            }
+        }
+
+        private int code;
+        private String description;
+
+        State(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public static ShareActivity.State getTypeByCode(Integer code) {
+            return stateMap.get(code);
+        }
+
+        public Integer getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    public ShareActivity(){}
 
     public ShareActivity(ShareActivityPo shareActivityPo){
         this.id = shareActivityPo.getId();

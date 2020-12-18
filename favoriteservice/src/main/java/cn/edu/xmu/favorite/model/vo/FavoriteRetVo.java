@@ -1,7 +1,7 @@
 package cn.edu.xmu.favorite.model.vo;
 
 import cn.edu.xmu.favorite.model.bo.Favorite;
-import cn.edu.xmu.favorite.model.bo.GoodSku;
+import cn.edu.xmu.provider.model.vo.GoodsSkuSimpleRetVo;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 public class FavoriteRetVo {
     private Long id;
 
-    private GoodSku goodSku;
+    private GoodsSkuSimpleRetVo goodsSku;
 
     private LocalDateTime gmtCreate;
 
     public FavoriteRetVo(Favorite favorite){
         this.id = favorite.getId();
-        this.goodSku = favorite.getGoodSku();
+        this.goodsSku = favorite.getGoodsSku();
         this.gmtCreate = favorite.getGmtCreate();
     }
 }

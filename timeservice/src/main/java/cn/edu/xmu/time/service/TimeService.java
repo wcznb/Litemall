@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public interface TimeService {
 
+    //need dubbo
     ReturnObject<TimeSegmentRetVo> addTimeSegment(NewTimeSegmentVo newTimeSegmentVo,Byte type);
 
     public ReturnObject deleteTimeSegment0(Long id);

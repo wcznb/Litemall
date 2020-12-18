@@ -1,11 +1,9 @@
 package cn.edu.xmu.provider.model.vo;
 
-import cn.edu.xmu.provider.model.bo.GoodsSKU;
 import cn.edu.xmu.provider.model.po.GoodsSkuPo;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * @author Yancheng Lai
@@ -14,14 +12,22 @@ import java.time.LocalDateTime;
  **/
 @Data
 public class GoodsSkuSimpleRetVo implements Serializable {
+
     private Long id;
+
     private String skuSn;
+
     private String name;
+
     private Long originalPrice;
-    private Integer price;
+
+    private Long price;
+
     private String imageUrl;
+
     private Integer inventory;
-    private Byte disabled;
+
+    private Boolean disable;
 
     /**
     * @Description: SKU返回简单视图
@@ -32,7 +38,7 @@ public class GoodsSkuSimpleRetVo implements Serializable {
     */
 
     public GoodsSkuSimpleRetVo(GoodsSkuPo goodsSkuPo){
-        this.setDisabled( goodsSkuPo.getDisabled());
+        this.setDisable((goodsSkuPo.getDisabled()==0)?false:true);
         this.setId (goodsSkuPo.getId());
         this.setImageUrl(goodsSkuPo.getImageUrl());
         this.setInventory( goodsSkuPo.getInventory());

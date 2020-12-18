@@ -15,6 +15,12 @@ spring:
     name: footprint-service
   profiles:
     active: dev
+  cloud:
+    nacos:
+      username: nacos
+      password: 1-6123
+      discovery:
+        server-addr: 114.215.198.238:8848
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
@@ -58,7 +64,7 @@ mybatis:
   #po对象的包
   type-aliases-package: cn.edu.xmu.footprint.model
   #mapper.xml所在的位置
-  mapper-locations: classpath*:cn.edu.xmu.privilege.mapper/*.xml
+  mapper-locations: classpath*:cn.edu.xmu.footprint.mapper/*.xml
   #自动将SQL中查出来的带下划线的字段，转换为驼峰标志，再去匹配类中的属性
   configuration:
     #输出产生的SQL
@@ -88,6 +94,15 @@ footprintservice:
 #pagehelper分页插件配置
 pagehelper:
   helper-dialect: mysql
+
+dubbo:
+  registry:
+    address: nacos://114.215.198.238:8848
+  cloud:
+    subscribed-services: spring-cloud-alibaba-dubbo-server
+  protocols:
+    dubbo:
+      port: 18888
 
 ##配置rocketmq
 #rocketmq:

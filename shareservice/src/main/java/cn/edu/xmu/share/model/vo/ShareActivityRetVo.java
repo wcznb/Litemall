@@ -8,7 +8,7 @@ public class ShareActivityRetVo {
 
     Long id;
     Long shopId;
-    Long goodSkuId;
+    Long skuId;
     String beginTime;
     String endTime;
     Integer state;
@@ -19,7 +19,7 @@ public class ShareActivityRetVo {
     public ShareActivityRetVo(ShareActivity shareActivity){
         this.id = shareActivity.getId();
         this.shopId = shareActivity.getShopId();
-        this.goodSkuId = shareActivity.getGoodsSkuId();
+        this.skuId = shareActivity.getGoodsSkuId();
         this.beginTime = shareActivity.getBeginTime().toString();
         this.endTime = shareActivity.getEndTime().toString();
         this.state = Integer.valueOf(shareActivity.getState());

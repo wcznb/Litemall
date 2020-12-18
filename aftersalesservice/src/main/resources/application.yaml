@@ -11,10 +11,20 @@ server:
       max: 1000
 
 spring:
+  main:
+    # Spring Boot 2.1 需要设定
+    allow-bean-definition-overriding: true
   application:
     name: aftersales-service
   profiles:
     active: dev
+  cloud:
+    nacos:
+      username: nacos
+      password: 1-6123
+      discovery:
+        server-addr: 114.215.198.238:8848
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
@@ -53,6 +63,15 @@ spring:
         max-wait: -1
     # 连接超时时间（毫秒）
     timeout: 5000
+
+dubbo:
+  registry:
+    address: nacos://114.215.198.238:8848
+  cloud:
+    subscribed-services: spring-cloud-alibaba-dubbo-server
+  protocols:
+    dubbo:
+      port: 18888
 
 mybatis:
   #po对象的包

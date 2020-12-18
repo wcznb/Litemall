@@ -19,3 +19,5 @@ public class ShareControllerTest {
 //        System.out.println(restGetObject.getfromurl("http://127.0.0.1:8080/shareactivities"));
     }
 }
+
+

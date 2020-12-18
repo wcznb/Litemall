@@ -2,6 +2,8 @@ package cn.edu.xmu.address.service.impl;
 
 
 import cn.edu.xmu.address.dao.AddressDao;
+import cn.edu.xmu.address.model.bo.Address;
+import cn.edu.xmu.address.model.po.AddressPo;
 import cn.edu.xmu.address.model.vo.AddressRetVo;
 import cn.edu.xmu.address.model.vo.NewAddressRetVo;
 import cn.edu.xmu.address.model.vo.NewAddressVo;
@@ -13,6 +15,9 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AddressServiceImpl implements AddressService {
@@ -29,13 +34,33 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public ReturnObject<PageInfo<VoObject>> getAllAddressById(Long id, Integer page, Integer pagesize){
-        ReturnObject<PageInfo<VoObject>> ret = addressDao.getALlAddressByUserid(id,page, pagesize);
-        return ret;
+        ReturnObject<PageInfo<AddressPo>> ret = addressDao.getALlAddressByUserid(id,page, pagesize);
+
+        if(ret.getCode()== ResponseCode.OK){
+            //成功搜索
+            PageInfo<AddressPo> poPageInfo = ret.getData();
+            List<AddressPo> footprintPos = poPageInfo.getList();
+            List<VoObject> retObj = new ArrayList<>(footprintPos.size());
+            for(AddressPo po:footprintPos){
+                Address footprint = new Address(po);
+
+                retObj.add(footprint);
+            }
+            PageInfo<VoObject> footPrintsPage = new PageInfo<>(retObj);
+            footPrintsPage.setPages(poPageInfo.getPages());
+            footPrintsPage.setPageNum(poPageInfo.getPageNum());
+            footPrintsPage.setPageSize(poPageInfo.getPageSize());
+            footPrintsPage.setTotal(poPageInfo.getTotal());
+            return new ReturnObject<>(footPrintsPage);
+        } else{
+            return new ReturnObject<>(ret.getCode());
+        }
+
     }
 
     @Override
-    public ReturnObject<Object> updateAddress(Long id , NewAddressVo vo){
-        return addressDao.updateAddress(id,vo);
+    public ReturnObject<Object> updateAddress(Long userId, Long id , NewAddressVo vo){
+        return addressDao.updateAddress(userId,id,vo);
     }
 
     @Override

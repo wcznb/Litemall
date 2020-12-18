@@ -1,5 +1,6 @@
 package cn.edu.xmu.provider.server;
 
+import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.provider.model.bo.FreightModel;
 import cn.edu.xmu.provider.model.vo.OrderItemRetVo;
 
@@ -20,14 +21,28 @@ public interface OrderService {
      * @author: Feiyan Liu
      * @date: Created at 2020/12/6 19:27
      */
-    public Long getUserIdByOrderItemId(Long id);
+    public ReturnObject<Long> getUserIdByOrderItemId(Long id);
 
     /**
      * @description: 根据orderitemId获取skuid
      * @author: Feiyan Liu
      * @date: Created at 2020/12/6 19:27
      */
-    public Long getGoodsSkuIdByOrderItemId(Long id);
+    public ReturnObject<Long> getGoodsSkuIdByOrderItemId(Long id);
 
     public FreightModel getFreightModelById(Long id);
+
+    public ReturnObject<Long> getOrderIdByOrderItemId(Long id);
+
+    public ReturnObject<String> getOrderSnByOrderId(Long id);
+
+    public ReturnObject<String> getSkuName(Long id);
+
+    public ReturnObject<Boolean> validItem(Long orderItemId);
+
+    public ReturnObject<Long> getShopIdByOrderId(Long orderId);
+
+    public ReturnObject<Long> getnumber(Long orderItemId) ;
+
+    public ReturnObject<Long> getNewOrderId(String consignee,Long regionId,String address,String mobile,Long orderItemId,Long quantity);
 }
