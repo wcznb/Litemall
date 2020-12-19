@@ -11,6 +11,7 @@ public class CustomerSetVo {
 
     @Range(min=0,max=1,message = "sex is 0/1")
     Byte gender;
+
     LocalDateTime birthday;
 
 }

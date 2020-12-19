@@ -252,7 +252,7 @@ public class UserServiceImpl implements UserService {
     public ReturnObject<Object> modifyCustomer(Long id, CustomerSetVo vo) {
         CustomerPo customerPo = new CustomerPo();
         customerPo.setId(id);
-        customerPo.setBirthday(vo.getBirthday());
+        customerPo.setBirthday(vo.getBirthday().toLocalDate());
         customerPo.setGender(vo.getGender());
         customerPo.setRealName(vo.getRealName());
 

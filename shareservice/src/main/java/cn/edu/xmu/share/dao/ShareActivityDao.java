@@ -164,7 +164,7 @@ public class ShareActivityDao {
 
         //开始时间再结束时间之后
         if(end.isBefore(begin)){
-            return new ReturnObject<>(ResponseCode.Log_Bigger, String.format("时间不合法"));
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, String.format("时间不合法"));
         }
 
         //分享格式错误

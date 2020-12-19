@@ -26,7 +26,6 @@
         <module>timeservice</module>
         <module>shareservice</module>
         <module>goodsinterfaces</module>
-        <module>otherinterfaces</module>
         <module>orderinterfaces</module>
     </modules>
 
