@@ -69,21 +69,23 @@ public class SharesServiceimpl implements SharesService {
         LocalDateTime begintime=null;
         LocalDateTime endtime=null;
         if(!beginTime.equals(""))  {
-            begintime = ExchangeDate.StringToDateTime(beginTime).get(true);
+            begintime = ExchangeDate.DateTimeStringToLocalDataTime(beginTime).get(true);
             if(begintime==null){
                 List<VoObject> ret = new ArrayList<>(0);
                 PageInfo<VoObject> sharesPage = PageInfo.of(ret);
                 sharesPage.setPageSize(pageSize);
                 sharesPage.setPageNum(page);
+                return new ReturnObject<>(sharesPage);
             }
         }
         if(!endTime.equals("")) {
-            endtime = ExchangeDate.StringToDateTime(endTime).get(true);
+            endtime = ExchangeDate.DateTimeStringToLocalDataTime(endTime).get(true);
             if(endtime==null){
                 List<VoObject> ret = new ArrayList<>(0);
                 PageInfo<VoObject> sharesPage = PageInfo.of(ret);
                 sharesPage.setPageSize(pageSize);
                 sharesPage.setPageNum(page);
+                return new ReturnObject<>(sharesPage);
             }
         }
         if(begintime!=null&&endtime!=null&&begintime.isAfter(endtime)){
@@ -91,6 +93,7 @@ public class SharesServiceimpl implements SharesService {
             PageInfo<VoObject> sharesPage = PageInfo.of(ret);
             sharesPage.setPageSize(pageSize);
             sharesPage.setPageNum(page);
+            return new ReturnObject<>(sharesPage);
         }
         List<SharePo> sharePos =  sharesDao.getOwnShares(userId, goodsId, begintime, endtime, page, pageSize);
 

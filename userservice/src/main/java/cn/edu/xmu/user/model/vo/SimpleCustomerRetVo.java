@@ -7,10 +7,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-//        "id": 0,
-//                "userName": "string",
-//                "realName": "string"
-
 @Data
 @ApiModel(description = "简单用户信息")
 public class SimpleCustomerRetVo {
@@ -23,7 +19,7 @@ public class SimpleCustomerRetVo {
 
     public SimpleCustomerRetVo(Customer customer){
         this.id = customer.getId();
-        this.realName = customer.getRealname();
+        this.realName = customer.getName();
         this.userName = customer.getUserName();
     }
 }
