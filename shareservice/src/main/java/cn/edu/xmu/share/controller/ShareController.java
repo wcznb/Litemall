@@ -39,7 +39,7 @@ import java.util.Map;
 
 @Api(value = "分享服务", tags = "share")
 @RestController /*Restful的Controller对象*/
-@RequestMapping(value = "/", produces = "application/json;charset=UTF-8")
+@RequestMapping(value = "/share", produces = "application/json;charset=UTF-8")
 public class ShareController {
     @Autowired
     ShareActivityService shareActivityService;
