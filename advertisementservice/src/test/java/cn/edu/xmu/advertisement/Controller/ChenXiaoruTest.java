@@ -63,33 +63,7 @@ private WebTestClient manageClient;
         log.debug(token);
         return token;
     }
-
-//    /**
-//     * 未登录获得广告的所有状态
-//     *
-//     * @author 24320182203175 陈晓如
-//     */
-//    @Test
-//    public void advertiseTest1() throws Exception {
-//
-//        byte[] ret = manageClient.get().uri("/advertisement/states")
-//                .exchange()
-//                .expectStatus().isUnauthorized()
-//                .expectBody()
-//                .returnResult()
-//                .getResponseBodyContent();
-//    }
-//
-//    /**
-//     * 使用伪造token获得广告的所有状态
-//     *
-//     * @author 24320182203175 陈晓如
-//     */
-//    @Test
-//    public void advertiseTest2() throws Exception {
-//        byte[] ret = manageClient.get().uri("/advertisement/states")
-//                .header("authorization", "test")
-//                .exchange()
+)
 //                .expectStatus().isUnauthorized()
 //                .expectBody()
 //                .returnResult()
