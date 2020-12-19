@@ -2,10 +2,10 @@ package cn.edu.xmu.cart.controller;
 
 import cn.edu.xmu.cart.model.vo.CartGetVo;
 import cn.edu.xmu.cart.service.CartService;
+import cn.edu.xmu.cart.util.Common;
 import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.model.VoObject;
-import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageInfo;
@@ -102,8 +102,6 @@ public class CartController {
             return o;
         }
         ReturnObject<Object> retObj = cartService.modifyCart(userId, id, vo);
-        if(retObj.getCode() == ResponseCode.FIELD_NOTVALID)
-            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         return Common.decorateReturnObject(retObj);
     }
 
@@ -118,8 +116,6 @@ public class CartController {
     @DeleteMapping("/{id}")
     public Object deleteCart(@LoginUser Long userId, @PathVariable Long id, HttpServletResponse httpServletResponse){
         ReturnObject<Object> retObj = cartService.deleteCart(userId, id);
-        if(retObj.getErrmsg() == ResponseCode.RESOURCE_ID_OUTSCOPE.getMessage())
-            httpServletResponse.setStatus(HttpStatus.FORBIDDEN.value());
         return Common.decorateReturnObject(retObj);
     }
 }

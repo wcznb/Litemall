@@ -66,20 +66,45 @@ public class FavoriteDao {
     }
 
     /**
+     * 通过skuid获取单个收藏信息
+     * @param skuId
+     * @return
+     */
+    public ReturnObject<FavoritePo> findFavoriteByCoustomerIdAndSkuId(Long customerId, Long skuId){
+        ReturnObject<FavoritePo> favoritePoRetObj = null;
+        try{
+            FavoritePoExample example = new FavoritePoExample();
+            FavoritePoExample.Criteria criteria = example.createCriteria();
+            criteria.andGoodsSkuIdEqualTo(skuId);
+            criteria.andCustomerIdEqualTo(customerId);
+
+            List<FavoritePo> favoritePos = favoritePoMapper.selectByExample(example);
+            FavoritePo po = null;
+            if(favoritePos.size()!=0)
+                po = favoritePos.get(0);
+            favoritePoRetObj = new ReturnObject<>(po);
+        } catch (DataAccessException e){
+            //数据库错误
+            favoritePoRetObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR,
+                    String.format("数据库错误：%s", e.getMessage()));
+        } catch (Exception e) {
+            // 属未知错误
+            favoritePoRetObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR,
+                    String.format("发生了严重的未知错误：%s", e.getMessage()));
+        }
+        return favoritePoRetObj;
+    }
+
+    /**
      * 通过主键获取单个收藏信息
      * @param id
      * @return
      */
-    public ReturnObject<FavoritePo> findFavorite(Long id){
+    public ReturnObject<FavoritePo> findFavoriteById(Long id){
         ReturnObject<FavoritePo> favoritePoRetObj = null;
         try{
             FavoritePo favoritePo = favoritePoMapper.selectByPrimaryKey(id);
-            if(favoritePo==null)
-                //搜索失败:id不存在
-                favoritePoRetObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
-            else
-                //搜索成功
-                favoritePoRetObj = new ReturnObject<>(favoritePo);
+            favoritePoRetObj = new ReturnObject<>(favoritePo);
         } catch (DataAccessException e){
             //数据库错误
             favoritePoRetObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR,

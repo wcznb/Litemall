@@ -199,38 +199,46 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 平台管理员封禁买家
+     * @param did
      * @param userId 用户id
      */
     @Override
     @Transactional
-    public ReturnObject<Object> banCustomer(Long userId){
-        CustomerPo customerPo = new CustomerPo();
-        customerPo.setId(userId);
-        customerPo.setState(Customer.State.FORBID.getCode().byteValue());//设置状态为封禁
-        customerPo.setGmtModified(LocalDateTime.now());
-        ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
-        if (retObj.getCode() != ResponseCode.OK){
-            return retObj;
-        }
-        return new ReturnObject<>(true);
+    public ReturnObject<Object> banCustomer(Long did, Long userId){
+        if(did == Long.valueOf(0)) {
+            CustomerPo customerPo = new CustomerPo();
+            customerPo.setId(userId);
+            customerPo.setState(Customer.State.FORBID.getCode().byteValue());//设置状态为封禁
+            customerPo.setGmtModified(LocalDateTime.now());
+            ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
+            if (retObj.getCode() != ResponseCode.OK) {
+                return retObj;
+            }
+            return new ReturnObject<>(true);
+        } else
+            return new ReturnObject(ResponseCode.FIELD_NOTVALID);
     }
 
     /**
      * 平台管理员解禁买家
+     * @param did
      * @param userId 用户id
      */
     @Override
     @Transactional
-    public ReturnObject<Object> releaseCustomer(Long userId){
-        CustomerPo customerPo = new CustomerPo();
-        customerPo.setId(userId);
-        customerPo.setState(Customer.State.NORM.getCode().byteValue());//设置状态为正常
-        customerPo.setGmtModified(LocalDateTime.now());
-        ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
-        if (retObj.getCode() != ResponseCode.OK){
-            return retObj;
-        }
-        return new ReturnObject<>();
+    public ReturnObject<Object> releaseCustomer(Long did,Long userId){
+        if(did == Long.valueOf(0)){
+            CustomerPo customerPo = new CustomerPo();
+            customerPo.setId(userId);
+            customerPo.setState(Customer.State.NORM.getCode().byteValue());//设置状态为正常
+            customerPo.setGmtModified(LocalDateTime.now());
+            ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
+            if (retObj.getCode() != ResponseCode.OK)
+                return retObj;
+            return new ReturnObject<>();
+
+        } else
+            return new ReturnObject(ResponseCode.FIELD_NOTVALID);//无权限
     }
 
     @Override

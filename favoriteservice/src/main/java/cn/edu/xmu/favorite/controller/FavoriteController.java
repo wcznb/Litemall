@@ -2,10 +2,10 @@ package cn.edu.xmu.favorite.controller;
 
 import cn.edu.xmu.favorite.service.FavoriteService;
 import cn.edu.xmu.favorite.service.impl.FavoriteServiceImpl;
+import cn.edu.xmu.favorite.util.Common;
 import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.model.VoObject;
-import cn.edu.xmu.ooad.util.Common;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageInfo;
@@ -58,7 +58,7 @@ public class FavoriteController {
         ReturnObject<VoObject> retObj = favoriteService.insertFavorite(userId, skuId);
         if (retObj.getCode() == ResponseCode.OK)
             httpServletResponse.setStatus(HttpStatus.CREATED.value());
-        return Common.getRetObject(retObj);
+        return Common.decorateReturnObject(retObj);
     }
 
     /**

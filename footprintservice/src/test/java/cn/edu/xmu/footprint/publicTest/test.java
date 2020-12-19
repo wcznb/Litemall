@@ -19,7 +19,7 @@ public class test {
 ////    @Value("${public-test.managementgate}")
 //    private String managementGate;
 //
-////    @Value("${public-test.mallgate}")
+//    @Value("${public-test.mallgate}")
 //    private String mallGate;
 
     private WebTestClient manageClient;
@@ -30,7 +30,7 @@ public class test {
     public void setUp(){
 
         this.mallClient = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:8090")
+                .baseUrl("http://114.215.198.238:4522")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
 
@@ -51,13 +51,13 @@ public class test {
      * createdBy yang8miao 2020/11/26 21:34
      * modifiedBy yang8miao 2020/11/26 21:34
      */
-    private String userLogin(String userName, String password) throws Exception{
+    private String adminLogin(String userName, String password) throws Exception{
 
         JSONObject body = new JSONObject();
         body.put("userName", userName);
         body.put("password", password);
         String requireJson = body.toJSONString();
-        byte[] responseString = mallClient.post().uri("/users/login").bodyValue(requireJson).exchange()
+        byte[] responseString = mallClient.post().uri("/adminusers/login").bodyValue(requireJson).exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
@@ -66,8 +66,6 @@ public class test {
                 .getResponseBodyContent();
         return JSONObject.parseObject(new String(responseString, StandardCharsets.UTF_8)).getString("data");
     }
-
-
 
     /**
      * 足迹服务-管理员查看浏览记录  普通测试1，查询成功
@@ -79,7 +77,7 @@ public class test {
     @Order(0)
     public void getFootprints1() throws Exception {
 
-        String token = this.userLogin("8606245097", "123456");
+        String token = this.adminLogin("13088admin", "123456");
 
         byte[] responseString = manageClient.get().uri("/shops/0/footprints?userId=220&page=1&pageSize=10").header("authorization",token).exchange()
                 .expectStatus().isOk()
@@ -106,7 +104,7 @@ public class test {
                 "          \"inventory\": 1,\n" +
                 "          \"originalPrice\": 130000,\n" +
                 "          \"price\": 130000,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:22\"\n" +
                 "      }\n" +
@@ -127,7 +125,7 @@ public class test {
     @Order(0)
     public void getFootprints2() throws Exception {
 
-        String token = this.userLogin("8606245097", "123456");
+        String token = this.adminLogin("537300010", "123456");
 
         byte[] responseString = manageClient.get().uri("/shops/0/footprints?userId=134&page=1&pageSize=1").header("authorization",token).exchange()
                 .expectStatus().isOk()
@@ -154,7 +152,7 @@ public class test {
                 "          \"inventory\": 1000,\n" +
                 "          \"originalPrice\": 699,\n" +
                 "          \"price\": 699,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:22\"\n" +
                 "      }\n" +
@@ -175,7 +173,7 @@ public class test {
     @Order(0)
     public void getFootprints3() throws Exception {
 
-        String token = this.userLogin("8606245097", "123456");
+        String token = this.adminLogin("13088admin", "123456");
 
         byte[] responseString = manageClient.get().uri("/shops/0/footprints?userId=17320&endTime=2019-11-11 12:00:00&page=10&pageSize=10").header("authorization",token).exchange()
                 .expectStatus().isOk()
@@ -209,7 +207,7 @@ public class test {
     @Order(0)
     public void getFootprints4() throws Exception {
 
-        String token = this.userLogin("8606245097", "123456");
+        String token = this.adminLogin("13088admin", "123456");
 
         byte[] responseString = manageClient.get().uri("/shops/0/footprints?userId=17320&beginTime=2022-11-24 12:00:00&page=10&pageSize=10").header("authorization",token).exchange()
                 .expectStatus().isOk()
@@ -242,11 +240,11 @@ public class test {
     @Order(0)
     public void getFootprints5() throws Exception {
 
-        String token = this.userLogin("8606245097", "123456");
+        String token = this.adminLogin("13088admin", "123456");
 
         byte[] responseString = manageClient.get().uri("/shops/0/footprints?beginTime=2022-11-24 12:00:00&endTime=2020-11-11 12:00:00")
                 .header("authorization",token).exchange()
-                .expectStatus().isOk()
+                .expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.Log_Bigger.getCode())
                 .returnResult()
@@ -264,11 +262,11 @@ public class test {
     @Order(0)
     public void getFootprints6() throws Exception {
 
-        String token = this.userLogin("8606245097", "123456");
+        String token = this.adminLogin("13088admin", "123456");
 
         byte[] responseString = manageClient.get().uri("/shops/0/footprints?userId=233&beginTime=2022-11-23 12:00:00&endTime=2020-11-11 12:00:00")
                 .header("authorization",token).exchange()
-                .expectStatus().isOk()
+                .expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.Log_Bigger.getCode())
                 .returnResult()

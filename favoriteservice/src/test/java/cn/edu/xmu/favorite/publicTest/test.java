@@ -30,7 +30,7 @@ public class test {
                 .build();
 
         this.manageClient = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:8090")
+                .baseUrl("http://114.215.198.238:4510")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
 
@@ -53,33 +53,7 @@ public class test {
         body.put("password", password);
         String requireJson = body.toJSONString();
         byte[] responseString = manageClient.post().uri("/users/login").bodyValue(requireJson).exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
-                .returnResult()
-                .getResponseBodyContent();
-        return JSONObject.parseObject(new String(responseString, StandardCharsets.UTF_8)).getString("data");
-    }
-
-    /**
-     * 管理员登录，获取token
-     *
-     * @author yang8miao
-     * @param userName
-     * @param password
-     * @return token
-     * createdBy yang8miao 2020/12/12 19:48
-     * modifiedBy yang8miao 2020/12/12 19:48
-     */
-    private String adminLogin(String userName, String password) throws Exception{
-
-        JSONObject body = new JSONObject();
-        body.put("userName", userName);
-        body.put("password", password);
-        String requireJson = body.toJSONString();
-        byte[] responseString = manageClient.post().uri("/privileges/login").bodyValue(requireJson).exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
@@ -126,7 +100,7 @@ public class test {
                 "          \"inventory\": 9972,\n" +
                 "          \"originalPrice\": 299,\n" +
                 "          \"price\": 299,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:23\"\n" +
                 "      }\n" +
@@ -174,7 +148,7 @@ public class test {
                 "          \"inventory\": 9972,\n" +
                 "          \"originalPrice\": 299,\n" +
                 "          \"price\": 299,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:23\"\n" +
                 "      },\n" +
@@ -188,7 +162,7 @@ public class test {
                 "          \"inventory\": 150,\n" +
                 "          \"originalPrice\": 118000,\n" +
                 "          \"price\": 118000,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      },\n" +
@@ -202,7 +176,7 @@ public class test {
                 "          \"inventory\": 100,\n" +
                 "          \"originalPrice\": 4028,\n" +
                 "          \"price\": 4028,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      }\n" +
@@ -250,7 +224,7 @@ public class test {
                 "          \"inventory\": 1000,\n" +
                 "          \"originalPrice\": 480,\n" +
                 "          \"price\": 480,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:23\"\n" +
                 "      },\n" +
@@ -264,7 +238,7 @@ public class test {
                 "          \"inventory\": 1,\n" +
                 "          \"originalPrice\": 15000,\n" +
                 "          \"price\": 15000,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      }\n" +
@@ -313,7 +287,7 @@ public class test {
                 "          \"inventory\": 1000,\n" +
                 "          \"originalPrice\": 480,\n" +
                 "          \"price\": 480,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:23\"\n" +
                 "      },\n" +
@@ -327,7 +301,7 @@ public class test {
                 "          \"inventory\": 1,\n" +
                 "          \"originalPrice\": 15000,\n" +
                 "          \"price\": 15000,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      },\n" +
@@ -341,7 +315,7 @@ public class test {
                 "          \"inventory\": 100,\n" +
                 "          \"originalPrice\": 2070,\n" +
                 "          \"price\": 2070,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      }\n" +
@@ -383,7 +357,7 @@ public class test {
                 "        \"inventory\": 1,\n" +
                 "        \"originalPrice\": 650000,\n" +
                 "        \"price\": 650000,\n" +
-                "        \"disable\": 0\n" +
+                "        \"disable\":  false\n" +
                 "        }\n" +
                 "  }\n" +
                 "}";
@@ -415,7 +389,7 @@ public class test {
                 "          \"inventory\": 1000,\n" +
                 "          \"originalPrice\": 999,\n" +
                 "          \"price\": 999,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      },\n" +
@@ -429,7 +403,7 @@ public class test {
                 "          \"inventory\": 1,\n" +
                 "          \"originalPrice\": 18000,\n" +
                 "          \"price\": 18000,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:23\"\n" +
                 "      },\n" +
@@ -443,7 +417,7 @@ public class test {
                 "          \"inventory\": 100,\n" +
                 "          \"originalPrice\": 2688,\n" +
                 "          \"price\": 2688,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      },\n" +
@@ -456,7 +430,7 @@ public class test {
                 "        \"inventory\": 1,\n" +
                 "        \"originalPrice\": 650000,\n" +
                 "        \"price\": 650000,\n" +
-                "        \"disable\": 0\n" +
+                "        \"disable\":  false\n" +
                 "        }\n" +
                 "      }\n" +
                 "    ]\n" +
@@ -496,7 +470,7 @@ public class test {
                 "          \"inventory\": 10,\n" +
                 "          \"originalPrice\": 16200,\n" +
                 "          \"price\": 16200,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        }\n" +
                 "  }\n" +
                 "}";
@@ -529,7 +503,7 @@ public class test {
                 "          \"inventory\": 10000,\n" +
                 "          \"originalPrice\": 299,\n" +
                 "          \"price\": 299,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      },\n" +
@@ -543,7 +517,7 @@ public class test {
                 "          \"inventory\": 30,\n" +
                 "          \"originalPrice\": 1380,\n" +
                 "          \"price\": 1380,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      },\n" +
@@ -557,7 +531,7 @@ public class test {
                 "          \"inventory\": 996,\n" +
                 "          \"originalPrice\": 299,\n" +
                 "          \"price\": 299,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:23\"\n" +
                 "      },\n" +
@@ -570,7 +544,7 @@ public class test {
                 "          \"inventory\": 10,\n" +
                 "          \"originalPrice\": 16200,\n" +
                 "          \"price\": 16200,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        }\n" +
                 "      }\n" +
                 "    ]\n" +
@@ -610,7 +584,7 @@ public class test {
                 "          \"inventory\": 93,\n" +
                 "          \"originalPrice\": 669,\n" +
                 "          \"price\": 669,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        }\n" +
                 "  }\n" +
                 "}";
@@ -642,7 +616,7 @@ public class test {
                 "          \"inventory\": 998,\n" +
                 "          \"originalPrice\": 2280,\n" +
                 "          \"price\": 2280,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:23\"\n" +
                 "      },\n" +
@@ -656,7 +630,7 @@ public class test {
                 "          \"inventory\": 1,\n" +
                 "          \"originalPrice\": 30000,\n" +
                 "          \"price\": 30000,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      },\n" +
@@ -670,7 +644,7 @@ public class test {
                 "          \"inventory\": 997,\n" +
                 "          \"originalPrice\": 1980,\n" +
                 "          \"price\": 1980,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      },\n" +
@@ -683,7 +657,7 @@ public class test {
                 "          \"inventory\": 93,\n" +
                 "          \"originalPrice\": 669,\n" +
                 "          \"price\": 669,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        }\n" +
                 "      }\n" +
                 "    ]\n" +
@@ -724,7 +698,7 @@ public class test {
                 "          \"inventory\": 93,\n" +
                 "          \"originalPrice\": 669,\n" +
                 "          \"price\": 669,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        }\n" +
                 "  }\n" +
                 "}";
@@ -756,7 +730,7 @@ public class test {
                 "          \"inventory\": 150,\n" +
                 "          \"originalPrice\": 128000,\n" +
                 "          \"price\": 128000,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      },\n" +
@@ -770,7 +744,7 @@ public class test {
                 "          \"inventory\": 10000,\n" +
                 "          \"originalPrice\": 219,\n" +
                 "          \"price\": 219,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:23\"\n" +
                 "      },\n" +
@@ -784,7 +758,7 @@ public class test {
                 "          \"inventory\": 1,\n" +
                 "          \"originalPrice\": 30000,\n" +
                 "          \"price\": 30000,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      },\n" +
@@ -797,7 +771,7 @@ public class test {
                 "          \"inventory\": 93,\n" +
                 "          \"originalPrice\": 669,\n" +
                 "          \"price\": 669,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        }\n" +
                 "      }\n" +
                 "    ]\n" +
@@ -838,7 +812,7 @@ public class test {
                 "          \"inventory\": 93,\n" +
                 "          \"originalPrice\": 669,\n" +
                 "          \"price\": 669,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        }\n" +
                 "  }\n" +
                 "}";
@@ -870,7 +844,7 @@ public class test {
                 "          \"inventory\": 971,\n" +
                 "          \"originalPrice\": 498,\n" +
                 "          \"price\": 498,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      },\n" +
@@ -884,7 +858,7 @@ public class test {
                 "          \"inventory\": 10,\n" +
                 "          \"originalPrice\": 3600,\n" +
                 "          \"price\": 3600,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      },\n" +
@@ -898,7 +872,7 @@ public class test {
                 "          \"inventory\": 1,\n" +
                 "          \"originalPrice\": 42000,\n" +
                 "          \"price\": 42000,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:23\"\n" +
                 "      },\n" +
@@ -911,7 +885,7 @@ public class test {
                 "          \"inventory\": 93,\n" +
                 "          \"originalPrice\": 669,\n" +
                 "          \"price\": 669,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        }\n" +
                 "      }\n" +
                 "    ]\n" +
@@ -1023,7 +997,7 @@ public class test {
                 "          \"inventory\": 10,\n" +
                 "          \"originalPrice\": 17800,\n" +
                 "          \"price\": 17800,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:23\"\n" +
                 "      },\n" +
@@ -1037,7 +1011,7 @@ public class test {
                 "          \"inventory\": 9831,\n" +
                 "          \"originalPrice\": 299,\n" +
                 "          \"price\": 299,\n" +
-                "          \"disable\": 0\n" +
+                "          \"disable\":  false\n" +
                 "        },\n" +
                 "        \"gmtCreate\": \"2020-12-07T21:47:24\"\n" +
                 "      }\n" +
@@ -1062,9 +1036,9 @@ public class test {
         String token = this.userLogin("45209106845", "123456");
 
         byte[] responseString = mallClient.delete().uri("/favorites/3782810").header("authorization",token).exchange()
-                .expectStatus().isNotFound()
+                .expectStatus().isForbidden()
                 .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getCode())
+                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_OUTSCOPE.getCode())
                 .returnResult()
                 .getResponseBodyContent();
     }
@@ -1146,13 +1120,343 @@ public class test {
         String token = this.userLogin("45209106845", "123456");
 
         byte[] responseString = mallClient.delete().uri("/favorites/3782808").header("authorization",token).exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_OUTSCOPE.getCode())
+                .returnResult()
+                .getResponseBodyContent();
+    }
+
+    /**
+     * 1. 买家查看收藏，分页信息错误 由pageHelper处理错误，无需额外检测
+     * @author: Zeyao Feng
+     * @date: Created in 2020/12/15 15:41
+     * modified in 2020/12/17 1:58
+     */
+    @Test
+    @Order(1)
+    public void fgetFavorites1() throws Exception {
+
+        //uid=26
+        String token = this.userLogin("9925906183", "123456");
+
+        byte[] responseString = mallClient.get().uri("/favorites?page=-1&pageSize=-1").header("authorization",token).exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .returnResult()
+                .getResponseBodyContent();
+
+        String expectedResponse="{\n" +
+                "  \"errno\": 0,\n" +
+                "  \"data\": {\n" +
+                "    \"total\": 15,\n" +
+                "    \"pages\": 0,\n" +
+                "    \"pageSize\": -1,\n" +
+                "    \"page\": -1,\n" +
+                "    \"list\": []\n" +
+                "  }\n" +
+                "}";
+        JSONAssert.assertEquals(expectedResponse, new String(responseString, StandardCharsets.UTF_8), false);
+    }
+
+
+
+    /**
+     * 2. 买家查看收藏，不输入分页信息（采用默认分页page=1，pageSize=10）
+     * @author: Zeyao Feng
+     * @date: Created in 2020/12/15 15:41
+     */
+    @Test
+    @Order(2)
+    public void fgetFavorites2() throws Exception {
+
+        //uid=26
+        String token = this.userLogin("9925906183", "123456");
+
+        byte[] responseString = mallClient.get().uri("/favorites").header("authorization",token).exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .returnResult()
+                .getResponseBodyContent();
+
+        String expectedResponse = "{\n" +
+                "  \"errno\": 0,\n" +
+                "  \"data\": {\n" +
+                "    \"total\": 15,\n" +
+                "    \"pages\": 2,\n" +
+                "    \"pageSize\": 10,\n" +
+                "    \"page\": 1,\n" +
+                "    \"list\": [\n" +
+                "      {\n" +
+                "        \"id\": 3735464,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201612/file_58622084a52a4.jpg\",\n" +
+                "          \"originalPrice\": 250000,\n" +
+                "          \"inventory\": 1,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 250000,\n" +
+                "          \"id\": 301\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3768231,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201807/file_5b3b1bd57832c.png\",\n" +
+                "          \"originalPrice\": 8800,\n" +
+                "          \"inventory\": 1000,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 8800,\n" +
+                "          \"id\": 609\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3800998,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201711/file_59ff1c1a717c4.png\",\n" +
+                "          \"originalPrice\": 269,\n" +
+                "          \"inventory\": 1214,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 269,\n" +
+                "          \"id\": 526\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3833754,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201612/file_586206d4c7d2f.jpg\",\n" +
+                "          \"originalPrice\": 980000,\n" +
+                "          \"inventory\": 1,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 980000,\n" +
+                "          \"id\": 273\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3833755,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201612/file_5861cd259e57a.jpg\",\n" +
+                "          \"originalPrice\": 850,\n" +
+                "          \"inventory\": 99,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 850,\n" +
+                "          \"id\": 274\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3833756,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201612/file_5861d65fa056a.jpg\",\n" +
+                "          \"originalPrice\": 4028,\n" +
+                "          \"inventory\": 10,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 4028,\n" +
+                "          \"id\": 275\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3833757,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201612/file_5861da5e7ec6a.jpg\",\n" +
+                "          \"originalPrice\": 6225,\n" +
+                "          \"inventory\": 10,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 6225,\n" +
+                "          \"id\": 276\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3833758,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201612/file_5861c5848ffc4.jpg\",\n" +
+                "          \"originalPrice\": 16200,\n" +
+                "          \"inventory\": 10,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 16200,\n" +
+                "          \"id\": 277\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3833759,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201610/file_580cfb485e1df.jpg\",\n" +
+                "          \"originalPrice\": 1199,\n" +
+                "          \"inventory\": 46100,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 1199,\n" +
+                "          \"id\": 278\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3833760,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201610/file_580cfc4323959.jpg\",\n" +
+                "          \"originalPrice\": 1199,\n" +
+                "          \"inventory\": 500,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 1199,\n" +
+                "          \"id\": 279\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}";
+        JSONAssert.assertEquals(expectedResponse, new String(responseString, StandardCharsets.UTF_8), false);
+    }
+
+    /**
+     * 3. 买家查看收藏，成功返回三条数据
+     * @author: Zeyao Feng
+     * @date: Created in 2020/12/15 16:46
+     * modified in 2020/12/17 2:03
+     */
+    @Test
+    @Order(3)
+    public void fgetFavorites3() throws Exception {
+
+        //uid=27
+        String token = this.userLogin("89972149478", "123456");
+
+        byte[] responseString = mallClient.get().uri("/favorites?page=1&pageSize=10").header("authorization",token).exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .returnResult()
+                .getResponseBodyContent();
+
+        String expectedResponse = "{\n" +
+                "  \"errno\": 0,\n" +
+                "  \"data\": {\n" +
+                "    \"total\": 3,\n" +
+                "    \"pages\": 1,\n" +
+                "    \"pageSize\": 10,\n" +
+                "    \"page\": 1,\n" +
+                "    \"list\": [\n" +
+                "      {\n" +
+                "        \"id\": 3735465,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201707/file_597080ddb672a.jpg\",\n" +
+                "          \"originalPrice\": 3000,\n" +
+                "          \"inventory\": 1,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 3000,\n" +
+                "          \"id\": 470\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3768232,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201903/file_5c789d915ae53.jpg\",\n" +
+                "          \"originalPrice\": 1299,\n" +
+                "          \"inventory\": 30,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 1299,\n" +
+                "          \"id\": 670\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3800999,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201811/file_5bf12117c0815.jpg\",\n" +
+                "          \"originalPrice\": 1199,\n" +
+                "          \"inventory\": 19987,\n" +
+                "          \"disable\": false,\n" +
+                "          \"price\": 1199,\n" +
+                "          \"id\": 661\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}";
+        JSONAssert.assertEquals(expectedResponse, new String(responseString, StandardCharsets.UTF_8), false);
+    }
+
+
+    /**
+     * 4. 买家重复收藏，返回他当前收藏的商品
+     * @author: Zeyao Feng
+     * @date: Created in 2020/12/15 16:50
+     * modified in 2020/12/17 2:05
+     */
+    @Test
+    @Order(4)
+    public void createFavorites1() throws Exception {
+
+        //uid=26
+        String token = this.userLogin("9925906183", "123456");
+
+        byte[] responseString = mallClient.post().uri("/favorites/goods/273").header("authorization",token).exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .returnResult()
+                .getResponseBodyContent();
+
+        String expectedResponse = "{\n" +
+                "  \"errno\": 0,\n" +
+                "  \"data\": {\n" +
+                "    \"id\": 3833754,\n" +
+                "    \"goodsSku\": {\n" +
+                "      \"name\": \"+\",\n" +
+                "      \"skuSn\": null,\n" +
+                "      \"imageUrl\": \"http://47.52.88.176/file/images/201612/file_586206d4c7d2f.jpg\",\n" +
+                "      \"originalPrice\": 980000,\n" +
+                "      \"inventory\": 1,\n" +
+                "      \"disable\": false,\n" +
+                "      \"price\": 980000,\n" +
+                "      \"id\": 273\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+        JSONAssert.assertEquals(expectedResponse, new String(responseString, StandardCharsets.UTF_8), false);
+    }
+
+
+    /**
+     * 5. 买家收藏的商品不存在
+     * @author: Zeyao Feng
+     * @date: Created in 2020/12/15 16:52
+     */
+    @Test
+    @Order(5)
+    public void createFavorites2() throws Exception {
+
+        //uid=26
+        String token = this.userLogin("9925906183", "123456");
+
+        byte[] responseString = mallClient.post().uri("/favorites/goods/12345678").header("authorization",token).exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getCode())
                 .returnResult()
                 .getResponseBodyContent();
     }
-
-
 
 }

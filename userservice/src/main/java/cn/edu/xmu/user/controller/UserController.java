@@ -150,13 +150,13 @@ public class UserController {
      * 平台管理员封禁买家
      * @param id
      * @return
-     * @author 24320182203181 陈渝璇
+     * @author cyx
      */
     @ApiOperation(value = "封禁买家")
     @Audit
-    @PutMapping("users/{id}/ban")
-    public Object banCustomer(@PathVariable Long id){
-        ReturnObject<Object> ret = userService.banCustomer(id);
+    @PutMapping("shops/{did}/users/{id}/ban")
+    public Object banCustomer(@PathVariable Long did,@PathVariable Long id){
+        ReturnObject<Object> ret = userService.banCustomer(did,id);
         return Common.decorateReturnObject(ret);
     }
 
@@ -164,13 +164,13 @@ public class UserController {
      * 平台管理员解禁买家
      * @param id
      * @return
-     * @author 24320182203181 陈渝璇
+     * @author cyx
      */
     @ApiOperation(value = "解禁买家")
     @Audit
-    @PutMapping("users/{id}/release")
-    public Object releaseCustomer(@PathVariable Long id){
-        ReturnObject<Object> ret = userService.releaseCustomer(id);
+    @PutMapping("shops/{did}/users/{id}/release")
+    public Object releaseCustomer(@PathVariable Long did,@PathVariable Long id){
+        ReturnObject<Object> ret = userService.releaseCustomer(did,id);
         return Common.decorateReturnObject(ret);
     }
 
@@ -184,7 +184,7 @@ public class UserController {
      */
     @ApiOperation(value = "修改买家信息", produces = "application/json")
     @Audit
-    @PutMapping("/users")
+    @PutMapping("users")
     public Object updateCustomer(@LoginUser Long id, @Validated @RequestBody CustomerSetVo vo) {
         ReturnObject<Object> success = userService.modifyCustomer(id,vo);
         //校验前端数据
@@ -204,7 +204,7 @@ public class UserController {
      */
     @ApiOperation(value = "查看买家信息", produces = "application/json")
     @Audit
-    @GetMapping("/users")
+    @GetMapping("users")
     public Object getCustomer(@LoginUser Long id) {
         ReturnObject<Object> success = userService.getCustomer(id);
         //校验前端数据

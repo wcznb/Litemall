@@ -24,7 +24,7 @@ public class test {
     public void setUp(){
 
         this.manageClient = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:8090")
+                .baseUrl("http://114.215.198.238:4510")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
 
@@ -52,7 +52,7 @@ public class test {
         body.put("password", password);
         String requireJson = body.toJSONString();
         byte[] responseString = manageClient.post().uri("/users/login").bodyValue(requireJson).exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
