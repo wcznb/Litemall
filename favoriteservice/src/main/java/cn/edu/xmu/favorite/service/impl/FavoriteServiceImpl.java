@@ -79,36 +79,49 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Transactional
     @Override
     public ReturnObject<VoObject> insertFavorite(Long userId, Long skuId){
-        LocalDateTime now = LocalDateTime.now();
-        FavoritePo favoritePo = new FavoritePo();
-        favoritePo.setCustomerId(userId);
-        favoritePo.setGoodsSkuId(skuId);
-        favoritePo.setGmtCreate(now);
-        favoritePo.setGmtModified(now);
+        //判断skuid是否正确
+        ReturnObject<Object> retCheckSkuId = goodsService.checkSkuId(skuId);
+        if(retCheckSkuId.getCode() != ResponseCode.OK)
+            return new ReturnObject<>(retCheckSkuId.getCode());
 
-        //插入
-        ReturnObject<FavoritePo> favoritePoRet = favoriteDao.insertFavorite(favoritePo);
-        if(favoritePoRet.getCode()==ResponseCode.OK){
-            //插入成功，组合信息
-            FavoritePo po = favoritePoRet.getData();
-            Favorite favorite = new Favorite(po);
-            //从商品模块获得信息
-            ReturnObject<GoodsSkuSimpleRetVo> skuSimpleRetVoReturnObject = goodsService.getGoodsSkuById(skuId);
-            if(skuSimpleRetVoReturnObject.getCode() == ResponseCode.OK){
-                favorite.setGoodsSku(skuSimpleRetVoReturnObject.getData());
-                return new ReturnObject<>(favorite);
-            }else{
-                return new ReturnObject<>(skuSimpleRetVoReturnObject.getCode());
-            }
+        ReturnObject<FavoritePo> retFavoritePos = favoriteDao.findFavoriteByCoustomerIdAndSkuId(userId,skuId);
+        if(retFavoritePos.getCode() != ResponseCode.OK)
+            return new ReturnObject<>(retFavoritePos.getCode());
 
+        FavoritePo favoritePo = retFavoritePos.getData();
+        if(favoritePo == null){
+            //商品没有被收藏，则插入
+            LocalDateTime now = LocalDateTime.now();
+            FavoritePo favoritePoForInsert = new FavoritePo();
+            favoritePoForInsert.setCustomerId(userId);
+            favoritePoForInsert.setGoodsSkuId(skuId);
+            favoritePoForInsert.setGmtCreate(now);
+            favoritePoForInsert.setGmtModified(now);
+
+            //插入
+            ReturnObject<FavoritePo> favoritePoRet = favoriteDao.insertFavorite(favoritePoForInsert);
+            favoritePo = favoritePoRet.getData();
+            if(favoritePoRet.getCode()!=ResponseCode.OK)
+                return new ReturnObject<>(favoritePoRet.getCode());
         }
-        return new ReturnObject<>(favoritePoRet.getCode());
+        Favorite favorite = new Favorite(favoritePo);
+        //从商品模块获得信息
+        ReturnObject<GoodsSkuSimpleRetVo> skuSimpleRetVoReturnObject = goodsService.getGoodsSkuById(skuId);
+        if(skuSimpleRetVoReturnObject.getCode() == ResponseCode.OK){
+            favorite.setGoodsSku(skuSimpleRetVoReturnObject.getData());
+            return new ReturnObject<>(favorite);
+        }else{
+            return new ReturnObject<>(skuSimpleRetVoReturnObject.getCode());
+        }
     }
 
     @Transactional
     @Override
     public ReturnObject<Object> deleteFavorite(Long userId, Long id){
-        ReturnObject<FavoritePo> favoritePoRetObj = favoriteDao.findFavorite(id);
+        ReturnObject<FavoritePo> favoritePoRetObj = favoriteDao.findFavoriteById(id);
+        if(favoritePoRetObj.getData()==null)
+            //搜索失败:id不存在
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         ReturnObject<Object> retObj = new ReturnObject<>(favoritePoRetObj.getCode(),favoritePoRetObj.getErrmsg());
         if(retObj.getCode()== ResponseCode.OK) {
             FavoritePo favoritePo = favoritePoRetObj.getData();

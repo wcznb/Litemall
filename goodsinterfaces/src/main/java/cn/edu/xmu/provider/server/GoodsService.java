@@ -1,4 +1,5 @@
 package cn.edu.xmu.provider.server;
+import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.provider.model.bo.GoodsSKU;
 import cn.edu.xmu.provider.model.vo.CouponActivityVo;
@@ -37,6 +38,21 @@ public interface GoodsService {
      * @date: Created at 2020/12/8 19:46
      */
     Boolean checkSkuIdByShopId(Long shopId,Long skuId);
+
+    /**
+     * 给收藏使用，通过skuid判断商品是否存在
+     * @param skuId
+     * @return
+     */
+    ReturnObject<Object> checkSkuId(Long skuId);
+
+    /**
+     * 给足迹使用，通过shop筛选sku
+     * @param shopId
+     * @param skuIds
+     * @return
+     */
+    ReturnObject<List<GoodsSkuSimpleRetVo>> getGoodsSkuListBySkuIdAndShopId(Long shopId,List<Long> skuIds);
 
     /**
      * 给购物车部分使用其1（用户获取购物车列表)

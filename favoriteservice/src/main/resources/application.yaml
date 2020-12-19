@@ -103,6 +103,9 @@ dubbo:
   protocols:
     dubbo:
       port: 18888
+  consumer:
+    timeout: 60000
+    check: false
 
 
 

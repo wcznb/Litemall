@@ -5,6 +5,7 @@ import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
@@ -12,8 +13,10 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
@@ -43,9 +46,12 @@ public class FootprintController {
                                        @RequestParam(required=false) String beginTime,
                                        @RequestParam(required=false) String endTime,
                                        @RequestParam(required=false, defaultValue = "1") Integer page,
-                                       @RequestParam(required=false, defaultValue = "10") Integer pageSize){
+                                       @RequestParam(required=false, defaultValue = "10") Integer pageSize,
+                                       HttpServletResponse httpServletResponse){
         Object object = null;
         ReturnObject<PageInfo<VoObject>> ret = footprintService.findPageOfFootprints(did, userId, beginTime, endTime, page, pageSize);
+        if(ret.getCode() == ResponseCode.Log_Bigger)
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         object = Common.getPageRetObject(ret);
         return object;
     }
