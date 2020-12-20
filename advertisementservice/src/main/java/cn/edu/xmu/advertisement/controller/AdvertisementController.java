@@ -54,17 +54,15 @@ public class AdvertisementController {
             @ApiImplicitParam(name = "did", required = true, dataType = "Long", paramType = "path"),
             @ApiImplicitParam(paramType = "header", dataType = "String", name = "authorization", value = "Token", required = true)
     })
-    //@Audit
+    @Audit
     @PutMapping("/shops/{did}/advertisement/{id}/default")
-    public Object becomeDefault(@PathVariable Long id, @PathVariable Long did) {
+    public Object becomeDefault(@LoginUser Long userId,@PathVariable Long id, @PathVariable Long did) {
 
         ReturnObject success = advertisementServiceImpl.becomeDefault(id);
-//        if (success.getData() == null) {
+
 
         return Common.decorateReturnObject(success);
-//        } else {
-//            return ResponseUtil.ok();
-//        }
+
 
     }
 
@@ -87,7 +85,7 @@ public class AdvertisementController {
     })
     @Audit
     @PutMapping("/shops/{did}/advertisement/{id}/offshelves")
-    public Object offshelf(@PathVariable Long id, @PathVariable Long did) {
+    public Object offshelf(@LoginUser Long userId,@PathVariable Long id, @PathVariable Long did) {
 
         ReturnObject<Boolean> success = advertisementServiceImpl.adoffshelf(id);
         if (success.getData() == null) {
@@ -117,7 +115,7 @@ public class AdvertisementController {
     })
     @Audit
     @PutMapping("/shops/{did}/advertisement/{id}/onshelves")
-    public Object onshelf(@PathVariable Long id, @PathVariable Long did) {
+    public Object onshelf(@LoginUser Long userId,@PathVariable Long id, @PathVariable Long did) {
 
         ReturnObject<Boolean> success = advertisementServiceImpl.adonshelf(id);
         if (success.getData() == null) {
@@ -148,7 +146,7 @@ public class AdvertisementController {
     })
     @Audit
     @DeleteMapping("/shops/{did}/advertisement/{id}")
-    public Object deleteAd(@PathVariable Long id, @Depart @PathVariable Long did) {
+    public Object deleteAd(@LoginUser Long userId,@PathVariable Long id, @Depart @PathVariable Long did) {
         logger.debug("deleteAd: id = " + id);
         ReturnObject returnObject = advertisementServiceImpl.deleteAd(id);
         return Common.decorateReturnObject(returnObject);
@@ -177,7 +175,7 @@ public class AdvertisementController {
     })
     @Audit
     @PutMapping("/shops/{did}/advertisement/{id}/audit")
-    public Object messageAd(@PathVariable Long id, @PathVariable Long did, @Validated @RequestBody AdvertisementMessageVo vo) {
+    public Object messageAd(@LoginUser Long userId,@PathVariable Long id, @PathVariable Long did, @Validated @RequestBody AdvertisementMessageVo vo) {
         ReturnObject<Object> success = advertisementServiceImpl.messageAd(id, vo);
 
         if (success.getCode() == ResponseCode.FIELD_NOTVALID) {
@@ -194,9 +192,9 @@ public class AdvertisementController {
      */
 
     @ApiOperation(value = "获得广告所有状态")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "authorization", value = "Token", required = true, dataType = "String", paramType = "header"),
-    })
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "authorization", value = "Token", required = true, dataType = "String", paramType = "header"),
+//    })
     @ApiResponses({
             @ApiResponse(code = 0, message = "成功")
     })
@@ -216,9 +214,9 @@ public class AdvertisementController {
      * 管理员查看某一时段的广告
      */
     @ApiOperation(value = "管理员查看某一广告时段的广告")
-    // @Audit
+    @Audit
     @ApiImplicitParams({
-            //  @ApiImplicitParam(paramType = "header", dataType = "String",  name = "authorization", value ="用户token", required = true),
+             @ApiImplicitParam(paramType = "header", dataType = "String",  name = "authorization", value ="用户token", required = true),
             @ApiImplicitParam(paramType = "query", dataType = "String", name = "beginDate", value = "开始日期", required = true),
             @ApiImplicitParam(paramType = "query", dataType = "String", name = "endDate", value = "结束日期", required = true),
             @ApiImplicitParam(paramType = "query", dataType = "Integer", name = "page", value = "页码", required = true),
@@ -227,7 +225,8 @@ public class AdvertisementController {
     })
     @GetMapping("/shops/{did}/timesegments/{id}/advertisement")
     public Object getAdBySegID(@PathVariable Long id,
-                               @PathVariable Long did,
+                               @PathVariable  Long did,
+                               @LoginUser Long userId,
                                @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
                                @RequestParam(value = "beginDate", required = false) String beginDate,
@@ -243,7 +242,7 @@ public class AdvertisementController {
         else if (ret.getCode() == ResponseCode.FIELD_NOTVALID)
             //return Common.getNullRetObj(new ReturnObject<>(ResponseCode.FIELD_NOTVALID), httpServletResponse);
 
-             return new ResponseEntity(ResponseUtil.fail(ResponseCode.FIELD_NOTVALID), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(ResponseUtil.fail(ResponseCode.FIELD_NOTVALID), HttpStatus.BAD_REQUEST);
         else
             return Common.getPageRetObject(ret);
 
@@ -274,7 +273,7 @@ public class AdvertisementController {
     })
     @Audit
     @PostMapping("/shops/{did}/advertisement/{id}/uploadImg")
-    public Object uploadImg(@RequestParam("img") MultipartFile multipartFile, @PathVariable Long id, @PathVariable Long did) {
+    public Object uploadImg(@LoginUser Long userId,@RequestParam("img") MultipartFile multipartFile, @PathVariable Long id, @PathVariable Long did) {
         logger.debug("uploadImg: id = " + id + " img :" + multipartFile.getOriginalFilename());
         ReturnObject returnObject = advertisementServiceImpl.uploadImg(id, multipartFile);
 
@@ -297,12 +296,12 @@ public class AdvertisementController {
             @ApiImplicitParam(paramType = "body", dataType = "AdvertisementUpdateVo", name = "vo1", value = "可修改的广告的内容", required = true)
 
     })
-    //f@Audit
+    @Audit
     @PutMapping("/shops/{did}/advertisement/{id}")
-    public Object messageUpdate(@PathVariable Long id, @PathVariable Long did, @Validated @RequestBody AdvertisementUpdateVo vo1) {
+    public Object messageUpdate(@LoginUser Long userId,@PathVariable Long id, @PathVariable Long did, @Validated @RequestBody AdvertisementUpdateVo vo1) {
         ReturnObject<Object> success = advertisementServiceImpl.messageUpdate(id, vo1);
 
-        if (success.getCode() == ResponseCode.FIELD_NOTVALID)
+        if (success.getCode() == ResponseCode.FIELD_NOTVALID||success.getCode()==ResponseCode.Log_Bigger)
             return new ResponseEntity(ResponseUtil.fail(success.getCode()), HttpStatus.BAD_REQUEST);
 
         return Common.decorateReturnObject(success);
@@ -327,15 +326,18 @@ public class AdvertisementController {
             @ApiResponse(code = 0, message = "成功"),
             @ApiResponse(code = 603, message = "达到广告时段（8个）")
     })
-    //@Audit
+   @Audit
     @PostMapping("/shops/{did}/timesegments/{id}/advertisement")
-    public Object newAdBySegID(@PathVariable Long id, @PathVariable Long did, @Validated @RequestBody NewAdvertisementVo vo) {
+    public Object newAdBySegID(@LoginUser Long userId,@PathVariable Long id, @PathVariable Long did, @Validated @RequestBody NewAdvertisementVo vo) {
 
         ReturnObject returnObject = advertisementServiceImpl.createUnderSegID(id, vo);
 
+        if(returnObject.getCode()==ResponseCode.FIELD_NOTVALID||returnObject.getCode()==ResponseCode.Log_Bigger)
+            return new ResponseEntity(ResponseUtil.fail(returnObject.getCode()), HttpStatus.BAD_REQUEST);
 
-        if (returnObject.getCode() == ResponseCode.OK)
+        else  if (returnObject.getCode() == ResponseCode.OK)
             return new ResponseEntity(ResponseUtil.ok(returnObject.getData()), HttpStatus.CREATED);
+
         else
             return Common.getNullRetObj(new ReturnObject<>(returnObject.getCode(), returnObject.getErrmsg()), httpServletResponse);
 
@@ -358,9 +360,9 @@ public class AdvertisementController {
             @ApiResponse(code = 0, message = "成功"),
             @ApiResponse(code = 603, message = "达到广告时段（8个）")
     })
-  //  @Audit
+   @Audit
     @PostMapping("/shops/{did}/timesegments/{tid}/advertisement/{id}")
-    public Object AddAdBySegID(@PathVariable Long tid, @PathVariable Long did, @PathVariable Long id) {
+    public Object AddAdBySegID(@LoginUser Long userId,@PathVariable Long tid, @PathVariable Long did, @PathVariable Long id) {
 
         ReturnObject returnObject = advertisementServiceImpl.addAdBySegID(tid, id);
 
@@ -377,9 +379,9 @@ public class AdvertisementController {
     @ApiOperation(value = "获取当前时段广告列表", produces = "application/json")
     //不需要登录那还需要验证吗？
 //    @Audit
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(paramType = "header",dataType = "String",name = "authorization",value = "用户token",required = true),
-//    })
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "header",dataType = "String",name = "authorization",value = "用户token",required = true),
+    })
     @GetMapping("/advertisement/current")
     public Object getCurrentById() {
 
