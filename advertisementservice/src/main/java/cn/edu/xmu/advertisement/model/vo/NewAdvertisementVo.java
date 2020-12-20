@@ -7,7 +7,7 @@ public class NewAdvertisementVo {
 
 
     String content;
-    String weight;
+    Integer weight;
     String beginDate;
     String endDate;
     Boolean repeat;

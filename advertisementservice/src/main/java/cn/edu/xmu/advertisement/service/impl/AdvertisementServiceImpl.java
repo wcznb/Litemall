@@ -20,6 +20,7 @@ import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageInfo;
 import io.lettuce.core.StrAlgoArgs;
+import org.apache.ibatis.jdbc.Null;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,49 +77,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Transactional
     public ReturnObject becomeDefault(Long id) {
 
-        AdvertisementPo advertisementPo1 = advertisementDao.findAdById(id);
 
-        if (advertisementPo1 == null)
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
-
-        AdvertisementPo advertisementPo = new AdvertisementPo();
-        advertisementPo.setId(id);
-        Byte bedefaults = 1;
-        Byte notbedefaults = 0;
-
-        ReturnObject returnObject2;
-
-        //该广告一开始是默认广告
-        if (advertisementPo1.getBeDefault() == bedefaults) {
-
-            advertisementPo.setBeDefault(notbedefaults);  //默认-》非默认
-        } else {
-
-//            AdvertisementPo advertisementPo2 = advertisementDao.getAdByExmple();
-//            //查询数据库中的默认广告，将其设置为非默认
-//            if(advertisementPo2!=null) {
-//                Long default_id = advertisementPo2.getId();
-//                AdvertisementPo advertisementPo3 = new AdvertisementPo();
-//
-//                advertisementPo3.setId(default_id);
-//                advertisementPo3.setBeDefault(notbedefaults);
-//                //将默认广告改为非默认广告，全平台只有一个默认广告
-//                returnObject2 = advertisementDao.modifyAdvertiseDefault(advertisementPo3);
-//
-//                if (returnObject2.getCode() != ResponseCode.OK)
-//                    return returnObject2;
-//            }
-
-            advertisementPo.setBeDefault(bedefaults); //非默认-》默认
-
-        }
-
-        ReturnObject retObj = advertisementDao.modifyAdvertiseDefault(advertisementPo);
-
-        if (retObj.getCode() != ResponseCode.OK) {
-            return retObj;
-        }
-        return new ReturnObject<>(ResponseCode.OK);
+        return  advertisementDao.getAdByDefault(id);
     }
 
 
@@ -237,7 +197,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             return new ReturnObject<>(ResponseCode.ADVERTISEMENT_STATENOTALLOW);   //608 广告状态禁止
         } else {
 
-            if(vo.getMessage()==null)
+            if (vo.getMessage() == null)
                 return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
             if (vo.getConclusion() == null)
                 return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
@@ -291,7 +251,6 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         if (vo == null)
             return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
 
-
         AdvertisementPo advertisementPo = new AdvertisementPo();
         advertisementPo.setId(id);
 
@@ -302,9 +261,13 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             LocalDate enddata1 = LocalDate.parse(vo.getEndDate(), fmt);
 
             if (begindata1.isAfter(enddata1))
+                return new ReturnObject<>(ResponseCode.Log_Bigger);
+
+            String str = "2020-11-30";
+            LocalDate str1 = LocalDate.parse(str, fmt);
+
+            if (enddata1.isBefore(str1))
                 return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
-//            if(enddata1.isBefore(LocalDate.now()))
-//                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
 
             advertisementPo.setBeginDate(begindata1);
             advertisementPo.setEndDate(enddata1);
@@ -314,24 +277,36 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
             return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
         }
+        if (vo.getRepeat() != null) {
+            //Boolean->Byte
+            Byte a = 1;
+            Byte b = 0;
+            Byte c = vo.getRepeat() ? a : b;
+            advertisementPo.setRepeats(c);
+        } else
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
 
-        //Boolean->Byte
-        Byte a = 1;
-        Byte b = 0;
-        Byte c = vo.getRepeat() ? a : b;
-        advertisementPo.setRepeats(c);
 
         if (vo.getLink() != null)
             advertisementPo.setLink(vo.getLink());
+        else
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+
 
         if (vo.getWeight() != null) {  //判别非空 进行类型转换   String->Integer
             if (vo.getWeight() < 0)
                 return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
             else
                 advertisementPo.setWeight(vo.getWeight());
-        }
+        } else
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+
+
         if (vo.getContent() != null)
             advertisementPo.setContent(vo.getContent());
+        else
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+
 
         //更新广告状态为待审核
         advertisementPo.setState(Advertisement.State.MESSAGES.getCode().byteValue());
@@ -457,6 +432,8 @@ public class AdvertisementServiceImpl implements AdvertisementService {
      * @param seg_id: 时段id
      * @return
      */
+
+    //  AdvertisementServiceImpl advertisementServiceIml = new AdvertisementServiceImpl();
     @Transactional
     public ReturnObject deleteSegIDThenZero(Long seg_id) {
 
