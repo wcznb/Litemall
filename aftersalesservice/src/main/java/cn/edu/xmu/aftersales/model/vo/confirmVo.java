@@ -14,6 +14,6 @@ public class confirmVo {
     @NotNull
     private boolean confirm;
 
-    @NotBlank
+//    @NotBlank
     private String conclusion;
 }
