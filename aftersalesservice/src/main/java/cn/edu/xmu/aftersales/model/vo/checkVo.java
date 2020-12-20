@@ -12,7 +12,7 @@ public class checkVo {
 
     private Long price;
 
-    @NotBlank
+//    @NotBlank
     private String conclusion;
 
     private Byte type;

@@ -21,11 +21,12 @@ public class NewSaleVo {
     @NotNull(message = "数量不能为空")
     @Range(message="数量必须大于0",min=1)
      private Integer quantity;
-    @NotBlank(message = "申请理由不能为空")
+//    @NotBlank(message = "申请理由不能为空")
      private String reason;
-    @NotNull(message = "地区id不能为空")
+//    @NotNull(message = "地区id不能为空")
+    @Range(message="地区Id必须大于0",min=1)
      private Integer regionId;
-    @NotBlank(message = "详细地址不能为空")
+//    @NotBlank(message = "详细地址不能为空")
      private String detail;
     @NotBlank(message = "联系人不能为空")
      private String consignee;

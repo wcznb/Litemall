@@ -3,6 +3,7 @@ package cn.edu.xmu.aftersales.service;
 import cn.edu.xmu.aftersales.dao.AftersalesDao;
 import cn.edu.xmu.aftersales.model.bo.AftersalesBo;
 import cn.edu.xmu.aftersales.model.bo.querySaleBo;
+import cn.edu.xmu.aftersales.model.po.AftersaleServicePo;
 import cn.edu.xmu.aftersales.model.vo.*;
 import cn.edu.xmu.aftersales.util.ExchangeDate;
 import cn.edu.xmu.ooad.model.VoObject;
@@ -12,6 +13,7 @@ import cn.edu.xmu.provider.server.OrderService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,12 +46,20 @@ public class AftersaleServiceImpl implements AfterSaleService{
         if(validItem.getData()==false)
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,String.format("orderItemId不存在"));
         else {
+
+            Byte orderState=orderService.checkState(orderItemId);
+            if (orderState==null) {
+                return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR,String.format("内部接口出错"));
+            }
+            if(orderState!=(byte)3)
+                return new ReturnObject<>(ResponseCode.ORDER_STATENOTALLOW,String.format("order未完成"));
+
             ReturnObject<Long> cusId = orderService.getUserIdByOrderItemId(orderItemId);
             if (cusId.getCode() != ResponseCode.OK)
                 return new ReturnObject(cusId.getCode(), cusId.getErrmsg());
             else {
                 Long customerId = cusId.getData();
-                if (customerId != userId)
+                if (!customerId.equals(userId))
                     return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
                 else {
 //                    ReturnObject<Long> quantity=orderService.getnumber(orderItemId);
@@ -92,6 +102,7 @@ public class AftersaleServiceImpl implements AfterSaleService{
 
         LocalDateTime begintime=null;
         LocalDateTime endtime=null;
+        ReturnObject<PageInfo<VoObject>> rett=null;
         if(!beginTime.equals(""))  {
             begintime = ExchangeDate.StringToDateTime(beginTime).get(true);
             if(ExchangeDate.StringToDateTime(beginTime).containsKey(false))
@@ -239,14 +250,52 @@ public class AftersaleServiceImpl implements AfterSaleService{
 //                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
 //            }
 //        }
-        ReturnObject<VoObject> ret=aftersalesDao.agreeSale(shopId, id, vo);
-        return ret;
+        ReturnObject<AftersaleServicePo> po=aftersalesDao.selectSale(id);
+        if(po.getCode()!=ResponseCode.OK)
+            return new ReturnObject<>(po.getCode(),po.getErrmsg());
+        else {
+            AftersaleServicePo sale = po.getData();
+            ReturnObject<Long> cusId = orderService.getUserIdByOrderItemId(sale.getOrderItemId());
+            if (cusId.getCode() != ResponseCode.OK)
+                return new ReturnObject(cusId.getCode(),"内部接口出错惹");
+            else {
+                Long customerId = cusId.getData();
+                if (!customerId.equals(sale.getCustomerId()))
+                    return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
+                ReturnObject<VoObject> ret = aftersalesDao.agreeSale(shopId, id, vo);
+                return ret;
+            }
+        }
     }
 
     @Override
     public ReturnObject<VoObject> receive(Long shopId, Long id, confirmVo vo) {
-        ReturnObject<VoObject> ret=aftersalesDao.confirmReceive(shopId, id, vo);
-        return ret;
+        ReturnObject<AftersaleServicePo> ret=aftersalesDao.confirmReceive(shopId, id, vo);
+        ReturnObject<VoObject> returnObject=null;
+        if(ret.getCode()!=ResponseCode.OK)
+            return new ReturnObject<>(ret.getCode(),ret.getErrmsg());
+        else{
+            AftersaleServicePo sale=ret.getData();
+            if(vo.isConfirm()) {
+                if (sale.getType() == (byte) 0||sale.getType()==(byte)2) {
+                    sale.setState((byte) 4);
+                    sale.setConclusion(vo.getConclusion());
+                } else {
+                    sale.setState((byte) 3);
+                    sale.setConclusion(vo.getConclusion());
+                    boolean innner=orderService.createRefund(sale.getId(),sale.getOrderItemId(),sale.getQuantity(),sale.getShopId());
+                    if (innner==false)
+                        return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR,String.format("内部接口出错"));///?
+
+                }
+                sale.setGmtModified(LocalDateTime.now());
+            }else {
+                sale.setConclusion(vo.getConclusion());
+                sale.setState((byte)1);
+            }
+            returnObject=aftersalesDao.updateRecevice(sale);
+        }
+        return returnObject;
     }
 
     @Override
@@ -256,29 +305,30 @@ public class AftersaleServiceImpl implements AfterSaleService{
             return new ReturnObject<>(ret.getCode(),ret.getErrmsg());
         }else{
             AftersalesBo bo=ret.getData();
-            if(bo.getType().getCode()==0){
-                ReturnObject<Long> orderId=orderService.getNewOrderId(bo.getConsignee(),bo.getRegionId(),bo.getDetail(),bo.getMobile(),bo.getOrderItemId(),bo.getQuantity().longValue());
-                if(orderId.getCode()!=ResponseCode.OK)
+            if(bo.getType().getCode()==0){//换货
+                Long orderId=orderService.NewShopOrder(bo.getConsignee(),bo.getRegionId(),bo.getDetail(),bo.getMobile(),bo.getOrderItemId(),bo.getQuantity());
+                if(orderId==null)
                     return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR,String.format("内部接口出错"));
                 else{
-                    if(vo.getShopLogSn()!=null)
-                        return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
-                    bo.setOrderId(orderId.getData());
+//                    if(vo.getShopLogSn()!=null)
+//                        return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+                    bo.setOrderId(orderId);
                     bo.setState(AftersalesBo.State.getTypeByCode(5));
                     bo.setGmtModified(LocalDateTime.now());
                 }
             }else if(bo.getType().getCode()==2){
+
+                boolean innerPay=orderService.createPay(bo.getId(),bo.getRefund());
+                if(innerPay==false)
+                    return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR,"内部接口出错");
                 if(vo.getShopLogSn()==null)
                     return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
                 bo.setShopLogSn(vo.getShopLogSn());
                 bo.setState(AftersalesBo.State.getTypeByCode(5));
                 bo.setGmtModified(LocalDateTime.now());
             }
-
-            ReturnObject<VoObject> retObj=aftersalesDao.updatedeliver(bo);
+            ReturnObject<VoObject> retObj=aftersalesDao.updateAfterSale(bo);
             return retObj;
         }
     }
-
-
 }
