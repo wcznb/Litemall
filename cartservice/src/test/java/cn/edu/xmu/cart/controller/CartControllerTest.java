@@ -114,27 +114,7 @@ public class CartControllerTest {
         System.out.println(response);
     }
 
-    /**
-     * 买家删除购物车中商品 成功
-     * @throws Exception
-     */
-    @Test
-    public void deleteCart1() throws Exception {
-        String token = this.login("8606245097", "123456");
-
-        Long id = 1L;
-        String response = new String(Objects.requireNonNull(webClient.delete().uri("/carts/{id}",id)
-                .header("authorization",token).exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo("成功")
-                .returnResult()
-                .getResponseBodyContent()));
-
-        System.out.println(response);
-    }
-
+  
     /**
      * 买家删除购物车中商品 操作对象不是自己的
      * @throws Exception

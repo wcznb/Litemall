@@ -26,17 +26,7 @@ import java.nio.charset.StandardCharsets;
  */
 @SpringBootTest(classes = AdvertisementserviceApplication.class)   //标识本类是一个SpringBootTest
 @Slf4j
-public class ChenXiaoruTest {
-
-//    @Value("${public-test.managementgate}")
-//    private String managementGate;
-//
-//    @Value("${public-test.mallgate}")
-//    private String mallGate;
-//
-//    private WebTestClient manageClient;
-//
-//    private WebTestClient mallClient;
+public class ChenXiaoruTes{
 //
 //    @BeforeEach
 //    public void setUp() {
@@ -63,33 +53,7 @@ private WebTestClient manageClient;
         log.debug(token);
         return token;
     }
-
-//    /**
-//     * 未登录获得广告的所有状态
-//     *
-//     * @author 24320182203175 陈晓如
-//     */
-//    @Test
-//    public void advertiseTest1() throws Exception {
-//
-//        byte[] ret = manageClient.get().uri("/advertisement/states")
-//                .exchange()
-//                .expectStatus().isUnauthorized()
-//                .expectBody()
-//                .returnResult()
-//                .getResponseBodyContent();
-//    }
-//
-//    /**
-//     * 使用伪造token获得广告的所有状态
-//     *
-//     * @author 24320182203175 陈晓如
-//     */
-//    @Test
-//    public void advertiseTest2() throws Exception {
-//        byte[] ret = manageClient.get().uri("/advertisement/states")
-//                .header("authorization", "test")
-//                .exchange()
+)
 //                .expectStatus().isUnauthorized()
 //                .expectBody()
 //                .returnResult()
@@ -345,31 +309,7 @@ private WebTestClient manageClient;
                 .getResponseBodyContent();
     }
 
-    /**
-     * 管理员修改广告内容
-     * 传入开始日期和结束日期格式错误
-     * @throws Exception
-     */
-    @Test
-    public void advertiseTest11() throws Exception{
-
-        String token = creatTestToken(1L, 1L, 1000);
-
-        //  String token = this.adminLogin("13088admin", "123456");
-        JSONObject body = new JSONObject();
-        body.put("beginDate","2020/01/12");
-        body.put("endDate","2020/03/06");
-        String requireJson = body.toJSONString();
-        byte[] responseString = manageClient.put().uri("/shops/{did}/advertisement/{id}", 0, 421)
-                .header("authorization", token)
-                .bodyValue(requireJson)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.FIELD_NOTVALID.getCode())
-                .returnResult()
-                .getResponseBodyContent();
-    }
+    
 
     /**
      * 管理员修改广告内容
