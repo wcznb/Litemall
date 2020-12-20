@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -150,13 +151,13 @@ public class UserController {
      * 平台管理员封禁买家
      * @param id
      * @return
-     * @author cyx
+     * @author 24320182203181 陈渝璇
      */
     @ApiOperation(value = "封禁买家")
     @Audit
-    @PutMapping("shops/{did}/users/{id}/ban")
-    public Object banCustomer(@PathVariable Long did,@PathVariable Long id){
-        ReturnObject<Object> ret = userService.banCustomer(did,id);
+    @PutMapping("users/{id}/ban")
+    public Object banCustomer(@PathVariable Long id){
+        ReturnObject<Object> ret = userService.banCustomer(id);
         return Common.decorateReturnObject(ret);
     }
 
@@ -164,13 +165,13 @@ public class UserController {
      * 平台管理员解禁买家
      * @param id
      * @return
-     * @author cyx
+     * @author 24320182203181 陈渝璇
      */
     @ApiOperation(value = "解禁买家")
     @Audit
-    @PutMapping("shops/{did}/users/{id}/release")
-    public Object releaseCustomer(@PathVariable Long did,@PathVariable Long id){
-        ReturnObject<Object> ret = userService.releaseCustomer(did,id);
+    @PutMapping("users/{id}/release")
+    public Object releaseCustomer(@PathVariable Long id){
+        ReturnObject<Object> ret = userService.releaseCustomer(id);
         return Common.decorateReturnObject(ret);
     }
 
@@ -184,7 +185,7 @@ public class UserController {
      */
     @ApiOperation(value = "修改买家信息", produces = "application/json")
     @Audit
-    @PutMapping("users")
+    @PutMapping("/users")
     public Object updateCustomer(@LoginUser Long id, @Validated @RequestBody CustomerSetVo vo) {
         ReturnObject<Object> success = userService.modifyCustomer(id,vo);
         //校验前端数据
@@ -204,16 +205,16 @@ public class UserController {
      */
     @ApiOperation(value = "查看买家信息", produces = "application/json")
     @Audit
-    @GetMapping("users")
+    @GetMapping("/users")
     public Object getCustomer(@LoginUser Long id) {
         ReturnObject<Object> success = userService.getCustomer(id);
         //校验前端数据
+//        if(success.getCode()==ResponseCode.INTERNAL_SERVER_ERR)
+//            return new ResponseEntity(
+//                    ResponseUtil.fail(success.getCode(), success.getErrmsg()),
+//                    HttpStatus.is5xxServerError);
+        return Common.decorateReturnObject(success);
 
-        if (success.getData() == null)  {
-            return ResponseUtil.fail(success.getCode(), success.getErrmsg());
-        }else {
-            return Common.decorateReturnObject(success);
-        }
     }
 
     /**

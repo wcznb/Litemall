@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
         JwtHelper jwtHelper = new JwtHelper();
         Random random = new Random();
         Long milliSecond = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli()+random.nextInt();
-        String jwt = jwtHelper.createToken(user.getId(),milliSecond, jwtExpireTime);
+        String jwt = jwtHelper.createToken(user.getId(),-2L, jwtExpireTime);
         redisTemplate.opsForSet().add(key, jwt);
         logger.debug("login: newJwt = "+ jwt);
         retObj = new ReturnObject<>(jwt);
@@ -193,57 +193,56 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ReturnObject<PageInfo<VoObject>> getallusers(String userName, String email, String mobile, Integer page, Integer pageSize){
+
+
         ReturnObject<PageInfo<VoObject>> ret = userDao.getUsersMix(userName, email, mobile, page, pageSize);
         return ret;
     }
 
     /**
      * 平台管理员封禁买家
-     * @param did
      * @param userId 用户id
      */
     @Override
     @Transactional
-    public ReturnObject<Object> banCustomer(Long did, Long userId){
-        if(did == Long.valueOf(0)) {
-            CustomerPo customerPo = new CustomerPo();
-            customerPo.setId(userId);
-            customerPo.setState(Customer.State.FORBID.getCode().byteValue());//设置状态为封禁
-            customerPo.setGmtModified(LocalDateTime.now());
-            ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
-            if (retObj.getCode() != ResponseCode.OK) {
-                return retObj;
-            }
-            return new ReturnObject<>(true);
-        } else
-            return new ReturnObject(ResponseCode.FIELD_NOTVALID);
+    public ReturnObject<Object> banCustomer(Long userId){
+        CustomerPo customerPo = new CustomerPo();
+        customerPo.setId(userId);
+        customerPo.setState(Customer.State.FORBID.getCode().byteValue());//设置状态为封禁
+        customerPo.setGmtModified(LocalDateTime.now());
+        ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
+        if (retObj.getCode() != ResponseCode.OK){
+            return retObj;
+        }
+        return new ReturnObject<>(true);
     }
 
     /**
      * 平台管理员解禁买家
-     * @param did
      * @param userId 用户id
      */
     @Override
     @Transactional
-    public ReturnObject<Object> releaseCustomer(Long did,Long userId){
-        if(did == Long.valueOf(0)){
-            CustomerPo customerPo = new CustomerPo();
-            customerPo.setId(userId);
-            customerPo.setState(Customer.State.NORM.getCode().byteValue());//设置状态为正常
-            customerPo.setGmtModified(LocalDateTime.now());
-            ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
-            if (retObj.getCode() != ResponseCode.OK)
-                return retObj;
-            return new ReturnObject<>();
-
-        } else
-            return new ReturnObject(ResponseCode.FIELD_NOTVALID);//无权限
+    public ReturnObject<Object> releaseCustomer(Long userId){
+        CustomerPo customerPo = new CustomerPo();
+        customerPo.setId(userId);
+        customerPo.setState(Customer.State.NORM.getCode().byteValue());//设置状态为正常
+        customerPo.setGmtModified(LocalDateTime.now());
+        ReturnObject<Object> retObj = userDao.modifyCustomerByPo(customerPo);
+        if (retObj.getCode() != ResponseCode.OK){
+            return retObj;
+        }
+        return new ReturnObject<>();
     }
 
     @Override
     @Transactional
     public ReturnObject<Object> getCustomer(Long id) {
+
+        String key = "up_" + id;
+//        if(!redisTemplate.hasKey(key)){
+//            return new ReturnObject<>(ResponseCode.AUTH_INVALID_ACCOUNT);
+//        }
         ReturnObject<Object> retObj = userDao.getCustomerById(id);
         return retObj;
     }
