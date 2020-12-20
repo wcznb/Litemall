@@ -16,7 +16,7 @@ public interface UserService {
     @Transactional
     ReturnObject<String> login(String userName, String password, String ipAddr);
 
-    void banJwt(String jwt);
+//    void banJwt(String jwt);
 
     ReturnObject Logout(Long userId);
 

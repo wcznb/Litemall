@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,7 @@ public class UserServiceImpl implements UserService {
     private long lockerExpireTime;
 
     @Autowired
-    private RedisTemplate<String, Serializable> redisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     @Autowired
     NewUserDao newUserDao;
@@ -83,21 +84,8 @@ public class UserServiceImpl implements UserService {
 
         String key = "up_" + user.getId();
         if(redisTemplate.hasKey(key) && !canMultiplyLogin){
-//            logger.debug("login: multiply  login key ="+key);
-            // 用户重复登录处理
-            Set<Serializable> set = redisTemplate.opsForSet().members(key);
+            Set<String> set = redisTemplate.opsForSet().members(key);
             redisTemplate.delete(key);
-
-            /* 将旧JWT加入需要踢出的集合 */
-            String jwt = null;
-            for (Serializable str : set) {
-                /* 找出JWT */
-                if((str.toString()).length() > 8){
-                    jwt =  str.toString();
-                    break;
-                }
-            }
-            this.banJwt(jwt);
         }
 
 
@@ -113,72 +101,72 @@ public class UserServiceImpl implements UserService {
         return retObj;
     }
 
-    /**
-     * 禁止持有特定令牌的用户登录
-     * @param jwt JWT令牌
-     */
-    @Override
-    public void banJwt(String jwt){
-        String[] banSetName = {"BanJwt_0", "BanJwt_1"};
-        long bannIndex = 0;
-        if (!redisTemplate.hasKey("banIndex")){
-            redisTemplate.opsForValue().set("banIndex", Long.valueOf(0));
-        } else {
-            logger.debug("banJwt: banIndex = " +redisTemplate.opsForValue().get("banIndex"));
-            bannIndex = Long.parseLong(redisTemplate.opsForValue().get("banIndex").toString());
-        }
-        logger.debug("banJwt: banIndex = " + bannIndex);
-        String currentSetName = banSetName[(int) (bannIndex % banSetName.length)];
-        logger.debug("banJwt: currentSetName = " + currentSetName);
-        if(!redisTemplate.hasKey(currentSetName)) {
-            // 新建
-            logger.debug("banJwt: create ban set" + currentSetName);
-            redisTemplate.opsForSet().add(currentSetName, jwt);
-            redisTemplate.expire(currentSetName,jwtExpireTime * 2, TimeUnit.SECONDS);
-        }else{
-            //准备向其中添加元素
-            if(redisTemplate.getExpire(currentSetName, TimeUnit.SECONDS) > jwtExpireTime) {
-                // 有效期还长，直接加入
-                logger.debug("banJwt: add to exist ban set" + currentSetName);
-                redisTemplate.opsForSet().add(currentSetName, jwt);
-            } else {
-                // 有效期不够JWT的过期时间，准备用第二集合，让第一个集合自然过期
-                // 分步式加锁
-                logger.debug("banJwt: switch to next ban set" + currentSetName);
-                long newBanIndex = bannIndex;
-                while (newBanIndex == bannIndex &&
-                        !redisTemplate.opsForValue().setIfAbsent("banIndexLocker","nouse", lockerExpireTime, TimeUnit.SECONDS)){
-                    //如果BanIndex没被其他线程改变，且锁获取不到
-                    try {
-                        Thread.sleep(10);
-                        //重新获得新的BanIndex
-                        newBanIndex = (Long) redisTemplate.opsForValue().get("banIndex");
-                    }catch (InterruptedException e){
-                        logger.error("banJwt: 锁等待被打断");
-                    }
-                    catch (IllegalArgumentException e){
-
-                    }
-                }
-                if (newBanIndex == bannIndex) {
-                    //切换ban set
-                    bannIndex = redisTemplate.opsForValue().increment("banIndex");
-                }else{
-                    //已经被其他线程改变
-                    bannIndex = newBanIndex;
-                }
-
-                currentSetName = banSetName[(int) (bannIndex % banSetName.length)];
-                //启用之前，不管有没有，先删除一下，应该是没有，保险起见
-                redisTemplate.delete(currentSetName);
-                logger.debug("banJwt: next ban set =" + currentSetName);
-                redisTemplate.opsForSet().add(currentSetName, jwt);
-                redisTemplate.expire(currentSetName,jwtExpireTime * 2,TimeUnit.SECONDS);
-                // 解锁
-                redisTemplate.delete("banIndexLocker");
-            }
-        }
-    }
+//    /**
+//     * 禁止持有特定令牌的用户登录
+//     * @param jwt JWT令牌
+//     */
+//    @Override
+//    public void banJwt(String jwt){
+//        String[] banSetName = {"BanJwt_0", "BanJwt_1"};
+//        long bannIndex = 0;
+//        if (!redisTemplate.hasKey("banIndex")){
+//            redisTemplate.opsForValue().set("banIndex", Long.valueOf(0));
+//        } else {
+//            logger.debug("banJwt: banIndex = " +redisTemplate.opsForValue().get("banIndex"));
+//            bannIndex = Long.parseLong(redisTemplate.opsForValue().get("banIndex").toString());
+//        }
+//        logger.debug("banJwt: banIndex = " + bannIndex);
+//        String currentSetName = banSetName[(int) (bannIndex % banSetName.length)];
+//        logger.debug("banJwt: currentSetName = " + currentSetName);
+//        if(!redisTemplate.hasKey(currentSetName)) {
+//            // 新建
+//            logger.debug("banJwt: create ban set" + currentSetName);
+//            redisTemplate.opsForSet().add(currentSetName, jwt);
+//            redisTemplate.expire(currentSetName,jwtExpireTime * 2, TimeUnit.SECONDS);
+//        }else{
+//            //准备向其中添加元素
+//            if(redisTemplate.getExpire(currentSetName, TimeUnit.SECONDS) > jwtExpireTime) {
+//                // 有效期还长，直接加入
+//                logger.debug("banJwt: add to exist ban set" + currentSetName);
+//                redisTemplate.opsForSet().add(currentSetName, jwt);
+//            } else {
+//                // 有效期不够JWT的过期时间，准备用第二集合，让第一个集合自然过期
+//                // 分步式加锁
+//                logger.debug("banJwt: switch to next ban set" + currentSetName);
+//                long newBanIndex = bannIndex;
+//                while (newBanIndex == bannIndex &&
+//                        !redisTemplate.opsForValue().setIfAbsent("banIndexLocker","nouse", lockerExpireTime, TimeUnit.SECONDS)){
+//                    //如果BanIndex没被其他线程改变，且锁获取不到
+//                    try {
+//                        Thread.sleep(10);
+//                        //重新获得新的BanIndex
+//                        newBanIndex = (Long) redisTemplate.opsForValue().get("banIndex");
+//                    }catch (InterruptedException e){
+//                        logger.error("banJwt: 锁等待被打断");
+//                    }
+//                    catch (IllegalArgumentException e){
+//
+//                    }
+//                }
+//                if (newBanIndex == bannIndex) {
+//                    //切换ban set
+//                    bannIndex = redisTemplate.opsForValue().increment("banIndex");
+//                }else{
+//                    //已经被其他线程改变
+//                    bannIndex = newBanIndex;
+//                }
+//
+//                currentSetName = banSetName[(int) (bannIndex % banSetName.length)];
+//                //启用之前，不管有没有，先删除一下，应该是没有，保险起见
+//                redisTemplate.delete(currentSetName);
+//                logger.debug("banJwt: next ban set =" + currentSetName);
+//                redisTemplate.opsForSet().add(currentSetName, jwt);
+//                redisTemplate.expire(currentSetName,jwtExpireTime * 2,TimeUnit.SECONDS);
+//                // 解锁
+//                redisTemplate.delete("banIndexLocker");
+//            }
+//        }
+//    }
 
     /**
      * 用户登出
