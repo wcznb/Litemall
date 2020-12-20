@@ -169,7 +169,7 @@ public class UserController {
      */
     @ApiOperation(value = "解禁买家")
     @Audit
-    @PutMapping("shops/{did}/users/{id}/ban")
+    @PutMapping("shops/{did}/users/{id}/release")
     public Object releaseCustomer(@PathVariable Long did,@PathVariable Long id){
         ReturnObject<Object> ret = userService.releaseCustomer(did,id);
         return Common.decorateReturnObject(ret);
