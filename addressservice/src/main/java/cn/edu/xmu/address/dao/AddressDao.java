@@ -35,7 +35,7 @@ public class AddressDao {
     @Autowired
     RegionDao regionDao;
 
-    public ReturnObject<NewAddressRetVo> addAddress(NewAddressVo vo,Long id){
+    public ReturnObject<NewAddressRetVo> addAddress(NewAddressVo vo, Long id) {
         //检查地址是否已经超过上限
         AddressPoExample example = new AddressPoExample();
         AddressPoExample.Criteria criteria = example.createCriteria();
@@ -45,19 +45,19 @@ public class AddressDao {
 
         ReturnObject returnObject = null;
 
-        if(pos.size()<20) {
+        if (pos.size() < 20) {
 
-            Long regionId=vo.getRegionId();
+            Long regionId = vo.getRegionId();
 
-            if(!regionDao.isExist(regionId)){
+            if (!regionDao.isExist(regionId)) {
 
-                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
 
-            }else if(!regionDao.isAble(regionId)){
+            } else if (!regionDao.isAble(regionId)) {
 
                 return new ReturnObject<>(ResponseCode.REGION_OBSOLETE);
 
-            }else{
+            } else {
 
                 AddressPo po = new AddressPo();
                 po.setRegionId(vo.getRegionId());
@@ -95,7 +95,7 @@ public class AddressDao {
 
                 }
             }
-        }else{
+        } else {
 
             returnObject = new ReturnObject<>(ResponseCode.ADDRESS_OUTLIMIT);
 
@@ -106,8 +106,7 @@ public class AddressDao {
     }
 
 
-
-    public ReturnObject<PageInfo<AddressPo>> getALlAddressByUserid(Long customerId, Integer page, Integer pagesize){
+    public ReturnObject<PageInfo<AddressPo>> getAllAddressByUserid(Long customerId, Integer page, Integer pagesize) {
 
         AddressPoExample example = new AddressPoExample();
         AddressPoExample.Criteria criteria = example.createCriteria();
@@ -120,7 +119,7 @@ public class AddressDao {
 
             pos = addressPoMapper.selectByExample(example);
 
-        }catch (DataAccessException e){
+        } catch (DataAccessException e) {
 
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
 
@@ -131,74 +130,72 @@ public class AddressDao {
 
     }
 
-    public ReturnObject<Object> updateAddress(Long userId,Long id,NewAddressVo vo){
+    public ReturnObject<Object> updateAddress(Long userId, Long id, NewAddressVo vo) {
 
         AddressPo check = addressPoMapper.selectByPrimaryKey(id);
-        if(check==null){
+        //addressid not exist
+        if (check == null) {
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
-        if(!check.getCustomerId().equals(userId)){
+        //not user's address
+        if (!check.getCustomerId().equals(userId)) {
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
         }
-        if(!regionDao.isExist(vo.getRegionId())){
+        //regionid not exist
+        if (!regionDao.isExist(vo.getRegionId())) {
 
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
 
-        }else if(!regionDao.isAble(vo.getRegionId())) {
+        } else if (!regionDao.isAble(vo.getRegionId())) {
 
             return new ReturnObject<>(ResponseCode.REGION_OBSOLETE);
         }
-            AddressPo addressPo=new AddressPo();
-        addressPo=addressPoMapper.selectByPrimaryKey(id);
+        AddressPo addressPo = new AddressPo();
+        addressPo = addressPoMapper.selectByPrimaryKey(id);
 
-        if(addressPo==null){
 
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        addressPo.setRegionId(vo.getRegionId());
+        addressPo.setDetail(vo.getDetail());
+        addressPo.setConsignee(vo.getConsignee());
+        addressPo.setMobile(vo.getMobile());
+        LocalDateTime localDateTime = LocalDateTime.now();
+        addressPo.setGmtModified(localDateTime);
 
-        }else{
+        try {
 
-            addressPo.setRegionId(vo.getRegionId());
-            addressPo.setDetail(vo.getDetail());
-            addressPo.setConsignee(vo.getConsignee());
-            addressPo.setMobile(vo.getMobile());
-            LocalDateTime localDateTime=LocalDateTime.now();
-            addressPo.setGmtModified(localDateTime);
+            int ret = addressPoMapper.updateByPrimaryKeySelective(addressPo);
 
-            try{
+            if (ret == 0) {
 
-                int ret = addressPoMapper.updateByPrimaryKeySelective(addressPo);
+                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
 
-                if(ret==0){
+            } else {
 
-                    return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
-
-                }else {
-
-                    return new ReturnObject<>();
-
-                }
-            }catch (Exception e){
-
-                return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
+                return new ReturnObject<>();
 
             }
+        } catch (Exception e) {
+
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
+
         }
+
 
     }
 
 
-    public ReturnObject<Object> setAddressAsDefault(Long id,Long customerId){
+    public ReturnObject<Object> setAddressAsDefault(Long id, Long customerId) {
 
 
         AddressPo check = addressPoMapper.selectByPrimaryKey(id);
-        if(check==null){
+        if (check == null) {
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
-        if(!(check.getCustomerId().equals(customerId))){
+        if (!(check.getCustomerId().equals(customerId))) {
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
         }
 
-        AddressPo addressPo=new AddressPo();
+        AddressPo addressPo = new AddressPo();
         addressPo.setId(id);
         addressPo.setBeDefault((byte) 1);
 
@@ -212,7 +209,7 @@ public class AddressDao {
 
             pos = addressPoMapper.selectByExample(example);
 
-        }catch (DataAccessException e){
+        } catch (DataAccessException e) {
 
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
 
@@ -221,31 +218,31 @@ public class AddressDao {
 
             po.setBeDefault((byte) 0);
 
-            try{
+            try {
                 int ret = addressPoMapper.updateByPrimaryKeySelective(po);
-                if(ret==0){
+                if (ret == 0) {
                     return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
             }
 
         }
         //设为默认
-        try{
+        try {
 
-            int ret=addressPoMapper.updateByPrimaryKeySelective(addressPo);
+            int ret = addressPoMapper.updateByPrimaryKeySelective(addressPo);
 
-            if(ret==0){
+            if (ret == 0) {
 
                 return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
 
-            }else{
+            } else {
 
                 return new ReturnObject<>();
 
             }
-        }catch(Exception e){
+        } catch (Exception e) {
 
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
         }
@@ -254,28 +251,28 @@ public class AddressDao {
     }
 
 
-    public ReturnObject<Object> deleteAddress(Long id){
+    public ReturnObject<Object> deleteAddress(Long id) {
 
         ReturnObject<Object> retObj = null;
         AddressPo addressPo = addressPoMapper.selectByPrimaryKey(id);
 
-        if(addressPo!=null){
+        if (addressPo != null) {
 
-                int ret = addressPoMapper.deleteByPrimaryKey(id);
+            int ret = addressPoMapper.deleteByPrimaryKey(id);
 
-                if (ret == 0) {
+            if (ret == 0) {
 
-                    retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+                retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
 
-                } else {
+            } else {
 
-                    retObj = new ReturnObject<>();
+                retObj = new ReturnObject<>();
 
-                }
+            }
 
 
-        }else {
-            retObj= new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+        } else {
+            retObj = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
 
         return retObj;

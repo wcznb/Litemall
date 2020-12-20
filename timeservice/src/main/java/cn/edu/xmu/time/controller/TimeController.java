@@ -63,7 +63,7 @@ public class TimeController {
         ReturnObject returnObject=timeService.addTimeSegment(vo,type);
 
         if(returnObject.getCode()== ResponseCode.TIMESEG_CONFLICT){
-            return new ResponseEntity(ResponseUtil.fail(ResponseCode.TIMESEG_CONFLICT), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(ResponseUtil.fail(ResponseCode.TIMESEG_CONFLICT), HttpStatus.OK);
         }
         if(returnObject.getCode()== ResponseCode.OK){
             return new ResponseEntity(ResponseUtil.ok(returnObject.getData()), HttpStatus.CREATED);
@@ -96,7 +96,7 @@ public class TimeController {
         Byte type=1;
         ReturnObject returnObject=timeService.addTimeSegment(vo,type);
         if(returnObject.getCode()== ResponseCode.TIMESEG_CONFLICT){
-            return new ResponseEntity(ResponseUtil.fail(ResponseCode.TIMESEG_CONFLICT), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(ResponseUtil.fail(ResponseCode.TIMESEG_CONFLICT), HttpStatus.OK);
         }
         if(returnObject.getCode()== ResponseCode.OK){
             return new ResponseEntity(ResponseUtil.ok(returnObject.getData()), HttpStatus.CREATED);

@@ -51,8 +51,9 @@ public class AddressController {
         if(returnObject.getCode()== ResponseCode.OK){
             return new ResponseEntity(ResponseUtil.ok(returnObject.getData()), HttpStatus.CREATED);
         }
-        if(returnObject.getCode()==ResponseCode.REGION_OBSOLETE||returnObject.getCode()==ResponseCode.RESOURCE_ID_NOTEXIST){
-            return new ResponseEntity(ResponseUtil.fail(ResponseCode.FIELD_NOTVALID), HttpStatus.BAD_REQUEST);
+
+        if(returnObject.getCode()==ResponseCode.REGION_OBSOLETE||returnObject.getCode()==ResponseCode.FIELD_NOTVALID){
+            return new ResponseEntity(ResponseUtil.fail(returnObject.getCode()), HttpStatus.BAD_REQUEST);
         }
         return Common.decorateReturnObject(returnObject);
 
@@ -66,11 +67,11 @@ public class AddressController {
     @Audit
     @GetMapping("addresses")
     public Object getAllAddressById(@LoginUser Long userId ,
-            @RequestParam(required = true , defaultValue = "1")  Integer page,
-            @RequestParam(required = true, defaultValue = "10")  Integer pageSize
+            @RequestParam( defaultValue = "1")  Integer page,
+            @RequestParam(defaultValue = "10")  Integer pageSize
     ){
 
-        Object object = null;
+        Object object;
 
         if(page <= 0 || pageSize <= 0) {
             object = Common.getNullRetObj(new ReturnObject<>(ResponseCode.FIELD_NOTVALID), httpServletResponse);
@@ -97,23 +98,26 @@ public class AddressController {
             return obj;
         }
         ReturnObject success = addressService.updateAddress(userId,id,newAddressVo);
-        if(success.getCode()==ResponseCode.RESOURCE_ID_OUTSCOPE){
+
+        if(success.getCode()==ResponseCode.OK){
+            return Common.decorateReturnObject(success);
+        }else if(success.getCode()==ResponseCode.RESOURCE_ID_NOTEXIST){
+            return new ResponseEntity(ResponseUtil.fail(ResponseCode.RESOURCE_ID_NOTEXIST), HttpStatus.NOT_FOUND);
+        }
+        else if(success.getCode()==ResponseCode.RESOURCE_ID_OUTSCOPE){
             return new ResponseEntity(ResponseUtil.fail(ResponseCode.RESOURCE_ID_OUTSCOPE), HttpStatus.FORBIDDEN);
 
-        }
-        if(success.getCode()==ResponseCode.REGION_OBSOLETE){
-            return new ResponseEntity(ResponseUtil.fail(ResponseCode.FIELD_NOTVALID), HttpStatus.BAD_REQUEST);
+        }else{
+            return new ResponseEntity(ResponseUtil.fail(success.getCode()), HttpStatus.BAD_REQUEST);
+
         }
 
 
-        return Common.decorateReturnObject(success);
 
     }
 
     /**
      * 设为默认地址
-     * @param id
-     * @return
      */
     @Audit
     @PutMapping("addresses/{id}/default")
