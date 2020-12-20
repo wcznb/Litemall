@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/addressservice/addressservice.iml" filepath="$PROJECT_DIR$/addressservice/addressservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/advertisementservice/advertisementservice.iml" filepath="$PROJECT_DIR$/advertisementservice/advertisementservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aftersalesservice/aftersalesservice.iml" filepath="$PROJECT_DIR$/aftersalesservice/aftersalesservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cartservice/cartservice.iml" filepath="$PROJECT_DIR$/cartservice/cartservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/favoriteservice/favoriteservice.iml" filepath="$PROJECT_DIR$/favoriteservice/favoriteservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/footprintservice/footprintservice.iml" filepath="$PROJECT_DIR$/footprintservice/footprintservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/other.iml" filepath="$PROJECT_DIR$/other.iml" />
+      <module fileurl="file://$PROJECT_DIR$/shareservice/shareservice.iml" filepath="$PROJECT_DIR$/shareservice/shareservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/timeservice/timeservice.iml" filepath="$PROJECT_DIR$/timeservice/timeservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/userservice/userservice.iml" filepath="$PROJECT_DIR$/userservice/userservice.iml" />
+    </modules>
+  </component>
+</project>
