@@ -156,7 +156,8 @@ public class UserDao {
     public ReturnObject<Object> getCustomerById(Long id) {
         CustomerPo customerPo=customerPoMapper.selectByPrimaryKey(id);
         if (customerPo == null) {
-            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+//            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+            return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
         }
         Customer customer = new Customer(customerPo);
         return new ReturnObject<>(customer.createSimpleVo());
