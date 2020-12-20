@@ -22,6 +22,8 @@ public enum ResponseCode {
     RESOURCE_ID_OUTSCOPE(505,"操作的资源id不是自己的对象"),
     FILE_NO_WRITE_PERMISSION(506,"目录文件夹没有写入的权限"),
     RESOURCE_FALSIFY(507, "信息签名不正确"),
+    IMG_FORMAT_ERROR(508,"图片格式不正确"),
+    IMG_SIZE_EXCEED(509,"图片大小超限"),
     //--------------------------------------------
 
 
@@ -37,6 +39,9 @@ public enum ResponseCode {
     FLASHSALE_OUTLIMIT(607,"达到时段秒杀上限"),
     ADVERTISEMENT_STATENOTALLOW(608,"广告状态禁止"),
     AFTERSALE_STATENOTALLOW(609,"售后单状态禁止"),
+    Log_Bigger(610,"开始时间大于结束时间"),
+    Log_BEGIN_NULL(611,"开始时间不能为空"),
+    Log_END_NULL(612,"结束时间不能为空"),
     /***************************************************
      *    权限模块错误码
      **************************************************/
@@ -61,6 +66,8 @@ public enum ResponseCode {
     MOBILE_NOTVERIFIED(749,"电话号码未确认"),
     USERPROXY_BIGGER(750,"开始时间要小于失效时间"),
     USERPROXY_SELF(751,"自己不可以代理自己"),
+    USERPROXY_DEPART_CONFLICT(752,"两个代理双方的部门冲突"),
+    USERPROXY_DEPART_MANAGER_CONFLICT(753,"管理员无此部门权限"),
     /***************************************************
      *    订单模块错误码
      **************************************************/
@@ -68,6 +75,10 @@ public enum ResponseCode {
     FREIGHTNAME_SAME(802,"运费模板名重复"),
     REGION_SAME(803,"运费模板中该地区已经定义"),
     REFUND_MORE(804,"退款金额超过支付金额"),
+    REGION_NOT_REACH(805,"该地区不可达"),
+    SHOP_ID_NOTEXIST(825,"不存在对应的shopid"),
+    DEFAULTMODEL_EXISTED(826,"已经存在对应的默认模板"),
+    MODEL_ID_NOTEXIST(827,"shopid不存在对应的模板id"),
     /***************************************************
      *    商品模块错误码
      **************************************************/
@@ -82,7 +93,15 @@ public enum ResponseCode {
     USER_HASSHOP(908,"用户已经有店铺"),
     COUPON_NOTBEGIN(909,"未到优惠卷领取时间"),
     COUPON_FINISH(910,"优惠卷领罄"),
-    COUPON_END(911,"优惠卷活动终止");
+    COUPON_END(911,"优惠卷活动终止"),
+    STATE_NOCHANGE(920,"状态未改变"),
+    ACTIVITYALTER_INVALID(923,"对活动的无效操作"),
+    DELETE_ONLINE_NOTALLOW(931, "不允许删除已上线状态的活动"),
+    DELETE_CHANGAE_NOTALLOW(932, "不允许修改已删除活动的状态"),
+    COMMENT_EXISTED(941,"该订单条目已评论"),
+    BRAND_NAME_SAME(990,"品牌名称已存在"),
+    CATEGORY_NAME_SAME(991, "类目名称已存在"),
+    SHOP_STATENOTALLOW(980, "当前店铺状态不允许进行此类操作");
 
     private int code;
     private String message;

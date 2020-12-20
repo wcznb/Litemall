@@ -1,6 +1,7 @@
 package cn.edu.xmu.share.model.bo;
 
 import cn.edu.xmu.ooad.model.VoObject;
+import cn.edu.xmu.provider.model.vo.GoodsSkuSimpleRetVo;
 import cn.edu.xmu.share.model.po.SharePo;
 import cn.edu.xmu.share.model.vo.SharesRetVo;
 import cn.edu.xmu.share.model.vo.SharesSimpleRetVo;
@@ -18,7 +19,7 @@ public class Share implements VoObject {
     LocalDateTime gmt_created;
     LocalDateTime gmt_modified;
     Long shareActivityId;
-    List<Sku> sku;
+    GoodsSkuSimpleRetVo sku;
 
     public Share(){
     }
@@ -34,7 +35,7 @@ public class Share implements VoObject {
     }
 
 
-    public Share(SharePo sharePo, List<Sku> sku){
+    public Share(SharePo sharePo, GoodsSkuSimpleRetVo sku){
         this.id=sharePo.getId();
         this.sharerId = sharePo.getSharerId();
         this.goodsSkuId = sharePo.getGoodsSkuId();

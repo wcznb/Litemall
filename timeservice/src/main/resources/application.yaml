@@ -15,6 +15,12 @@ spring:
     name: time-service
   profiles:
     active: dev
+  cloud:
+    nacos:
+      username: nacos
+      password: 1-6123
+      discovery:
+        server-addr: 114.215.198.238:8848
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
@@ -38,6 +44,16 @@ spring:
           slow-sql-millis: 100
       validation-query: select 1
     sql-script-encoding: UTF-8
+
+
+dubbo:
+  registry:
+    address: nacos://114.215.198.238:8848
+  cloud:
+    subscribed-services: spring-cloud-alibaba-dubbo-server
+  protocols:
+    dubbo:
+      port: 18888
   redis:
     # Redis数据库索引（默认为0）
     database: 0

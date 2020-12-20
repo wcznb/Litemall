@@ -2,16 +2,19 @@ package cn.edu.xmu.cart.controller;
 
 import cn.edu.xmu.cart.model.vo.CartGetVo;
 import cn.edu.xmu.cart.service.CartService;
+import cn.edu.xmu.cart.util.Common;
 import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.model.VoObject;
-import cn.edu.xmu.ooad.util.Common;
+import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -55,7 +58,7 @@ public class CartController {
     @ApiOperation(value = "买家将商品加入购物车")
     @Audit
     @PostMapping("")
-    public Object insertCart(@LoginUser Long userId, @RequestBody CartGetVo vo,
+    public Object insertCart(@LoginUser Long userId,@Validated @RequestBody CartGetVo vo,
                              BindingResult bindingResult, HttpServletResponse httpServletResponse){
         /* 处理参数校验错误 */
         Object o = Common.processFieldErrors(bindingResult, httpServletResponse);
@@ -63,6 +66,8 @@ public class CartController {
             return o;
         }
         ReturnObject<VoObject> ret = cartService.insertCart(userId, vo);
+        if(ret.getCode() == ResponseCode.OK)
+            httpServletResponse.setStatus(HttpStatus.CREATED.value());
         return Common.getRetObject(ret);
     }
 
@@ -89,7 +94,7 @@ public class CartController {
     @ApiOperation(value = "买家修改购物车单个商品的数量或规格")
     @Audit
     @PutMapping("/{id}")
-    public Object modifyCart(@LoginUser Long userId, @PathVariable Long id, @RequestBody CartGetVo vo,
+    public Object modifyCart(@LoginUser Long userId, @PathVariable Long id,@Validated @RequestBody CartGetVo vo,
                              BindingResult bindingResult, HttpServletResponse httpServletResponse){
         /* 处理参数校验错误 */
         Object o = Common.processFieldErrors(bindingResult, httpServletResponse);
@@ -109,7 +114,7 @@ public class CartController {
     @ApiOperation(value = "买家删除购物车中商品")
     @Audit
     @DeleteMapping("/{id}")
-    public Object deleteCart(@LoginUser Long userId, @PathVariable Long id){
+    public Object deleteCart(@LoginUser Long userId, @PathVariable Long id, HttpServletResponse httpServletResponse){
         ReturnObject<Object> retObj = cartService.deleteCart(userId, id);
         return Common.decorateReturnObject(retObj);
     }

@@ -5,7 +5,7 @@ import cn.edu.xmu.user.model.po.CustomerPo;
 import cn.edu.xmu.user.model.vo.CustomerRetVo;
 import cn.edu.xmu.user.model.vo.SimpleCustomerRetVo;
 import lombok.Data;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,11 +22,11 @@ public class Customer implements VoObject {
 
     private String email;
 
-    private String realname;
+    private String name;
 
     private Byte gender;
 
-    private LocalDateTime birthday;
+    private LocalDate birthday;
 
     private Integer point;
 
@@ -47,11 +47,12 @@ public class Customer implements VoObject {
 
         customerRetVo.setId(this.id);
         customerRetVo.setUserName(this.userName);
-        customerRetVo.setRealName(this.realname);
+        customerRetVo.setName(this.name);
         customerRetVo.setEmail(this.email);
         customerRetVo.setMobile(this.mobile);
-        customerRetVo.setGender(this.gender.intValue()>0?"男":"女");
-        customerRetVo.setBirthday(this.birthday.toString());
+        customerRetVo.setGender(this.gender);
+        customerRetVo.setBirthday(this.birthday);
+        customerRetVo.setState(this.state.getCode().byteValue());
 
         return customerRetVo;
     }
@@ -107,7 +108,7 @@ public class Customer implements VoObject {
 
         this.email = po.getEmail();
 
-        this.realname = po.getRealName();
+        this.name = po.getRealName();
 
         this.gender = po.getGender();
 

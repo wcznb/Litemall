@@ -56,12 +56,13 @@ public class UserController {
             @ApiResponse(code = 404, message = "参数不合法")
     })
     @PostMapping("users")
-    public Object register(@Validated @RequestBody NewUserVo vo, BindingResult result){
+    public Object register(@Validated @RequestBody NewUserVo vo, BindingResult result,HttpServletResponse httpServletResponse){
         if(result.hasErrors()){
             return Common.processFieldErrors(result,httpServletResponse);
         }
         ReturnObject returnObject= userService.register(vo);
         if(returnObject.getCode()== ResponseCode.OK){
+            httpServletResponse.setStatus(HttpServletResponse.SC_CREATED);
             return ResponseUtil.ok(returnObject.getData());
         }
         else return ResponseUtil.fail(returnObject.getCode());
@@ -91,6 +92,7 @@ public class UserController {
         if(jwt.getData() == null){
             return ResponseUtil.fail(jwt.getCode(), jwt.getErrmsg());
         }else{
+            httpServletResponse.setStatus(HttpServletResponse.SC_CREATED);
             return ResponseUtil.ok(jwt.getData());
         }
     }
@@ -129,7 +131,7 @@ public class UserController {
         return ResponseUtil.ok(new ReturnObject<List>(stateVos).getData());
     }
 
-//    @RequestParam(value="username") String username, @RequestParam(value="age", required=false, defaultValue="0") int age
+
 
     @ApiOperation(value = "平台管理员获取所有用户列表")
     @Audit
@@ -148,13 +150,13 @@ public class UserController {
      * 平台管理员封禁买家
      * @param id
      * @return
-     * @author 24320182203181 陈渝璇
+     * @author cyx
      */
     @ApiOperation(value = "封禁买家")
     @Audit
-    @PutMapping("users/{id}/ban")
-    public Object banCustomer(@PathVariable Long id){
-        ReturnObject<Object> ret = userService.banCustomer(id);
+    @PutMapping("shops/{did}/users/{id}/ban")
+    public Object banCustomer(@PathVariable Long did,@PathVariable Long id){
+        ReturnObject<Object> ret = userService.banCustomer(did,id);
         return Common.decorateReturnObject(ret);
     }
 
@@ -162,13 +164,13 @@ public class UserController {
      * 平台管理员解禁买家
      * @param id
      * @return
-     * @author 24320182203181 陈渝璇
+     * @author cyx
      */
     @ApiOperation(value = "解禁买家")
     @Audit
-    @PutMapping("users/{id}/release")
-    public Object releaseCustomer(@PathVariable Long id){
-        ReturnObject<Object> ret = userService.releaseCustomer(id);
+    @PutMapping("shops/{did}/users/{id}/release")
+    public Object releaseCustomer(@PathVariable Long did,@PathVariable Long id){
+        ReturnObject<Object> ret = userService.releaseCustomer(did,id);
         return Common.decorateReturnObject(ret);
     }
 
@@ -182,7 +184,7 @@ public class UserController {
      */
     @ApiOperation(value = "修改买家信息", produces = "application/json")
     @Audit
-    @PutMapping("/users")
+    @PutMapping("users")
     public Object updateCustomer(@LoginUser Long id, @Validated @RequestBody CustomerSetVo vo) {
         ReturnObject<Object> success = userService.modifyCustomer(id,vo);
         //校验前端数据
@@ -202,7 +204,7 @@ public class UserController {
      */
     @ApiOperation(value = "查看买家信息", produces = "application/json")
     @Audit
-    @GetMapping("/users")
+    @GetMapping("users")
     public Object getCustomer(@LoginUser Long id) {
         ReturnObject<Object> success = userService.getCustomer(id);
         //校验前端数据

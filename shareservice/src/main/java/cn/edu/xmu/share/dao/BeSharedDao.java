@@ -23,10 +23,10 @@ public class BeSharedDao {
     @Autowired
     BeSharePoMapper beSharePoMapper;
 
-    public List<BeSharePo> getBesharedBySpuidlist(List<Long> spuIds, LocalDateTime beginTime, LocalDateTime endTime, Integer page, Integer pageSize){
+    public List<BeSharePo> getBesharedBySkuId(Long skuId, LocalDateTime beginTime, LocalDateTime endTime, Integer page, Integer pageSize){
         BeSharePoExample example = new BeSharePoExample();
         BeSharePoExample.Criteria criteria = example.createCriteria();
-        if(spuIds!=null)criteria.andGoodsSkuIdIn(spuIds);
+        criteria.andGoodsSkuIdEqualTo(skuId);
         if(beginTime!=null) criteria.andGmtCreateGreaterThanOrEqualTo(beginTime);
         if(endTime!=null) criteria.andGmtCreateLessThanOrEqualTo(endTime);
         PageHelper.startPage(page, pageSize);

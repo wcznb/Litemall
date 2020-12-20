@@ -31,7 +31,7 @@ public class RegionDao {
 
         if(checkPo==null){
 
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,String.format("新增失败,上级地区"+pid+"不存在"));
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
 
         }else if(checkPo.getState()==1){
 
@@ -55,7 +55,7 @@ public class RegionDao {
 
                 if (ret == 0) {
                     //插入失败
-                    returnObject = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("新增失败：" ));
+                    returnObject = new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
                 } else {
                     //插入成功
                     returnObject = new ReturnObject<>();
@@ -79,7 +79,7 @@ public class RegionDao {
 
         if(checkPo==null){
 
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,String.format("修改失败,地区"+id+"不存在"));
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
 
         }else if(checkPo.getState()==1){
 
@@ -116,7 +116,7 @@ public class RegionDao {
 
         if(checkPo==null){
 
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,String.format("修改失败,地区"+id+"不存在"));
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
 
         }else if(checkPo.getState()==1){
 
@@ -176,7 +176,7 @@ public class RegionDao {
 
         if(checkPo==null){
 
-            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,String.format("失败,地区"+id+"不存在"));
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
 
         }else if(checkPo.getState()==1){
 

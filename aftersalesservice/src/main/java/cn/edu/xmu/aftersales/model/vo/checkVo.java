@@ -14,4 +14,6 @@ public class checkVo {
 
     @NotBlank
     private String conclusion;
+
+    private Byte type;
 }

@@ -111,26 +111,18 @@ public class NewUserDao implements InitializingBean {
      */
     public ReturnObject createNewUserByVo(NewUserVo vo){
         CustomerPo customerPo=new CustomerPo();
-        ReturnObject returnObject;
+        ReturnObject returnObject = null;
         customerPo.setEmail(vo.getEmail());
         customerPo.setMobile(vo.getMobile());
         customerPo.setUserName(vo.getUserName());
-        returnObject=checkBloomFilter(customerPo);
-        if(returnObject!=null){
-            logger.debug("found duplicate in bloomFilter");
-            return returnObject;
-        }
 
         if(isEmailExist(customerPo.getEmail())){
-            setBloomFilterByName("email",customerPo);
             return new ReturnObject(ResponseCode.EMAIL_REGISTERED);
         }
         if(isMobileExist(customerPo.getMobile())){
-            setBloomFilterByName("mobile",customerPo);
             return new ReturnObject(ResponseCode.MOBILE_REGISTERED);
         }
         if(isUserNameExist(customerPo.getUserName())){
-            setBloomFilterByName("userName",customerPo);
             return new ReturnObject(ResponseCode.USER_NAME_REGISTERED);
         }
 
@@ -142,11 +134,11 @@ public class NewUserDao implements InitializingBean {
         LocalDateTime localDateTime = LocalDateTime.now();
         customerPo.setGmtCreate(localDateTime);
         customerPo.setGmtModified(localDateTime);
+        customerPo.setState((byte)4);
 
 
         LocalDate localDate = LocalDate.parse(vo.getBirthday(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        LocalDateTime birthday = localDate.atStartOfDay();
-        customerPo.setBirthday(birthday);
+        customerPo.setBirthday(localDate);
         customerPo.setState(Customer.State.NORM.getCode().byteValue());
 
         try{

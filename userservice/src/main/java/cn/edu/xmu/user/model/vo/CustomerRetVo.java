@@ -6,6 +6,7 @@ import cn.edu.xmu.user.model.po.CustomerPo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,39 +15,26 @@ public class CustomerRetVo {
 
     Long id;
     String userName;
-    String realName;
+    String name;
     String mobile;
     String email;
-    String gender;
-    String birthday;
+    Byte gender;
+    LocalDate birthday;
+    Byte state;
     LocalDateTime gmt_create;
     LocalDateTime gmt_modified;
-
-
-    public CustomerRetVo(Customer customer){
-
-        this.id = customer.getId();
-        this.userName = customer.getUserName();
-        this.realName = customer.getRealname();
-        this.email = customer.getEmail();
-        this.mobile = customer.getMobile();
-        this.gender = customer.getGender().intValue()>0?"男":"女";
-        this.birthday = customer.getBirthday().toString();
-        this.gmt_create = customer.getGmt_create();
-        this.gmt_modified = customer.getGmt_modified();
-
-    }
 
     public CustomerRetVo(CustomerPo customerPo){
         this.id = customerPo.getId();
         this.userName = customerPo.getUserName();
-        this.realName = customerPo.getRealName();
+        this.name = customerPo.getRealName();
         this.email = customerPo.getEmail();
         this.mobile = customerPo.getMobile();
-        this.gender = customerPo.getGender().intValue()>0?"男":"女";
-        this.birthday = customerPo.getBirthday().toString();
+        this.gender = customerPo.getGender();
+        this.birthday = customerPo.getBirthday();
         this.gmt_modified = customerPo.getGmtModified();
         this.gmt_create = customerPo.getGmtCreate();
+        this.state = customerPo.getState();
     }
 
 

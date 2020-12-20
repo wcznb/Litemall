@@ -4,6 +4,7 @@ import cn.edu.xmu.footprint.model.po.FootprintPo;
 import cn.edu.xmu.footprint.model.vo.FootprintRetVo;
 import cn.edu.xmu.footprint.model.vo.FootprintSimpleRetVo;
 import cn.edu.xmu.ooad.model.VoObject;
+import cn.edu.xmu.provider.model.vo.GoodsSkuSimpleRetVo;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -16,7 +17,7 @@ public class Footprint implements VoObject {
 
     private Long goodsSkuId;
 
-    private GoodsSku goodsSku;
+    private GoodsSkuSimpleRetVo goodsSku;
 
     private LocalDateTime gmtCreate;
 
@@ -28,10 +29,6 @@ public class Footprint implements VoObject {
         this.goodsSkuId = footPrintPo.getGoodsSkuId();
         this.gmtCreate = footPrintPo.getGmtCreate();
         this.gmtModified = footPrintPo.getGmtModified();
-    }
-
-    public void setGoodsSku(GoodsSku goodsSku){
-        this.goodsSku = goodsSku;
     }
 
     @Override

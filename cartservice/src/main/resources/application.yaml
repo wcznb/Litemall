@@ -15,6 +15,12 @@ spring:
     name: cart-service
   profiles:
     active: dev
+  cloud:
+    nacos:
+      username: nacos
+      password: 1-6123
+      discovery:
+        server-addr: 114.215.198.238:8848
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
@@ -88,6 +94,15 @@ privilegeservice:
 #pagehelper分页插件配置
 pagehelper:
   helper-dialect: mysql
+
+dubbo:
+  registry:
+    address: nacos://114.215.198.238:8848
+  cloud:
+    subscribed-services: spring-cloud-alibaba-dubbo-server
+  protocols:
+    dubbo:
+      port: 18888
 
 
 

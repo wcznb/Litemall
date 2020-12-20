@@ -11,6 +11,7 @@ import cn.edu.xmu.share.model.po.SharePo;
 import cn.edu.xmu.share.model.vo.ShareActivityRetVo;
 import cn.edu.xmu.share.model.vo.ShareActivityVo;
 import cn.edu.xmu.share.util.ExchangeDate;
+import cn.edu.xmu.share.util.ShareJson;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +30,17 @@ public class ShareActivityDao {
     ShareActivityPoMapper shareActivityPoMapper;
 
 
-    private Boolean getStateOnline(ShareActivityPo shareActivityPo){
-        if((shareActivityPo.getBeginTime().isBefore(LocalDateTime.now()))&&(shareActivityPo.getEndTime().isAfter(LocalDateTime.now()))){
-            if(shareActivityPo.getState()!=null&&shareActivityPo.getState().equals(0)){
-                return false;
-            }else{
-                return true;
-            }
-        }else {
-            return false;
-        }
-    }
+//    private Boolean getStateOnline(ShareActivityPo shareActivityPo){
+//        if((shareActivityPo.getBeginTime().isBefore(LocalDateTime.now()))&&(shareActivityPo.getEndTime().isAfter(LocalDateTime.now()))){
+//            if(shareActivityPo.getState()!=null&&shareActivityPo.getState().equals(0)){
+//                return false;
+//            }else{
+//                return true;
+//            }
+//        }else {
+//            return false;
+//        }
+//    }
 
 
     /**
@@ -56,16 +57,32 @@ public class ShareActivityDao {
         criteria.andGoodsSkuIdEqualTo(id);
         criteria.andBeginTimeLessThan(localDateTime);
         criteria.andEndTimeGreaterThan(localDateTime);
+        criteria.andStateEqualTo((byte)1);
+
+        ShareActivityPoExample.Criteria criteria2 = example.createCriteria();
+        criteria2.andShopIdEqualTo(0L);
+        criteria2.andGoodsSkuIdEqualTo(0L);
+        criteria2.andBeginTimeLessThan(localDateTime);
+        criteria2.andEndTimeGreaterThan(localDateTime);
+        criteria2.andStateEqualTo((byte)1);
+        example.or(criteria2);
 
         List<ShareActivityPo> shareActivityPos = shareActivityPoMapper.selectByExample(example);
 
+        Long acid=null;
         for(ShareActivityPo shareActivityPo:shareActivityPos){
-            if(getStateOnline(shareActivityPo)){
+            if(shareActivityPo.getShopId()!=0&&shareActivityPo.getGoodsSkuId()!=0){
                 return shareActivityPo.getId();
+            }
+
+            if(shareActivityPo.getShopId()==0&&shareActivityPo.getGoodsSkuId()==0&&acid==null){
+                acid=shareActivityPo.getId();
+            }else if(shareActivityPo.getShopId()==0){
+                acid=shareActivityPo.getId();
             }
         }
 
-        return null;
+        return acid;
     }
     /**
      * 上线指定的分享活动
@@ -110,9 +127,9 @@ public class ShareActivityDao {
         if(shareActivityPo == null){
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
-        //shopId和skuId不匹配，无权修改
+
         if(!shareActivityPo.getShopId().equals(shopId)){
-            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, String.format("shopId, id不匹配"));
+            return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE, String.format("shopId, id不匹配"));
         }
 
         shareActivityPo.setState((byte)0);
@@ -140,9 +157,19 @@ public class ShareActivityDao {
         //检查时间是否冲突
         LocalDateTime begin= ExchangeDate.StringToDateTime(shareActivityVo.getBeginTime()).get(true);
         LocalDateTime end = ExchangeDate.StringToDateTime(shareActivityVo.getEndTime()).get(true);
+
+        if(begin==null||end==null){
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, String.format("时间不合法"));
+        }
+
         //开始时间再结束时间之后
-        if(begin==null||end==null||end.isBefore(begin)){
-            return new ReturnObject<>(ResponseCode.TIMESEG_CONFLICT, String.format("时间不合法"));
+        if(end.isBefore(begin)){
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, String.format("时间不合法"));
+        }
+
+        //分享格式错误
+        if(!ShareJson.JudgeJson(shareActivityVo.getStrategy())){
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, String.format("分享规则格式错误"));
         }
 
         ShareActivityPo shareActivityPo = shareActivityPoMapper.selectByPrimaryKey(id);
@@ -150,7 +177,7 @@ public class ShareActivityDao {
             return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
         }
 
-        if(getStateOnline(shareActivityPo)){
+        if(shareActivityPo.getState()!=null&&shareActivityPo.getState()==(byte)1){
             return new ReturnObject<>(ResponseCode.FILE_NO_WRITE_PERMISSION, String.format("活动处于上线不能修改"));
         }
 
@@ -215,6 +242,8 @@ public class ShareActivityDao {
             ret.add(shareActivity);
         }
         PageInfo<VoObject> rolePage = PageInfo.of(ret);
+        rolePage.setPageNum(page);
+        rolePage.setPageSize(pageSize);
 
         return new ReturnObject<>(rolePage);
     }
@@ -236,21 +265,21 @@ public class ShareActivityDao {
         criteria.andGoodsSkuIdEqualTo(skuId);
         criteria.andBeginTimeLessThan(begin);
         criteria.andEndTimeGreaterThan(begin);
-        criteria.andStateIsNull();
+        criteria.andStateEqualTo((byte)1);
         example.or(criteria);
 
         ShareActivityPoExample.Criteria criteria2 = example.createCriteria();
         criteria2.andGoodsSkuIdEqualTo(skuId);
         criteria2.andBeginTimeLessThan(end);
         criteria2.andEndTimeGreaterThan(end);
-        criteria2.andStateIsNull();
+        criteria2.andStateEqualTo((byte)1);
         example.or(criteria2);
 
         ShareActivityPoExample.Criteria criteria3 = example.createCriteria();
         criteria3.andGoodsSkuIdEqualTo(skuId);
         criteria3.andBeginTimeEqualTo(begin);
         criteria3.andEndTimeEqualTo(end);
-        criteria3.andStateIsNull();
+        criteria3.andStateEqualTo((byte)1);
         example.or(criteria3);
 
         return shareActivityPoMapper.selectByExample(example);
@@ -271,16 +300,25 @@ public class ShareActivityDao {
 
         LocalDateTime begin= ExchangeDate.StringToDateTime(shareActivityVo.getBeginTime()).get(true);
         LocalDateTime end = ExchangeDate.StringToDateTime(shareActivityVo.getEndTime()).get(true);
+
+        if(begin==null||end==null){
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, String.format("时间不合法"));
+        }
+
         //开始时间再结束时间之后
-        if(begin==null||end==null||end.isBefore(begin)){
-            return new ReturnObject<>(ResponseCode.TIMESEG_CONFLICT, String.format("时间不合法"));
+        if(end.isBefore(begin)){
+            return new ReturnObject<>(ResponseCode.Log_Bigger, String.format("时间不合法"));
+        }
+
+        //判断分享格式
+        if(!ShareJson.JudgeJson(shareActivityVo.getStrategy())){
+            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID, String.format("分享规则格式错误"));
         }
 
         //判断时间段是否存在冲突
-
         List<ShareActivityPo> shareActivityPos = getShareActivityByTime(skuId, begin, end);
         if(!shareActivityPos.isEmpty()){
-            return new ReturnObject<>(ResponseCode.TIMESEG_CONFLICT, String.format("时间段冲突"));
+            return new ReturnObject<>(ResponseCode.SHAREACT_CONFLICT, String.format("时间段冲突"));
         }
 
         //进行插入
@@ -290,6 +328,7 @@ public class ShareActivityDao {
         shareActivityPo.setGoodsSkuId(skuId);
         shareActivityPo.setBeginTime(begin);
         shareActivityPo.setEndTime(end);
+        shareActivityPo.setState((byte)0);
         shareActivityPo.setStrategy(shareActivityVo.getStrategy());
         shareActivityPo.setGmtModified(LocalDateTime.now());
 

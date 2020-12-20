@@ -1,9 +1,7 @@
 package cn.edu.xmu.aftersales.service;
 
-import cn.edu.xmu.aftersales.model.vo.NewSaleVo;
-import cn.edu.xmu.aftersales.model.vo.UpdateVo;
-import cn.edu.xmu.aftersales.model.vo.checkVo;
-import cn.edu.xmu.aftersales.model.vo.confirmVo;
+import cn.edu.xmu.aftersales.model.bo.AftersalesBo;
+import cn.edu.xmu.aftersales.model.vo.*;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageInfo;
@@ -17,9 +15,9 @@ public interface AfterSaleService {
 
     ReturnObject<VoObject> searchSaleById(Long userId,Long id);
 
-    ReturnObject<PageInfo<VoObject>> getSale(Long userId, Long spuId,Long skuId, String beginTime,String endTime, Integer page, Integer pageSize, Byte type, Byte state);
+    ReturnObject<PageInfo<VoObject>> getSale(Long userId, String beginTime,String endTime, Integer page, Integer pageSize, Byte type, Byte state);
 
-    ReturnObject<PageInfo<VoObject>> getSaleByShop(Long shopId,Long spuId,Long skuId, String beginTime,String endTime, Integer page, Integer pageSize, Byte type, Byte state);
+    ReturnObject<PageInfo<VoObject>> getSaleByShop(Long shopId, String beginTime,String endTime, Integer page, Integer pageSize, Byte type, Byte state);
     @Transactional
     ReturnObject<VoObject> modifySale(Long userId, Long id, UpdateVo newVo);
     @Transactional
@@ -29,13 +27,13 @@ public interface AfterSaleService {
     @Transactional
     ReturnObject<VoObject> confirmOver(Long userId,Long id);
 
-    ReturnObject<VoObject> searchSale(Long userId,Long shopId,Long id);
+    ReturnObject<VoObject> searchSale(Long shopId, Long id);
     @Transactional
     ReturnObject<VoObject> agreeRequest(Long shopId, Long id, checkVo vo);
     @Transactional
     ReturnObject<VoObject> receive(Long shopId,Long id,confirmVo vo);
     @Transactional
-    ReturnObject<VoObject> deliver(Long shopId,Long id,String logSn);
+    ReturnObject<VoObject> deliver(Long shopId, Long id, shopLogSnVo vo);
 
 
 
