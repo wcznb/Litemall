@@ -26,27 +26,34 @@ import com.alibaba.fastjson.JSONObject;
 public class QianQiuyanTest {
 
 //    @Value("${public-test.managementgate}")
-    private String managementGate="http://127.0.0.1:8084";
+    private String managementGate="127.0.0.1:8084";
 
 //    @Value("${public-test.mallgate}")
-    private String mallGate="http://127.0.0.1:8084";
+    private String mallGate="127.0.0.1:8084";
 
+    private String login_="114.215.198.238:4522";
     private WebTestClient manageClient;
 
     private WebTestClient mallClient;
 
+    private WebTestClient adminClient;
+
     @BeforeEach
     public void setup(){
         this.manageClient = WebTestClient.bindToServer()
-                .baseUrl(managementGate)
+                .baseUrl("http://"+managementGate)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
 
         this.mallClient = WebTestClient.bindToServer()
-                .baseUrl(mallGate)
+                .baseUrl("http://"+mallGate)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
 
+        this.adminClient = WebTestClient.bindToServer()
+                .baseUrl("http://"+login_)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
+                .build();
     }
 
     /**
@@ -60,7 +67,7 @@ public class QianQiuyanTest {
         body.put("password", password);
         String requireJson = body.toJSONString();
         byte[] responseString = mallClient.post().uri("/users/login").bodyValue(requireJson).exchange()
-//                .expectStatus().isCreated()
+                .expectStatus().isCreated()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
@@ -80,8 +87,8 @@ public class QianQiuyanTest {
         body.put("password", password);
         String requireJson = body.toJSONString();
 
-        byte[] ret = manageClient.post().uri("/adminusers/login").bodyValue(requireJson).exchange()
-                .expectStatus().isCreated()
+        byte[] ret = adminClient.post().uri("/adminusers/login").bodyValue(requireJson).exchange()
+//                .expectStatus().isCreated()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo("成功")
@@ -135,7 +142,7 @@ public class QianQiuyanTest {
                 .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
                 .returnResult()
                 .getResponseBodyContent();
-        String expectedResponse = "{\"errno\":0,\"data\":{\"orderItemId\":1,\"customerId\":1,\"type\":\"0\",\"reason\":\"testR\",\"quantity\":5,\"regionId\":1,\"detail\":\"testD\",\"consignee\":\"testC\",\"mobile\":\"13912345678\"},\"errmsg\":\"成功\"}";
+        String expectedResponse = "{\"errno\":0,\"data\":{\"orderItemId\":1,\"customerId\":1,\"type\":0,\"reason\":\"testR\",\"quantity\":5,\"regionId\":1,\"detail\":\"testD\",\"consignee\":\"testC\",\"mobile\":\"13912345678\"},\"errmsg\":\"成功\"}";
         log.info(new String(responseString, StandardCharsets.UTF_8));
         JSONAssert.assertEquals(expectedResponse, new String(responseString, StandardCharsets.UTF_8), false);
 
@@ -636,8 +643,7 @@ public class QianQiuyanTest {
      */
     @Test
     public void adminAgreeAftersales1() throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
         body.put("confirm",true);
         body.put("price",20);
@@ -672,8 +678,7 @@ public class QianQiuyanTest {
      * @date  Created in 2020/12/15 下午3:38
      */
     public void adminAgreeAftersales2() throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
         body.put("confirm",false);
         body.put("price",20);
@@ -766,8 +771,7 @@ public class QianQiuyanTest {
      * @date  Created in 2020/12/15 下午3:57
      */
     public void adminAcceptExchange1() throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
         body.put("confirm",true);
         body.put("conclusion","收到换货");
@@ -806,8 +810,7 @@ public class QianQiuyanTest {
      * @date  Created in 2020/12/15 下午4:06
      */
     public void adminAcceptExchange2() throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
 //        body.put("confirm",true);
         body.put("conclusion","收到换货");
@@ -829,8 +832,7 @@ public class QianQiuyanTest {
      */
     @Test
     public void adminAcceptExchange3() throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
         body.put("confirm",true);
 //        body.put("conclusion","收到换货");
@@ -852,8 +854,7 @@ public class QianQiuyanTest {
      */
     @Test
     public void adminAcceptRefund1() throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
         body.put("confirm",true);
         body.put("conclusion","收到退款");
@@ -893,8 +894,7 @@ public class QianQiuyanTest {
      */
     @Test
     public void adminAcceptRefund2() throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
 //        body.put("confirm",true);
         body.put("conclusion","收到退款");
@@ -916,8 +916,7 @@ public class QianQiuyanTest {
      */
     @Test
     public void adminAcceptRefund3() throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
         body.put("confirm",true);
 //        body.put("conclusion","收到退款");
@@ -939,8 +938,7 @@ public class QianQiuyanTest {
      */
     @Test
     public void adminUnacceptRefund1() throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
         body.put("confirm",false);
         body.put("conclusion","不同意换货");
@@ -971,8 +969,7 @@ public class QianQiuyanTest {
      */
     @Test
     public void adminDeliver() throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
         body.put("shopLogSn","1234567");
         String requireJson = body.toJSONString();
@@ -1171,8 +1168,7 @@ public class QianQiuyanTest {
      */
     @Test
     public void AdminGetAftersales1()throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         byte[] responseString = manageClient.get().uri("/shops/0/aftersales/6343256").header("authorization", token)
                 .exchange()
                 .expectStatus().isNotFound()
@@ -1191,8 +1187,7 @@ public class QianQiuyanTest {
      */
     @Test
     public void AdminConfirmAftersales1()throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
         body.put("confirm",true);
         body.put("price",20);
@@ -1217,8 +1212,7 @@ public class QianQiuyanTest {
      */
     @Test
     public void AdminReceiveAftersales1()throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
         body.put("confirm",true);
         body.put("conclusion","收到换货");
@@ -1240,8 +1234,7 @@ public class QianQiuyanTest {
      */
     @Test
     public void AdminDeliverAftersales1()throws Exception{
-//        String token = adminLogin("13088admin","123456");
-        String token = userLogin("8606245097","123456");
+        String token = adminLogin("13088admin","123456");
         JSONObject body = new JSONObject();
         body.put("shopLogSn","1234567");
         String requireJson = body.toJSONString();

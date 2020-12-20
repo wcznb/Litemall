@@ -3,10 +3,11 @@ package cn.edu.xmu.aftersales.controller;
 import cn.edu.xmu.aftersales.model.bo.AftersalesBo;
 import cn.edu.xmu.aftersales.model.vo.*;
 import cn.edu.xmu.aftersales.service.AfterSaleService;
+import cn.edu.xmu.aftersales.util.Common;
 import cn.edu.xmu.ooad.annotation.Audit;
 import cn.edu.xmu.ooad.annotation.LoginUser;
 import cn.edu.xmu.ooad.model.VoObject;
-import cn.edu.xmu.ooad.util.Common;
+
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ResponseUtil;
 import cn.edu.xmu.ooad.util.ReturnObject;
@@ -63,7 +64,7 @@ public class aftersalesController {
      */
     @ApiOperation(value ="买家提交售后单")
     @Audit
-    @PostMapping("/orderItems/{id}/aftersales")
+    @PostMapping("/orderitems/{id}/aftersales")
     public Object newSale(@LoginUser Long userId, @PathVariable("id") Long orderItemId, @Validated @RequestBody NewSaleVo vo, BindingResult bindingResult, HttpServletResponse httpServletResponse){
         Object obj = Common.processFieldErrors(bindingResult, httpServletResponse);
         if(obj != null){
@@ -75,7 +76,7 @@ public class aftersalesController {
             httpServletResponse.setStatus(HttpStatus.CREATED.value());
             return Common.getRetObject(retObject);
         } else {
-            return Common.getNullRetObj(new ReturnObject<>(retObject.getCode(), retObject.getErrmsg()), httpServletResponse);
+            return  Common.decorateReturnObject(retObject);
         }
     }
 
@@ -281,7 +282,7 @@ public class aftersalesController {
     @ApiOperation(value="店家寄出维修好（调换）的货物")
     @Audit
     @PutMapping("/shops/{shopId}/aftersales/{id}/deliver")
-    public Object deliver(@PathVariable("shopId")Long shopId,@PathVariable("id")Long id,@RequestBody shopLogSnVo vo){
+    public Object deliver(@PathVariable("shopId")Long shopId,@PathVariable("id")Long id,@RequestBody(required = false) shopLogSnVo vo){
 
         ReturnObject<VoObject> returnObject=afterSaleService.deliver(shopId,id,vo);
         if (returnObject.getCode() == ResponseCode.OK) {
