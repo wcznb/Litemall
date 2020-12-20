@@ -27,10 +27,12 @@ public class WangJintaiTest {
 
 //    @Value("${public-test.mallgate}")
     private String mallGate="http://127.0.0.1:8084";
+    private String login_="114.215.198.238:4522";
 
     private WebTestClient manageClient;
 
     private WebTestClient mallClient;
+    private WebTestClient adminClient;
 
     @BeforeEach
     public void setUp(){
@@ -44,6 +46,10 @@ public class WangJintaiTest {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
 
+        this.adminClient = WebTestClient.bindToServer()
+                .baseUrl("http://"+login_)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
+                .build();
     }
 
     private String login(String userName, String password) throws Exception {
@@ -51,8 +57,8 @@ public class WangJintaiTest {
         vo.setUserName(userName);
         vo.setPassword(password);
         String requireJson = JacksonUtil.toJson(vo);
-        byte[] ret = manageClient.post().uri("/adminusers/login").bodyValue(requireJson).exchange()
-                .expectStatus().isOk()
+        byte[] ret = adminClient.post().uri("/adminusers/login").bodyValue(requireJson).exchange()
+//                .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo("成功")
@@ -67,7 +73,7 @@ public class WangJintaiTest {
         vo.setPassword(password);
         String requireJson = JacksonUtil.toJson(vo);
         byte[] ret = manageClient.post().uri("/users/login").bodyValue(requireJson).exchange()
-                .expectStatus().isOk()
+//                .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo("成功")
@@ -190,7 +196,7 @@ public class WangJintaiTest {
                 .returnResult()
                 .getResponseBodyContent();
         String responseString = new String(ret, "UTF-8");
-        String expectedResponse = "{\"errno\":0,\"data\":{\"pageSize\":10,\"page\":2,\"list\":[{\"id\":11,\"orderId\":1,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046106QD\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":1},{\"id\":12,\"orderId\":1,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046108CZ\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":2},{\"id\":13,\"orderId\":1,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046132F8\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":3},{\"id\":14,\"orderId\":1,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046134BS\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":4},{\"id\":15,\"orderId\":1,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046135RW\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":5},{\"id\":16,\"orderId\":1,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046137BA\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":6},{\"id\":17,\"orderId\":1,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046139YW\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":7},{\"id\":18,\"orderId\":1,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"20201204104614065\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":8},{\"id\":19,\"orderId\":1,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"2020120410475991S\",\"type\":2,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":0},{\"id\":20,\"orderId\":1,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041048001PO\",\"type\":2,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":1}]}}";
+        String expectedResponse = "{\"errno\":0,\"data\":{\"pageSize\":10,\"page\":2,\"list\":[{\"id\":11,\"orderId\":null,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046106QD\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":1},{\"id\":12,\"orderId\":null,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046108CZ\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":2},{\"id\":13,\"orderId\":null,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046132F8\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":3},{\"id\":14,\"orderId\":null,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046134BS\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":4},{\"id\":15,\"orderId\":null,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046135RW\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":5},{\"id\":16,\"orderId\":null,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046137BA\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":6},{\"id\":17,\"orderId\":null,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041046139YW\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":7},{\"id\":18,\"orderId\":null,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"20201204104614065\",\"type\":1,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":8},{\"id\":19,\"orderId\":null,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"2020120410475991S\",\"type\":2,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":0},{\"id\":20,\"orderId\":null,\"orderItemId\":1,\"customerId\":1,\"shopId\":1,\"serviceSn\":\"202012041048001PO\",\"type\":2,\"reason\":\"string\",\"refund\":0,\"quantity\":0,\"regionId\":1,\"detail\":\"detail\",\"consignee\":\"string\",\"mobile\":\"15306987163\",\"customerLogSn\":\"\",\"shopLogSn\":\"\",\"state\":1}]},\"errmsg\":\"成功\"}";
         JSONAssert.assertEquals(expectedResponse, responseString, false);
 
     }
@@ -415,9 +421,9 @@ public class WangJintaiTest {
     @Order(5)
     public void getAllAftersalesTest1() throws Exception {
 
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
-        byte[] ret = mallClient.get()
+        String token = this.login("13088admin","123456");
+
+        byte[] ret = manageClient.get()
                 .uri("/shops/1/aftersales?page=1")
                 .header("authorization",token)
                 .exchange()
@@ -634,7 +640,7 @@ public class WangJintaiTest {
 
     /**
      * 管理员查询所有售后单信息  - 成功
-     * shopId=0(查所有) page=2 pagesize=15
+     * shopId=0(查所有) page=2 pageSize=15
      * @author Jintai Wang 24320182203278
      * Created in 2020/12/13
      */
@@ -642,10 +648,10 @@ public class WangJintaiTest {
     @Order(6)
     public void getAllAftersalesTest2() throws Exception {
 
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
-        byte[] ret = mallClient.get()
-                .uri("/shops/0/aftersales?page=2&pagesize=15")
+        String token = this.login("13088admin","123456");
+
+        byte[] ret = manageClient.get()
+                .uri("/shops/0/aftersales?page=2&pageSize=15")
                 .header("authorization",token)
                 .exchange()
                 .expectStatus().isOk()
@@ -772,9 +778,9 @@ public class WangJintaiTest {
     @Order(10)
     public void getAftersaleOrderByIdAdminTest1() throws Exception {
         // admin
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
-        byte[] ret = mallClient.get()
+        String token = this.login("13088admin","123456");
+
+        byte[] ret = manageClient.get()
                 .uri("/shops/1/aftersales/1")
                 .header("authorization",token)
                 .exchange()
@@ -821,9 +827,9 @@ public class WangJintaiTest {
     @Order(11)
     public void getAftersaleOrderByIdAdminTest2() throws Exception {
         // admin
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
-        byte[] ret = mallClient.get()
+        String token = this.login("13088admin","123456");
+
+        byte[] ret = manageClient.get()
                 .uri("/shops/2/aftersales/1")
                 .header("authorization",token)
                 .exchange()
@@ -849,15 +855,15 @@ public class WangJintaiTest {
     @Order(12)
     public void getAftersaleOrderByIdAdminTest3() throws Exception {
         // admin
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
-        byte[] ret = mallClient.get()
+        String token = this.login("13088admin","123456");
+
+        byte[] ret = manageClient.get()
                 .uri("/shops/1/aftersales/-1")
                 .header("authorization",token)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_OUTSCOPE.getCode())
+                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getCode())
                 .returnResult()
                 .getResponseBodyContent();
         String responseString = new String(ret, "UTF-8");
@@ -1120,7 +1126,6 @@ public class WangJintaiTest {
                 .expectStatus().isNotFound()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getCode())
-                .jsonPath("$.data").exists()
                 .returnResult()
                 .getResponseBodyContent();
         String expectedResponseString = "{\"errno\":504}";
@@ -1366,10 +1371,9 @@ public class WangJintaiTest {
     @Order(24)
     public void confirmAftersaleTest3() throws Exception {
         // userId = 1
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
-        String requireJson = "{\"conclusion\":\"同意\",\"confirm\":true,\"price\":100,\"type\":1}";
-        byte[] ret = mallClient.put()
+        String token = this.login("13088admin","123456");
+        String requireJson = "{\"conclusion\":\"同意\",\"confirm\":true,\"price\":-100,\"type\":1}";
+        byte[] ret = manageClient.put()
                 .uri("/shops/1/aftersales/28/confirm")
                 .header("authorization",token)
                 .bodyValue(requireJson)
@@ -1404,7 +1408,7 @@ public class WangJintaiTest {
                 "    \"serviceSn\": \"202012041048014JB\",\n" +
                 "    \"type\": 1,\n" +
                 "    \"reason\": \"string\",\n" +
-                "    \"refund\": 100,\n" +
+                "    \"refund\": -100,\n" +
                 "    \"quantity\": 0,\n" +
                 "    \"regionId\": 1,\n" +
                 "    \"detail\": \"detail\",\n" +
@@ -1430,10 +1434,9 @@ public class WangJintaiTest {
     @Order(25)
     public void confirmAftersaleTest4() throws Exception {
         // userId = 1
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
-        String requireJson = "{\"conclusion\":\"不符合要求\",\"confirm\":false,\"price\":100,,\"type\":1}";
-        byte[] ret = mallClient.put()
+        String token = this.login("13088admin","123456");
+        String requireJson = "{\"conclusion\":\"不符合要求\",\"confirm\":false,\"price\":100,\"type\":1}";
+        byte[] ret = manageClient.put()
                 .uri("/shops/2/aftersales/29/confirm")
                 .header("authorization",token)
                 .bodyValue(requireJson)
@@ -1494,17 +1497,16 @@ public class WangJintaiTest {
     @Order(26)
     public void confirmAftersaleTest5() throws Exception {
         //admin
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
+        String token = this.login("13088admin","123456");
         String requireJson = "{\"conclusion\":\"不符合要求\",\"confirm\":false,\"price\":100,\"type\":1}";
-        byte[] ret = mallClient.put()
+        byte[] ret = manageClient.put()
                 .uri("/shops/1/aftersales/21/confirm")
                 .header("authorization",token)
                 .bodyValue(requireJson)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .jsonPath("$.errno").isEqualTo(ResponseCode.AFTERSALE_STATENOTALLOW.getCode())
                 .returnResult()
                 .getResponseBodyContent();
         String responseString = new String(ret, "UTF-8");
@@ -1518,7 +1520,6 @@ public class WangJintaiTest {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
                 .jsonPath("$.data").exists()
                 .returnResult()
                 .getResponseBodyContent();
@@ -1558,10 +1559,9 @@ public class WangJintaiTest {
     @Order(27)
     public void shopConfirmReceiveTest1() throws Exception {
         //admin
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
+        String token = this.login("13088admin","123456");
         String requireJson = "{\"conclusion\":\"收到的货物满足条件\",\"confirm\":true}";
-        byte[] ret = mallClient.put()
+        byte[] ret = manageClient.put()
                 .uri("/shops/1/aftersales/3/receive")
                 .header("authorization",token)
                 .bodyValue(requireJson)
@@ -1572,7 +1572,7 @@ public class WangJintaiTest {
                 .returnResult()
                 .getResponseBodyContent();
         String responseString = new String(ret, "UTF-8");
-        String expectedResponse = "{\"errno\":0";
+        String expectedResponse = "{\"errno\":0}";
         JSONAssert.assertEquals(expectedResponse, responseString, false);
 
         String temp = new String(ret, "UTF-8");
@@ -1622,10 +1622,9 @@ public class WangJintaiTest {
     @Order(28)
     public void shopConfirmReceiveTest2() throws Exception {
         //admin
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
+        String token = this.login("13088admin","123456");
         String requireJson = "{\"conclusion\":\"收到的货物不满足条件\",\"confirm\":false}";
-        byte[] ret = mallClient.put()
+        byte[] ret = manageClient.put()
                 .uri("/shops/1/aftersales/21/receive")
                 .header("authorization",token)
                 .bodyValue(requireJson)
@@ -1685,10 +1684,9 @@ public class WangJintaiTest {
     @Order(29)
     public void shopConfirmReceiveTest3() throws Exception {
         //admin
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
+        String token = this.login("13088admin","123456");
         String requireJson = "{\"conclusion\":\"收到的货物不满足条件\",\"confirm\":false}";
-        byte[] ret = mallClient.put()
+        byte[] ret = manageClient.put()
                 .uri("/shops/1/aftersales/27/receive")
                 .header("authorization",token)
                 .bodyValue(requireJson)
@@ -1748,10 +1746,9 @@ public class WangJintaiTest {
     @Order(30)
     public void deliverAfterServiceTest1() throws Exception {
         //admin
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
+        String token = this.login("13088admin","123456");
         String requireJson = "{\"logSn\":\"shopLogSn\"}";
-        byte[] ret = mallClient.put()
+        byte[] ret = manageClient.put()
                 .uri("/shops/1/aftersales/14/deliver")
                 .header("authorization",token)
                 .bodyValue(requireJson)
@@ -1810,10 +1807,9 @@ public class WangJintaiTest {
     @Order(31)
     public void deliverAfterServiceTest2() throws Exception {
         //admin
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
+        String token = this.login("13088admin","123456");
         String requireJson = "{\"logSn\":\"shopLogSn\"}";
-        byte[] ret = mallClient.put()
+        byte[] ret = manageClient.put()
                 .uri("/shops/1/aftersales/5/deliver")
                 .header("authorization",token)
                 .bodyValue(requireJson)
@@ -1872,10 +1868,9 @@ public class WangJintaiTest {
     @Order(32)
     public void deliverAfterServiceTest3() throws Exception {
         //admin
-//        String token = this.login("13088admin","123456");
-        String token = this.user_login("8606245097","123456");
+        String token = this.login("13088admin","123456");
         String requireJson = "{\"logSn\":\"shopLogSn\"}";
-        byte[] ret = mallClient.put()
+        byte[] ret = manageClient.put()
                 .uri("/shops/1/aftersales/23/deliver")
                 .header("authorization",token)
                 .bodyValue(requireJson)

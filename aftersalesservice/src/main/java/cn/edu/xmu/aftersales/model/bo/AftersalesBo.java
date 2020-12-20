@@ -160,7 +160,6 @@ public class AftersalesBo implements VoObject {
         this.setType(AftersalesBo.saleType.getTypeByCode(Integer.valueOf(po.getType())));
         this.setReason(po.getReason());
         this.setConclusion(po.getConclusion());
-        this.setConclusion(po.getConclusion());
         this.setRefund(po.getRefund());
         this.setQuantity(po.getQuantity());
         this.setRegionId(po.getRegionId());
@@ -183,7 +182,7 @@ public class AftersalesBo implements VoObject {
         if(this.id!=null){
             po.setId(this.id);
         }
-
+        po.setOrderId(this.getOrderId());
         po.setOrderItemId(this.getOrderItemId());
         po.setCustomerId(this.customerId);
         po.setShopId(this.shopId);
@@ -192,12 +191,15 @@ public class AftersalesBo implements VoObject {
             po.setType(this.type.getCode().byteValue());
         }
         po.setReason(this.reason);
+        po.setConclusion(this.conclusion);
         po.setRefund(this.refund);
         po.setQuantity(this.quantity);
         po.setRegionId(this.regionId);
         po.setDetail(this.detail);
         po.setConsignee(this.consignee);
         po.setMobile(this.mobile);
+        po.setCustomerLogSn(this.getCustomerLogSn());
+        po.setShopLogSn(this.getShopLogSn());
         if(this.state!=null) {
             po.setState(this.state.getCode().byteValue());
         }
@@ -208,9 +210,6 @@ public class AftersalesBo implements VoObject {
             po.setGmtCreate(this.gmtCreated);
         }
         po.setGmtModified(this.gmtModified);
-
         return po;
     }
-
-
 }

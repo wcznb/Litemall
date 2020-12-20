@@ -118,7 +118,8 @@ public class AftersalesDao implements InitializingBean {
         AftersaleServicePoExample.Criteria criteria=example.createCriteria();
 
         criteria.andBeDeletedNotEqualTo((byte)1);
-        criteria.andShopIdEqualTo(shopId);
+        if(shopId!=0)
+            criteria.andShopIdEqualTo(shopId);
 
         if(beginTime!=null){
             criteria.andGmtCreateGreaterThanOrEqualTo(beginTime);
@@ -166,7 +167,7 @@ public class AftersalesDao implements InitializingBean {
             if (po==null||po.getBeDeleted()==1) {
                 return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
             } else {
-                if(po.getCustomerId()!=userId)
+                if(!po.getCustomerId().equals(userId))
                     return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
                 else{
                         AftersalesBo bo = new AftersalesBo(po);
@@ -201,7 +202,7 @@ public class AftersalesDao implements InitializingBean {
                 return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
             }else{
                 for(AftersaleServicePo sale:pos){
-                    if(sale.getCustomerId()!=userId)
+                    if(!sale.getCustomerId().equals(userId))
                         return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
                     else if(sale.getState()!=0&&sale.getState()!=1)
                         return new ReturnObject<>(ResponseCode.AFTERSALE_STATENOTALLOW);
@@ -243,7 +244,7 @@ public class AftersalesDao implements InitializingBean {
             } else {
                 for (AftersaleServicePo sale : pos) {
                     //感觉不会有这种情况
-                    if(sale.getCustomerId()!=userId)
+                    if(!sale.getCustomerId().equals(userId))
                         return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
                     else {
                         if (sale.getState()==(byte)0||sale.getState()==(byte)1) //售后单还没有完成
@@ -295,7 +296,7 @@ public class AftersalesDao implements InitializingBean {
                 return retObj;
             } else{
                 for(AftersaleServicePo sale:pos){
-                    if(sale.getCustomerId()!=userId)
+                    if(!sale.getCustomerId().equals(userId))
                         return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
                     if(sale.getState()!=(byte)1){
                         retObj = new ReturnObject<>(ResponseCode.AFTERSALE_STATENOTALLOW);
@@ -342,7 +343,7 @@ public class AftersalesDao implements InitializingBean {
                 return retObj;
             } else{
                 for(AftersaleServicePo sale:pos){
-                    if(sale.getCustomerId()!=userId)
+                    if(!sale.getCustomerId().equals(userId))
                         return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
                     if(sale.getState()==(byte)3&&sale.getType()==(byte)1||sale.getState()==(byte)5&&sale.getType()!=(byte)1){
                         po.setState((byte) 8);
@@ -422,11 +423,11 @@ public class AftersalesDao implements InitializingBean {
                         return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE);
                     if(po.getState()!=0)
                         return new ReturnObject<>(ResponseCode.AFTERSALE_STATENOTALLOW);
-                    if(vo.isConfirm()) {
+//                    if(vo.isConfirm()) {
 
-                        if (((po.getType() == 1 || newType == 1) && (price == null || price > 0)) || ((po.getType() == 2 || newType == 2) && (price == null || price < 0)))//不是修改为维修 价格不对
-                            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
-                        }
+//                        if (((po.getType() == 1 || newType == 1) && (price == null || price >= 0)) || ((po.getType() == 2 || newType == 2) && (price == null || price <= 0))||((po.getType()==0||newType==0)&&(price!=null||price!=0)))//不是修改为维修 价格不对
+//                            return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+//                        }
                     }
                 }
         }catch (DataAccessException e) {
@@ -476,15 +477,15 @@ public class AftersalesDao implements InitializingBean {
 
     /**
      * 店家确认收到买家的退（换）货
-     * 如果是退款，则退款给用户，如果换货则产生一个新订单，如果是维修则等待下一个动作
+     * 如果是退款，内部接口调用退款单，则退款给用户；如果换货则发货时产生一个新订单，如果是维修则等待下一个动作
      */
-    public ReturnObject<VoObject> confirmReceive(Long shopId,Long id,confirmVo vo){
+    public ReturnObject<AftersaleServicePo> confirmReceive(Long shopId,Long id,confirmVo vo){
         AftersaleServicePoExample example=new AftersaleServicePoExample();
         AftersaleServicePoExample.Criteria criteria=example.createCriteria();
 
         criteria.andIdEqualTo(id);
         criteria.andBeDeletedNotEqualTo((byte)1);
-        ReturnObject<VoObject> retObj=null;
+        ReturnObject<AftersaleServicePo> retObj=null;
         try{
             List<AftersaleServicePo> po=aftersaleServicePoMapper.selectByExample(example);
             if(po.size()==0){
@@ -496,26 +497,7 @@ public class AftersalesDao implements InitializingBean {
                     if(sale.getState()!=2){
                         return new ReturnObject<>(ResponseCode.AFTERSALE_STATENOTALLOW);
                     }
-                    if(vo.isConfirm()) {
-                        if (sale.getType() == (byte) 0||sale.getType()==(byte)2) {
-                            sale.setState((byte) 4);
-                            sale.setConclusion(vo.getConclusion());
-                        } else {
-                            sale.setState((byte) 3);
-                            sale.setConclusion(vo.getConclusion());
-                        }
-                        sale.setGmtModified(LocalDateTime.now());
-                    }else {
-                        sale.setConclusion(vo.getConclusion());
-                        sale.setState((byte)1);
-                    }
-                    criteria.andStateEqualTo((byte)2);
-                    int ret=aftersaleServicePoMapper.updateByExampleSelective(sale,example);
-                    if(ret==0){
-                        retObj=new ReturnObject<>(ResponseCode.AFTERSALE_STATENOTALLOW,String.format("店家确认收货失败，id=%d,shopId=%d",id,shopId));
-                    }else{
-                        retObj=new ReturnObject<>(ResponseCode.OK);
-                    }
+                   return new ReturnObject<>(sale);
                 }
             }
         }catch (DataAccessException e) {
@@ -524,7 +506,7 @@ public class AftersalesDao implements InitializingBean {
         } catch (Exception e) {
             retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
-        return retObj;
+       return retObj;
     }
 
     /**
@@ -564,7 +546,33 @@ public class AftersalesDao implements InitializingBean {
         return retObj;
     }
 
-    public ReturnObject<VoObject> updatedeliver(AftersalesBo bo) {
+    public ReturnObject<VoObject> updateRecevice(AftersaleServicePo po){
+
+        AftersaleServicePoExample example=new AftersaleServicePoExample();
+        AftersaleServicePoExample.Criteria criteria=example.createCriteria();
+        criteria.andBeDeletedNotEqualTo((byte)1);
+//        criteria.andStateEqualTo((byte)2)
+
+        ReturnObject<VoObject> retObj=null;
+        try{
+            int ret=aftersaleServicePoMapper.updateByPrimaryKeySelective(po);
+            if(ret==0){
+                retObj=new ReturnObject<>(ResponseCode.AFTERSALE_STATENOTALLOW,String.format("店家确认收货失败"));
+            }else{
+                retObj=new ReturnObject<>(ResponseCode.OK);
+            }
+            return retObj;
+        } catch (DataAccessException e) {
+            //日志
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
+        } catch (Exception e) {
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
+        }
+        return retObj;
+    }
+
+
+    public ReturnObject<VoObject> updateAfterSale(AftersalesBo bo) {
         AftersaleServicePo po=bo.gotSalePo();
         ReturnObject<VoObject> retObj=null;
         try{
@@ -573,6 +581,23 @@ public class AftersalesDao implements InitializingBean {
                 retObj=new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
             }
             else retObj=new ReturnObject<>(ResponseCode.OK);
+        }catch (DataAccessException e) {
+            //日志
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
+        } catch (Exception e) {
+            retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
+        }
+        return retObj;
+    }
+
+    public ReturnObject<AftersaleServicePo> selectSale(Long id) {
+        ReturnObject<AftersaleServicePo> retObj=null;
+        try{
+            AftersaleServicePo po=aftersaleServicePoMapper.selectByPrimaryKey(id);
+            if(po==null){
+                retObj=new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST);
+            }
+            else retObj=new ReturnObject<>(po);
         }catch (DataAccessException e) {
             //日志
             retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
