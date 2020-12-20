@@ -23,10 +23,10 @@ public interface UserService {
     ReturnObject<PageInfo<VoObject>> getallusers(String userName, String email, String mobile, Integer page, Integer pageSize);
 
     @Transactional
-    ReturnObject<Object> banCustomer(Long userId);
+    ReturnObject<Object> banCustomer(Long did,Long userId);
 
     @Transactional
-    ReturnObject<Object> releaseCustomer(Long userId);
+    ReturnObject<Object> releaseCustomer(Long did,Long userId);
 
     @Transactional
     ReturnObject <Object> getCustomer(Long id);

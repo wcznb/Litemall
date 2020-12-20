@@ -155,9 +155,9 @@ public class UserController {
      */
     @ApiOperation(value = "封禁买家")
     @Audit
-    @PutMapping("users/{id}/ban")
-    public Object banCustomer(@PathVariable Long id){
-        ReturnObject<Object> ret = userService.banCustomer(id);
+    @PutMapping("shops/{did}/users/{id}/ban")
+    public Object banCustomer(@PathVariable Long did,@PathVariable Long id){
+        ReturnObject<Object> ret = userService.banCustomer(did,id);
         return Common.decorateReturnObject(ret);
     }
 
@@ -169,9 +169,9 @@ public class UserController {
      */
     @ApiOperation(value = "解禁买家")
     @Audit
-    @PutMapping("users/{id}/release")
-    public Object releaseCustomer(@PathVariable Long id){
-        ReturnObject<Object> ret = userService.releaseCustomer(id);
+    @PutMapping("shops/{did}/users/{id}/ban")
+    public Object releaseCustomer(@PathVariable Long did,@PathVariable Long id){
+        ReturnObject<Object> ret = userService.releaseCustomer(did,id);
         return Common.decorateReturnObject(ret);
     }
 
