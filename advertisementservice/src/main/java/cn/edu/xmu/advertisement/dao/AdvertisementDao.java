@@ -44,6 +44,44 @@ public class AdvertisementDao {
     private static final Logger logger = LoggerFactory.getLogger(AdvertisementDao.class);
 
 
+
+
+
+
+
+    public ReturnObject getAdByDefault(Long id){
+
+        Byte BeDefault = 1;
+        Byte notBeDefault = 0;
+
+        AdvertisementPo advertisementPo = advertisementPoMapper.selectByPrimaryKey(id);
+        if (advertisementPo ==null)
+            return new ReturnObject(ResponseCode.RESOURCE_ID_NOTEXIST);
+        if(advertisementPo.getBeDefault().equals(BeDefault)){
+
+            advertisementPo.setBeDefault(notBeDefault);
+            advertisementPoMapper.updateByPrimaryKey(advertisementPo);
+            return new ReturnObject(ResponseCode.OK);
+        }
+        AdvertisementPoExample example = new AdvertisementPoExample();
+        AdvertisementPoExample.Criteria criteria=example.createCriteria();
+        criteria.andBeDefaultEqualTo(BeDefault);
+
+        List<AdvertisementPo> poList = advertisementPoMapper.selectByExample(example);
+        for(AdvertisementPo oldDefaultPo:poList){
+
+            oldDefaultPo.setBeDefault(notBeDefault);
+            advertisementPoMapper.updateByPrimaryKeySelective(oldDefaultPo);
+        }
+
+        advertisementPo.setBeDefault(BeDefault);
+        advertisementPoMapper.updateByPrimaryKey(advertisementPo);
+
+        return new ReturnObject(ResponseCode.OK);
+    }
+
+
+
     /**
      * 通过广告id更新广告信息
      *
@@ -69,7 +107,7 @@ public class AdvertisementDao {
     }
 
 
-    public AdvertisementPo getAdByExmple() {
+    public List<AdvertisementPo> getAdByExmple() {
 
         //没有默认广告时略带一点问题
         AdvertisementPoExample example = new AdvertisementPoExample();
@@ -81,8 +119,8 @@ public class AdvertisementDao {
             return null;
 
         else {
-            AdvertisementPo advertisementPo = advertisementPoMapper.selectByExample(example).get(0);
-            return advertisementPo;
+            List<AdvertisementPo> advertisementPos = advertisementPoMapper.selectByExample(example);
+            return advertisementPos;
         }
 
 
@@ -253,7 +291,7 @@ public class AdvertisementDao {
     public ReturnObject addAdBySegId(Long tid, Long id) {
 
         AdvertisementPo ishave = findAdById(id);
-        if(ishave==null)
+        if (ishave == null)
             return new ReturnObject(RESOURCE_ID_NOTEXIST);
 
         AdvertisementPo advertisementPo = new AdvertisementPo();
@@ -270,38 +308,38 @@ public class AdvertisementDao {
 //            ReturnObject ret = numBySegID(tid);
 //            if (ret.getCode() == ResponseCode.OK) {
 
-            //将原有的广告时段覆盖
-            advertisementPo.setSegId(tid);
+        //将原有的广告时段覆盖
+        advertisementPo.setSegId(tid);
 
-            try {
-                int rets = advertisementPoMapper.updateByPrimaryKeySelective(advertisementPo);
-                Long ids = advertisementPo.getId();
-                //检查更新是否成功
-                if (rets == 0) {
-                    logger.info("广告不存在或已被删除：id = " + ids);
-                    return new ReturnObject<>(RESOURCE_ID_NOTEXIST);
-                } else {
-                    logger.info("广告 id = " + ids + " 的资料已更新");
+        try {
+            int rets = advertisementPoMapper.updateByPrimaryKeySelective(advertisementPo);
+            Long ids = advertisementPo.getId();
+            //检查更新是否成功
+            if (rets == 0) {
+                logger.info("广告不存在或已被删除：id = " + ids);
+                return new ReturnObject<>(RESOURCE_ID_NOTEXIST);
+            } else {
+                logger.info("广告 id = " + ids + " 的资料已更新");
 
-                    AdvertisementPoExample example = new AdvertisementPoExample();
-                    AdvertisementPoExample.Criteria criteria = example.createCriteria();
-                    criteria.andIdEqualTo(id);
+                AdvertisementPoExample example = new AdvertisementPoExample();
+                AdvertisementPoExample.Criteria criteria = example.createCriteria();
+                criteria.andIdEqualTo(id);
 
-                    AdvertisementPo advertisementPo1 = advertisementPoMapper.selectByExample(example).get(0);
-                    ReturnObject returnObject = new ReturnObject<>(new AdvertisementRetVo(advertisementPo1));
-                    return returnObject;
-                }
-            } catch (Exception e) {
-                logger.error("Internal error Happened:" + e.getMessage());
-                return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
+                AdvertisementPo advertisementPo1 = advertisementPoMapper.selectByExample(example).get(0);
+                ReturnObject returnObject = new ReturnObject<>(new AdvertisementRetVo(advertisementPo1));
+                return returnObject;
             }
+        } catch (Exception e) {
+            logger.error("Internal error Happened:" + e.getMessage());
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR);
+        }
 
 //            } else {
 //                return ret;
 //
 //            }
 
-       // }
+        // }
 
 
     }
@@ -329,8 +367,12 @@ public class AdvertisementDao {
 
         AdvertisementPoExample example = new AdvertisementPoExample();
         AdvertisementPoExample.Criteria criteria = example.createCriteria();
-
         criteria.andSegIdEqualTo(tid);
+
+        AdvertisementPoExample example2 = new AdvertisementPoExample();
+        AdvertisementPoExample.Criteria criteria2 = example2.createCriteria();
+        criteria2.andSegIdEqualTo(tid);
+
 
         //String->Localdata 赋值广告开始结束时间 类型LocalData
         //查询的广告时间应该位于beginDate和endDate之间
@@ -346,8 +388,6 @@ public class AdvertisementDao {
                 begindata1 = LocalDate.parse(beginDate, fmt);
 
                 criteria.andBeginDateGreaterThanOrEqualTo(begindata1);
-
-
             } catch (Exception e) {
 
                 return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
@@ -382,7 +422,7 @@ public class AdvertisementDao {
 
                 //开始时间大于结束时间
                 if (begindata1.isAfter(enddata2))
-                    return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+                    return new ReturnObject<>(ResponseCode.Log_Bigger);
 
                 criteria.andBeginDateGreaterThanOrEqualTo(begindata1);
                 criteria.andEndDateLessThanOrEqualTo(enddata2);
@@ -398,20 +438,36 @@ public class AdvertisementDao {
 //        String orderBy = "weight desc";
 //
 //       PageHelper.startPage(page,pageSize,orderBy);
-        PageHelper.startPage(page, pageSize);
+        PageHelper.startPage(page, pageSize, true, true, null);
         // PageHelper.offsetPage(0,8,true);
 
         List<AdvertisementPo> advertisementPos = null;
-
+        Byte aaa = 1;
         try {
 
             //按照条件进行查询
             advertisementPos = advertisementPoMapper.selectByExample(example);
+
         } catch (DataAccessException e) {
 
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
 
+
+        if (advertisementPos.size()==0 && beginDate != null && endDate != null) {
+
+
+            criteria2.andRepeatsEqualTo(aaa);
+            PageHelper.startPage(page, pageSize, true, true, null);
+
+            try {
+                advertisementPos = advertisementPoMapper.selectByExample(example2);
+            }catch  (DataAccessException e) {
+
+                return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
+            }
+
+        }
 
         List<VoObject> ret = new ArrayList<>(advertisementPos.size());
 
@@ -427,7 +483,6 @@ public class AdvertisementDao {
         adPage.setPageSize(adPoPage.getPageSize());
         adPage.setTotal(adPoPage.getTotal());
         return new ReturnObject<>(adPage);
-
 
     }
 

@@ -57,7 +57,7 @@ public class NewAdvertisementDao {
 
             //判断广告时段是否已经达到上线
             int returnObject1 = advertisementDao.numBySegID(tid);
-            if (returnObject1==0)
+            if (returnObject1 == 0)
                 return new ReturnObject(ResponseCode.FIELD_NOTVALID);
         }
         //else {
@@ -73,11 +73,11 @@ public class NewAdvertisementDao {
 
         //传入的权重能否转换为数字
         if (vo.getWeight() != null) {
-            try {
-                advertisementPo.setWeight(Integer.valueOf(vo.getWeight()));
-            } catch (Exception e) {
+            if (vo.getWeight() > 0)
+                advertisementPo.setWeight(vo.getWeight());
+            else
                 return new ReturnObject(ResponseCode.FIELD_NOTVALID);
-            }
+
         } else
             advertisementPo.setWeight(null);
 
@@ -120,19 +120,22 @@ public class NewAdvertisementDao {
 
             //开始日期晚于结束日期
             if (begindata1.isAfter(enddata1))
+                return new ReturnObject<>(ResponseCode.Log_Bigger);
+
+            if (!(begindata1.isAfter(firstDayOfThisMonth) && begindata1.isBefore(lastDayOfThisMonth) || begindata1.isEqual(firstDayOfThisMonth) || begindata1.isEqual(lastDayOfThisMonth)))
                 return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
 
-            if(!(begindata1.isAfter(firstDayOfThisMonth)&& begindata1.isBefore(lastDayOfThisMonth)||begindata1.isEqual(firstDayOfThisMonth)||begindata1.isEqual(lastDayOfThisMonth)))
+            if (!(enddata1.isAfter(firstDayOfThisMonth1) && enddata1.isBefore(lastDayOfThisMonth1) || enddata1.isEqual(firstDayOfThisMonth1) || enddata1.isEqual(lastDayOfThisMonth1)))
                 return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
-            if(!(enddata1.isAfter(firstDayOfThisMonth1)&&enddata1.isBefore(lastDayOfThisMonth1)||enddata1.isEqual(firstDayOfThisMonth1)||enddata1.isEqual(lastDayOfThisMonth1)))
-                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
-
 
             advertisementPo.setBeginDate(begindata1);
             advertisementPo.setEndDate(enddata1);
 
-//            if (enddata1.isBefore(LocalDate.now()))
-//                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
+            String str = "2020-11-30";
+            LocalDate str1 = LocalDate.parse(str, fmt);
+
+            if (enddata1.isBefore(str1))
+                return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
 
         } catch (Exception e) {
             return new ReturnObject<>(ResponseCode.FIELD_NOTVALID);
@@ -152,31 +155,23 @@ public class NewAdvertisementDao {
         //图片，审核附言 null
         advertisementPo.setImageUrl(null);
         advertisementPo.setMessage(null);
+        ReturnObject returnObject1 ;
 
-        int ret = advertisementPoMapper.insert(advertisementPo);
+        try {
+            advertisementPoMapper.insert(advertisementPo);
 
-        if (ret != 0) {
+        }catch (Exception e){
 
-            AdvertisementPoExample example = new AdvertisementPoExample();
-            AdvertisementPoExample.Criteria criteria = example.createCriteria();
-
-            criteria.andLinkEqualTo(advertisementPo.getContent());
-            criteria.andContentEqualTo(advertisementPo.getContent());
-            criteria.andSegIdEqualTo(advertisementPo.getSegId());
-            criteria.andWeightEqualTo(advertisementPo.getWeight());
-
-           Long ids =  advertisementPoMapper.selectByExample(example).get(0).getId();
-            AdvertisementPo advertisementPo1 = advertisementDao.findAdById(ids);
-
-            if(advertisementPo1==null)
-                return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
-
-            returnObject = new ReturnObject<>(new AdvertisementRetVo(advertisementPo1));
-        } else
+            System.out.println("1");
+//
             return new ReturnObject(ResponseCode.INTERNAL_SERVER_ERR);
+        }
 
-        return returnObject;
-        //  }
+
+        returnObject = new ReturnObject<>(new AdvertisementRetVo(advertisementPo));
+
+        return  returnObject;
+
 
     }
 

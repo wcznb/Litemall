@@ -33,9 +33,9 @@ public class AdvertisementRetVo {
 
     Boolean repeat;
 
-String gmtCreate;
-//
-String gmtModified;
+    String gmtCreate;
+    //
+    String gmtModified;
 
 
     public AdvertisementRetVo(Advertisement advertisement) {
@@ -53,7 +53,11 @@ String gmtModified;
         this.beginDate = advertisement.getBeginDate().toString();
         this.endDate = advertisement.getEndDate().toString();
         this.repeat = advertisement.getRepeate().intValue() > 0 ? true : false;
-        this.imagePath = advertisement.getImageUrl();
+
+        if (advertisement.getImageUrl() == null)
+            this.imagePath = null;
+        else
+            this.imagePath = advertisement.getImageUrl();
         if (advertisement.getWeight() == null)
             this.weight = null;
         else
@@ -62,61 +66,57 @@ String gmtModified;
             this.state = null;
         else
             this.state = advertisement.getState().getCode();
-//    if(advertisement.getGmtCreate()==null)
-//        this.gmtCreate = null;
-//    else
-//        this.gmtCreate= advertisement.getGmtCreate().toString();
-//    if(advertisement.getGmtModified()==null)
-//        this.gmtModified = null;
-//    else
-//        this.gmtModified = advertisement.getGmtModified().toString();
+
+        if(advertisement.getGmtCreate()==null)
+            this.gmtCreate = null;
+        else
+            this.gmtCreate= advertisement.getGmtCreate().toString();
+        if(advertisement.getGmtModified()==null)
+            this.gmtModified = null;
+        else
+            this.gmtModified = advertisement.getGmtModified().toString();
 
 
     }
 
     public AdvertisementRetVo(AdvertisementPo advertisementPo) {
 
-//        this.id = advertisementPo.getId();
-//        this.segId = advertisementPo.getSegId();
-//
-//        this.beDefault = advertisementPo.getBeDefault().intValue() > 0 ? true : false;
-//
-//        this.link = advertisementPo.getLink();
-//        this.content = advertisementPo.getContent();
-//        this.beginDate = advertisementPo.getBeginDate().toString();
-//        this.endDate = advertisementPo.getEndDate().toString();
-//        this.repeat = advertisementPo.getRepeats().intValue() > 0 ? true : false;
-//        this.imagePath = advertisementPo.getImageUrl();
-//
-//        this.weight = advertisementPo.getWeight().toString();
-//
-//        this.state = advertisementPo.getState().intValue();
-//    this.gmtCreate = advertisementPo.getGmtCreate().toString();
-//    this.gmtModified = advertisementPo.getGmtModified().toString();
+
         this.id = advertisementPo.getId();
         this.segId = advertisementPo.getSegId();
-        if(advertisementPo.getBeDefault()==null)
+        if (advertisementPo.getBeDefault() == null)
             this.beDefault = null;
         else
-            this.beDefault = advertisementPo.getBeDefault().intValue()>0?true:false;
+            this.beDefault = advertisementPo.getBeDefault().intValue() > 0 ? true : false;
 
         //this.bedefault = advertisementPo.getBeDefault().intValue()>0?true:false;
         this.link = advertisementPo.getLink();
         this.content = advertisementPo.getContent();
-        this.beginDate =advertisementPo.getBeginDate().toString();
+        this.beginDate = advertisementPo.getBeginDate().toString();
         this.endDate = advertisementPo.getEndDate().toString();
-        this.repeat = advertisementPo.getRepeats().intValue()>0?true:false;
-        this.imagePath = advertisementPo.getImageUrl();
+        this.repeat = advertisementPo.getRepeats().intValue() > 0 ? true : false;
 
-        if(advertisementPo.getWeight()==null)
-            this.weight=null;
+        if (advertisementPo.getImageUrl() == null)
+            this.imagePath = null;
+        else
+            this.imagePath = advertisementPo.getImageUrl();
+
+        if (advertisementPo.getWeight() == null)
+            this.weight = null;
         else
             this.weight = advertisementPo.getWeight().toString();
 
-               this.state = advertisementPo.getState().intValue();
+        this.state = advertisementPo.getState().intValue();
 
-        this.gmtCreate = advertisementPo.getGmtCreate().toString();
-        this.gmtModified = advertisementPo.getGmtModified().toString();
+        if(advertisementPo.getGmtCreate()==null)
+            this.gmtCreate = null;
+        else
+            this.gmtCreate= advertisementPo.getGmtCreate().toString();
+        if(advertisementPo.getGmtModified()==null)
+            this.gmtModified = null;
+        else
+            this.gmtModified = advertisementPo.getGmtModified().toString();
+
 
     }
 

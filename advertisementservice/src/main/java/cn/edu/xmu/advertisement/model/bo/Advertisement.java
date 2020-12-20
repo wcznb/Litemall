@@ -16,21 +16,21 @@ import java.util.Map;
 public class Advertisement  implements VoObject {
 
 
-private Long id;
+    private Long id;
 
-private Long segId;;
+    private Long segId;;
 
-private  String link;
+    private  String link;
 
-private String imageUrl;
+    private String imageUrl;
 
-private  String content;
+    private  String content;
 
-private  State state ;
+    private  State state ;
 
-private Integer weight;
+    private Integer weight;
 
-private Byte beDefault;
+    private Byte beDefault;
 
     private LocalDate beginDate;
 
@@ -38,11 +38,11 @@ private Byte beDefault;
 
     private  Byte repeate;
 
-private String message;
+    private String message;
 
-private LocalDateTime gmtCreate;
+    private LocalDateTime gmtCreate;
 
-private LocalDateTime gmtModified;
+    private LocalDateTime gmtModified;
 
 
     @Override
@@ -55,8 +55,8 @@ private LocalDateTime gmtModified;
      * 广告状态
      */
     public enum State {
-       // NEW(0, "空状态"),
-     //   DEFAULT(1, "默认"),
+        // NEW(0, "空状态"),
+        //   DEFAULT(1, "默认"),
         MESSAGES(0,"待审核"),
         SHELF(4, "上架"),
         OFFSHELF(6,"下架");
@@ -111,18 +111,18 @@ private LocalDateTime gmtModified;
     public Advertisement(AdvertisementPo po){
 
         this.link = po.getLink();
-          this.beDefault = po.getBeDefault();
-          this.beginDate = po.getBeginDate();
-          this.content = po.getContent();
-          this.endDate = po.getEndDate();
-          this.id = po.getId();
-          this.imageUrl = po.getImageUrl();
-          this.message = po.getMessage();
-          this.repeate = po.getRepeats();
-          this.segId = po.getSegId();
-          this.weight = po.getWeight();
-          this.gmtCreate = po.getGmtCreate();
-          this.gmtModified = po.getGmtModified();
+        this.beDefault = po.getBeDefault();
+        this.beginDate = po.getBeginDate();
+        this.content = po.getContent();
+        this.endDate = po.getEndDate();
+        this.id = po.getId();
+        this.imageUrl = po.getImageUrl();
+        this.message = po.getMessage();
+        this.repeate = po.getRepeats();
+        this.segId = po.getSegId();
+        this.weight = po.getWeight();
+        this.gmtCreate = po.getGmtCreate();
+        this.gmtModified = po.getGmtModified();
         if (null != po.getState()) {
             this.state = State.getTypeByCode(po.getState().intValue());
         }
