@@ -1,0 +1,20 @@
+
+spring:
+  boot:
+    admin:
+      client:
+        url: http://localhost:8080
+  datasource:
+    url: jdbc:mysql://localhost:3306/oomall?serverTimezone=GMT%2B8
+    username: root
+    password: Cyy243699
+    druid:
+      stat-view-servlet:
+        login-username: admin
+        login-password: 123456
+        enabled: true
+        url-pattern: /druid/*
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 114.215.198.238:8848
