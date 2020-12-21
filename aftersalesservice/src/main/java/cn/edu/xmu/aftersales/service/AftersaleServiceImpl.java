@@ -331,4 +331,16 @@ public class AftersaleServiceImpl implements AfterSaleService{
             return retObj;
         }
     }
+
+    //两个订单的API
+    public ReturnObject<VoObject> shopFindOrderById(Long shopId, Long id) {
+        return aftersalesDao.shopFindOrderById(shopId,id);
+    }
+
+    public ReturnObject<List> adminGetAftersaleRefunds(Long shopId, Long aftersaleId) {
+
+        return aftersalesDao.adminGetAftersaleRefunds(shopId,aftersaleId);
+    }
+
+
 }

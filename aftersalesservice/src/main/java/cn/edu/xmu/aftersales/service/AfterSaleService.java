@@ -8,6 +8,8 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public interface AfterSaleService {
     @Transactional
@@ -36,6 +38,7 @@ public interface AfterSaleService {
     ReturnObject<VoObject> deliver(Long shopId, Long id, shopLogSnVo vo);
 
 
+    ReturnObject<VoObject> shopFindOrderById(Long shopId, Long id);
 
-
+    ReturnObject<List> adminGetAftersaleRefunds(Long shopId, Long id);
 }

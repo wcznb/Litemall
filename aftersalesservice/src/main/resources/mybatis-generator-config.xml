@@ -137,7 +137,34 @@
             <!--mysql 配置-->
             <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
         </table>
+        <table tableName="orders" domainObjectName="OrderPo"
+               enableCountByExample="true" enableUpdateByExample="true"
+               enableDeleteByExample="false" enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <!-- 如果设置为true，生成的model类会直接使用column本身的名字，而不会再使用驼峰命名方法，比如BORN_DATE，生成的属性名字就是BORN_DATE,而不会是bornDate -->
+            <property name="useActualColumnNames" value="false"/>
+            <!--mysql 配置-->
+            <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
+        </table>
 
+        <table tableName="order_item" domainObjectName="OrderItemPo"
+               enableCountByExample="true" enableUpdateByExample="true"
+               enableDeleteByExample="false" enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <!-- 如果设置为true，生成的model类会直接使用column本身的名字，而不会再使用驼峰命名方法，比如BORN_DATE，生成的属性名字就是BORN_DATE,而不会是bornDate -->
+            <property name="useActualColumnNames" value="false"/>
+            <!--mysql 配置-->
+            <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
+        </table>
 
+        <table tableName="refund" domainObjectName="RefundPo"
+               enableCountByExample="true" enableUpdateByExample="true"
+               enableDeleteByExample="true" enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <!-- 如果设置为true，生成的model类会直接使用column本身的名字，而不会再使用驼峰命名方法，比如BORN_DATE，生成的属性名字就是BORN_DATE,而不会是bornDate -->
+            <property name="useActualColumnNames" value="false"/>
+            <!--mysql 配置-->
+            <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
+        </table>
     </context>
 </generatorConfiguration>

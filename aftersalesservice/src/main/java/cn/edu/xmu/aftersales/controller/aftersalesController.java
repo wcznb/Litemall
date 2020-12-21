@@ -13,10 +13,7 @@ import cn.edu.xmu.ooad.util.ResponseUtil;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -292,4 +289,46 @@ public class aftersalesController {
         }
     }
 
+
+    //两个订单的API
+    @ApiOperation(value = "店家查询店内订单完整信息（普通，团购，预售）", produces = "application/json", notes = "0普通，1团购，2预售")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "header", dataType = "String", name = "authorization", value = "用户token", required = true),
+            @ApiImplicitParam(paramType="path", dataType="Long", name="shopId", value = "商户id (店员只能查询本商铺)", required = true),
+            @ApiImplicitParam(paramType = "path", dataType = "Long", name = "id", value = "订单id", required = true)
+    })
+    @ApiResponses({
+            @ApiResponse(code = 0, message = "成功"),
+    })
+    @Audit
+    @GetMapping("/shops/{shopId}/orders/{id}")
+    public Object shopsShopIdOrdersIdGet(@PathVariable(required = true) Long shopId,
+                                         @PathVariable(required = true) Long id){
+        ReturnObject returnObject;
+        ReturnObject<VoObject> order = afterSaleService.shopFindOrderById(shopId,id);
+        //如果是异常情况
+        if(order.getCode().getCode()!=0) {
+            returnObject = new ReturnObject(order.getCode(),order.getErrmsg());
+            return cn.edu.xmu.ooad.util.Common.decorateReturnObject(returnObject);
+        }
+        //非异常情况
+        else
+            return cn.edu.xmu.ooad.util.Common.getRetObject(order);
+    }
+
+    @Audit
+    @GetMapping(value = "/shops/{shopId}/aftersales/{id}/refunds")
+    public Object adminGetAftersaleRefunds(@PathVariable Long shopId, @PathVariable Long id){
+
+        Object returnObject;
+
+        ReturnObject<List> refund = afterSaleService.adminGetAftersaleRefunds(shopId,id);
+        if(!refund.getCode().equals(ResponseCode.OK)) {
+            returnObject = new ReturnObject(refund.getCode(),refund.getErrmsg());
+            return cn.edu.xmu.ooad.util.Common.decorateReturnObject((ReturnObject) returnObject);
+        }
+        //非异常情况
+        else
+            return cn.edu.xmu.ooad.util.Common.getListRetObject(refund);
+    }
 }

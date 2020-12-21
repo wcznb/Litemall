@@ -1,10 +1,14 @@
 package cn.edu.xmu.aftersales.dao;
 
 import cn.edu.xmu.aftersales.mapper.AftersaleServicePoMapper;
+import cn.edu.xmu.aftersales.mapper.OrderItemPoMapper;
+import cn.edu.xmu.aftersales.mapper.OrderPoMapper;
+import cn.edu.xmu.aftersales.mapper.RefundPoMapper;
 import cn.edu.xmu.aftersales.model.bo.AftersalesBo;
+import cn.edu.xmu.aftersales.model.bo.Order;
+import cn.edu.xmu.aftersales.model.bo.Refund;
 import cn.edu.xmu.aftersales.model.bo.querySaleBo;
-import cn.edu.xmu.aftersales.model.po.AftersaleServicePo;
-import cn.edu.xmu.aftersales.model.po.AftersaleServicePoExample;
+import cn.edu.xmu.aftersales.model.po.*;
 import cn.edu.xmu.aftersales.model.vo.checkVo;
 import cn.edu.xmu.aftersales.model.vo.confirmVo;
 import cn.edu.xmu.ooad.model.VoObject;
@@ -27,6 +31,15 @@ public class AftersalesDao implements InitializingBean {
 
     @Autowired
     private AftersaleServicePoMapper aftersaleServicePoMapper;
+
+    @Autowired
+    private OrderPoMapper orderPoMapper;
+
+    @Autowired
+    private OrderItemPoMapper orderItemPoMapper;
+
+    @Autowired
+    private RefundPoMapper refundPoMapper;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -605,5 +618,62 @@ public class AftersalesDao implements InitializingBean {
             retObj = new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
         }
         return retObj;
+    }
+
+    public ReturnObject<VoObject> shopFindOrderById(Long shopId, Long id) {
+        OrderItemPoExample example = new OrderItemPoExample();
+        OrderItemPoExample.Criteria criteria1 = example.createCriteria();
+        criteria1.andOrderIdEqualTo(id);
+        try {
+            OrderPo orderPo = orderPoMapper.selectByPrimaryKey(id);
+            if(orderPo==null)
+                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST,String.format("查询的订单id不存在"));
+            else if(orderPo.getShopId()==null||(!orderPo.getShopId().equals(shopId)))
+                return new ReturnObject<>(ResponseCode.RESOURCE_ID_OUTSCOPE,String.format("查询的订单id不是本店铺的"));
+            List<OrderItemPo> orderItemPos = orderItemPoMapper.selectByExample(example);
+            Order order = new Order(orderPo, orderItemPos);
+            return new ReturnObject<>(order);
+        } catch (DataAccessException e) {
+//            logger.error("selectOrder: DataAccessException:" + e.getMessage());
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
+        } catch (Exception e) {
+//            logger.error("other exception:" + e.getMessage());
+            e.printStackTrace();
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("严重数据库错误：%s", e.getMessage()));
+        }
+    }
+
+
+    public ReturnObject<List> adminGetAftersaleRefunds(Long shopId, Long id) {
+        List<VoObject> refunds=null;
+        RefundPoExample example = new RefundPoExample();
+        RefundPoExample.Criteria criteria1 = example.createCriteria();
+        criteria1.andAftersaleIdEqualTo(id);
+
+        try {
+            List<RefundPo> refundPo=refundPoMapper.selectByExample(example);
+            List<VoObject> refundContents=null;
+            if(refundPo.isEmpty()){
+
+                return new ReturnObject<>(ResponseCode.RESOURCE_ID_NOTEXIST, String.format("查询id不存在"));
+            }
+            refundContents=new ArrayList<>(refundPo.size());
+            for (RefundPo po:refundPo){
+                Refund refund=new Refund(po);
+
+                refundContents.add(refund);
+            }
+            return new ReturnObject<>(refundContents);
+        }
+        catch (DataAccessException e){
+            // 其他数据库错误
+//            logger.debug("other sql exception : " + e.getMessage());
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("数据库错误：%s", e.getMessage()));
+
+        }
+        catch (Exception e){
+//            logger.error("other exception : " + e.getMessage());
+            return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR, String.format("发生了严重的数据库错误：%s", e.getMessage()));
+        }
     }
 }
