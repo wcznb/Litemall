@@ -24,12 +24,12 @@ public class test {
     public void setUp(){
 
         this.manageClient = WebTestClient.bindToServer()
-                .baseUrl("http://114.215.198.238:4510")
+                .baseUrl("http://114.215.198.238:4600")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
 
         this.mallClient = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:8080")
+                .baseUrl("http://114.215.198.238:4600")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
 
@@ -445,174 +445,6 @@ public class test {
                 "}";
         JSONAssert.assertEquals(queryExpectedResponse, new String(queryResponseString, StandardCharsets.UTF_8), false);
     }
-
-    /**
-     * 购物车服务-买家将商品加入购物车  普通测试3，该商品原来已经在购物车。
-     * @throws Exception
-     * @author yang8miao
-     * @date Created in 2020/12/9 16:18
-     */
-    @Test
-    @Order(0)
-    public void postCarts3() throws Exception {
-
-        // userId = 100
-        String token = this.userLogin("48673740540", "123456");
-
-        JSONObject body = new JSONObject();
-        body.put("goodsSkuId", 367);
-        body.put("quantity", 111);
-        String requireJson = body.toJSONString();
-
-        byte[] responseString = mallClient.post().uri("/carts").header("authorization",token).bodyValue(requireJson).exchange()
-                .expectStatus().isCreated()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .returnResult()
-                .getResponseBodyContent();
-
-        String expectedResponse = "{\n" +
-                "  \"errno\": 0,\n" +
-                "  \"data\": {\n" +
-                "    \"id\": 1021,\n" +
-                "    \"goodsSkuId\": 367,\n" +
-                "    \"skuName\": \"+\",\n" +
-                "    \"quantity\": 211,\n" +
-                "    \"price\": 24120,\n" +
-                "    \"couponActivity\": [\n" +
-                "    ],\n" +
-                "    \"gmtCreate\": \"2020-11-24T17:06:28\"\n" +
-                "  }\n" +
-                "}";
-        JSONAssert.assertEquals(expectedResponse, new String(responseString, StandardCharsets.UTF_8), false);
-
-        // 买家查询自己购物车中商品，进行验证
-        byte[] queryResponseString = mallClient.get().uri("/carts?page=1&pageSize=10").header("authorization",token).exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .returnResult()
-                .getResponseBodyContent();
-
-        String queryExpectedResponse = "{\n" +
-                "  \"errno\": 0,\n" +
-                "  \"data\": {\n" +
-                "    \"page\": 1,\n" +
-                "    \"pageSize\": 10,\n" +
-                "    \"total\": 1,\n" +
-                "    \"pages\": 1,\n" +
-                "    \"list\": [\n" +
-                "      {\n" +
-                "        \"id\": 1021,\n" +
-                "        \"goodsSkuId\": 367,\n" +
-                "        \"skuName\": \"+\",\n" +
-                "        \"quantity\": 211,\n" +
-                "        \"price\": 24120,\n" +
-                "        \"gmtCreate\": \"2020-11-24T17:06:28\",\n" +
-                "        \"couponActivity\": [\n" +
-                "        ]\n" +
-                "      }\n" +
-                "    ]\n" +
-                "  }\n" +
-                "}";
-        JSONAssert.assertEquals(queryExpectedResponse, new String(queryResponseString, StandardCharsets.UTF_8), false);
-    }
-
-
-    /**
-     * 购物车服务-买家将商品加入购物车  普通测试4，该商品原来已经在购物车。
-     * @throws Exception
-     * @author yang8miao
-     * @date Created in 2020/12/9 16:18
-     */
-    @Test
-    @Order(0)
-    public void postCarts4() throws Exception {
-
-        // userId = 101
-        String token = this.userLogin("76876407281", "123456");
-
-        JSONObject body = new JSONObject();
-        body.put("goodsSkuId", 446);
-        body.put("quantity", 2);
-        String requireJson = body.toJSONString();
-
-        byte[] responseString = mallClient.post().uri("/carts").header("authorization",token).bodyValue(requireJson).exchange()
-                .expectStatus().isCreated()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .returnResult()
-                .getResponseBodyContent();
-
-        String expectedResponse = "{\n" +
-                "  \"errno\": 0,\n" +
-                "  \"data\": {\n" +
-                "    \"id\": 1024,\n" +
-                "    \"goodsSkuId\": 446,\n" +
-                "    \"skuName\": \"+\",\n" +
-                "    \"quantity\": 102,\n" +
-                "    \"price\": 1799,\n" +
-                "    \"couponActivity\": [\n" +
-                "    ],\n" +
-                "    \"gmtCreate\": \"2020-11-24T17:06:28\"\n" +
-                "  }\n" +
-                "}";
-        JSONAssert.assertEquals(expectedResponse, new String(responseString, StandardCharsets.UTF_8), false);
-
-        // 买家查询自己购物车中商品，进行验证
-        byte[] queryResponseString = mallClient.get().uri("/carts?page=1&pageSize=10").header("authorization",token).exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .returnResult()
-                .getResponseBodyContent();
-
-        String queryExpectedResponse = "{\n" +
-                "  \"errno\": 0,\n" +
-                "  \"data\": {\n" +
-                "    \"page\": 1,\n" +
-                "    \"pageSize\": 10,\n" +
-                "    \"total\": 3,\n" +
-                "    \"pages\": 1,\n" +
-                "    \"list\": [\n" +
-                "      {\n" +
-                "        \"id\": 1024,\n" +
-                "        \"goodsSkuId\": 446,\n" +
-                "        \"skuName\": \"+\",\n" +
-                "        \"quantity\": 102,\n" +
-                "        \"price\": 1799,\n" +
-                "        \"gmtCreate\": \"2020-11-24T17:06:28\",\n" +
-                "        \"couponActivity\": [\n" +
-                "        ]\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"id\": 1025,\n" +
-                "        \"goodsSkuId\": 643,\n" +
-                "        \"skuName\": \"+\",\n" +
-                "        \"quantity\": 100,\n" +
-                "        \"price\": 2,\n" +
-                "        \"gmtCreate\": \"2020-11-24T17:06:28\",\n" +
-                "        \"gmtModified\": \"2020-11-24T17:06:28\",\n" +
-                "        \"couponActivity\": [\n" +
-                "        ]\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"id\": 1026,\n" +
-                "        \"goodsSkuId\": 521,\n" +
-                "        \"skuName\": \"+\",\n" +
-                "        \"quantity\": 100,\n" +
-                "        \"price\": 2,\n" +
-                "        \"gmtCreate\": \"2020-11-24T17:06:28\",\n" +
-                "        \"gmtModified\": \"2020-11-24T17:06:28\",\n" +
-                "        \"couponActivity\": [\n" +
-                "        ]\n" +
-                "      }\n" +
-                "    ]\n" +
-                "  }\n" +
-                "}";
-        JSONAssert.assertEquals(queryExpectedResponse, new String(queryResponseString, StandardCharsets.UTF_8), false);
-    }
-
 
     /**
      * 购物车服务-买家清空购物车  普通测试1，清空购物车成功
@@ -1228,128 +1060,6 @@ public class test {
 
 
     /**
-     * 购物车服务-买家修改购物车单个商品的数量或规格  普通测试6，修改成功并查询，此时修改规格，要修改的skuId已加入购物车
-     *
-     * @throws Exception
-     * @author yang8miao
-     * @date Created in 2020/12/9 16:18
-     */
-    @Test
-    @Order(0)
-    public void putCartsId6() throws Exception {
-
-        // userId = 10004
-        String token = this.userLogin("60097829494", "123456");
-
-        JSONObject body = new JSONObject();
-        body.put("goodsSkuId", 6830);
-        body.put("quantity", 100);
-        String requireJson = body.toJSONString();
-
-        byte[] responseString = mallClient.put().uri("/carts/1049").header("authorization",token)
-                .bodyValue(requireJson)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .returnResult()
-                .getResponseBodyContent();
-
-        // 买家查询自己购物车中商品，进行验证
-        byte[] queryResponseString = mallClient.get().uri("/carts?page=1&pageSize=10").header("authorization",token).exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .returnResult()
-                .getResponseBodyContent();
-
-        String queryExpectedResponse = "{\n" +
-                "  \"errno\": 0,\n" +
-                "  \"data\": {\n" +
-                "    \"page\": 1,\n" +
-                "    \"pageSize\": 10,\n" +
-                "    \"total\": 1,\n" +
-                "    \"pages\": 1,\n" +
-                "    \"list\": [\n" +
-                "      {\n" +
-                "        \"id\": 1050,\n" +
-                "        \"goodsSkuId\": 6830,\n" +
-                "        \"skuName\": \"+\",\n" +
-                "        \"quantity\": 200,\n" +
-                "        \"price\": 6695,\n" +
-                "        \"gmtCreate\": \"2020-11-24T17:06:28\",\n" +
-                "        \"couponActivity\": [\n" +
-                "        ]\n" +
-                "      }\n" +
-                "    ]\n" +
-                "  }\n" +
-                "}";
-        JSONAssert.assertEquals(queryExpectedResponse, new String(queryResponseString, StandardCharsets.UTF_8), false);
-    }
-
-
-    /**
-     * 购物车服务-买家修改购物车单个商品的数量或规格  普通测试7，修改成功并查询，此时修改规格，要修改的skuId已加入购物车
-     *
-     * @throws Exception
-     * @author yang8miao
-     * @date Created in 2020/12/9 16:18
-     */
-    @Test
-    @Order(0)
-    public void putCartsId7() throws Exception {
-
-        // userId = 10005
-        String token = this.userLogin("38059308229", "123456");
-
-        JSONObject body = new JSONObject();
-        body.put("goodsSkuId", 6860);
-        body.put("quantity", 100);
-        String requireJson = body.toJSONString();
-
-        byte[] responseString = mallClient.put().uri("/carts/1051").header("authorization",token)
-                .bodyValue(requireJson)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .returnResult()
-                .getResponseBodyContent();
-
-        // 买家查询自己购物车中商品，进行验证
-        byte[] queryResponseString = mallClient.get().uri("/carts?page=1&pageSize=10").header("authorization",token).exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .returnResult()
-                .getResponseBodyContent();
-
-        String queryExpectedResponse = "{\n" +
-                "  \"errno\": 0,\n" +
-                "  \"data\": {\n" +
-                "    \"page\": 1,\n" +
-                "    \"pageSize\": 10,\n" +
-                "    \"total\": 1,\n" +
-                "    \"pages\": 1,\n" +
-                "    \"list\": [\n" +
-                "      {\n" +
-                "        \"id\": 1052,\n" +
-                "        \"goodsSkuId\": 6860,\n" +
-                "        \"skuName\": \"+\",\n" +
-                "        \"quantity\": 200,\n" +
-                "        \"price\": 6695,\n" +
-                "        \"gmtCreate\": \"2020-11-24T17:06:28\",\n" +
-                "        \"couponActivity\": [\n" +
-                "        ]\n" +
-                "      }\n" +
-                "    ]\n" +
-                "  }\n" +
-                "}";
-        JSONAssert.assertEquals(queryExpectedResponse, new String(queryResponseString, StandardCharsets.UTF_8), false);
-    }
-
-
-    /**
      * 购物车服务-买家删除购物车中商品  普通测试1，删除成功
      * @throws Exception
      * @author yang8miao
@@ -1551,5 +1261,6 @@ public class test {
                 .returnResult()
                 .getResponseBodyContent();
     }
+
 
 }

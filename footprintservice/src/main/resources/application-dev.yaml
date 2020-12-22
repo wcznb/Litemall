@@ -8,6 +8,9 @@ spring:
     url: jdbc:mysql://114.215.198.238:4502/oomall_other?serverTimezone=GMT%2B8
     username: root
     password: 123456789
+#    url: jdbc:mysql://172.16.0.139:3306/oomall_other?serverTimezone=GMT%2B8
+#    username: root
+#    password: 123456789
     druid:
       stat-view-servlet:
         login-username: admin
