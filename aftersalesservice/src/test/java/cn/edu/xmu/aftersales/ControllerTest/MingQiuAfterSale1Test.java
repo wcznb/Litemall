@@ -85,7 +85,6 @@ public class MingQiuAfterSale1Test {
         //endregion
     }
 
-
     @Test
     @Order(1)
     public void aftersaleTest1(){
@@ -139,7 +138,7 @@ public class MingQiuAfterSale1Test {
         Map<String, Object> aftersale = new HashMap<>();
         aftersale.put("type",0);
         aftersale.put("quantity",1);
-        aftersale.put("region",1599);
+        aftersale.put("regionId",1599);
         aftersale.put("consignee","Qiu");
         aftersale.put("mobile","13959288888");
         String json = JacksonUtil.toJson(aftersale);
@@ -313,7 +312,7 @@ public class MingQiuAfterSale1Test {
                 .jsonPath("$.data.customer.id").isEqualTo(6594)
                 .jsonPath("$.data.orderType").isEqualTo(0)
                 .jsonPath("$.data.state").isEqualTo(2)
-                .jsonPath("$.data.substate").isEqualTo(21)
+                .jsonPath("$.data.subState").isEqualTo(21)
                 .jsonPath("$.data.discountPrice").isEqualTo(0)
                 .jsonPath("$.data.freightPrice").isEqualTo(0)
                 .jsonPath("$.data.regionId").isEqualTo(1599)

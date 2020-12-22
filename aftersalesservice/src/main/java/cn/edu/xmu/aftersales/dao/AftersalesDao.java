@@ -3,15 +3,13 @@ package cn.edu.xmu.aftersales.dao;
 import cn.edu.xmu.aftersales.mapper.AftersaleServicePoMapper;
 import cn.edu.xmu.aftersales.model.bo.AftersalesBo;
 import cn.edu.xmu.aftersales.model.bo.querySaleBo;
-import cn.edu.xmu.aftersales.model.po.AftersaleServicePo;
-import cn.edu.xmu.aftersales.model.po.AftersaleServicePoExample;
+import cn.edu.xmu.aftersales.model.po.*;
 import cn.edu.xmu.aftersales.model.vo.checkVo;
 import cn.edu.xmu.aftersales.model.vo.confirmVo;
 import cn.edu.xmu.ooad.model.VoObject;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -27,6 +25,8 @@ public class AftersalesDao implements InitializingBean {
 
     @Autowired
     private AftersaleServicePoMapper aftersaleServicePoMapper;
+
+
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -606,4 +606,6 @@ public class AftersalesDao implements InitializingBean {
         }
         return retObj;
     }
+
+
 }
