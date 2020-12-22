@@ -43,6 +43,7 @@ public class FavoriteController {
     public Object findPageOfFavorites(@LoginUser Long userId,
                                        @RequestParam(required=false, defaultValue = "1") Integer page,
                                        @RequestParam(required=false, defaultValue = "10") Integer pageSize){
+
         ReturnObject<PageInfo<VoObject>> ret = favoriteService.findPageOfFavorites(userId, page, pageSize);
         return Common.getPageRetObject(ret);
     }

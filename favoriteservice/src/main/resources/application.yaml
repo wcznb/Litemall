@@ -5,7 +5,7 @@ management:
         include: "*"
 
 server:
-  port: 8080
+  port: 8092
   tomcat:
     threads:
       max: 1000
@@ -102,7 +102,7 @@ dubbo:
     subscribed-services: spring-cloud-alibaba-dubbo-server
   protocols:
     dubbo:
-      port: 18888
+      port: 18889
   consumer:
     timeout: 60000
     check: false

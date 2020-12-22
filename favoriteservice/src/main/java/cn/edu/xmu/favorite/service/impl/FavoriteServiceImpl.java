@@ -36,7 +36,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Autowired
     private FavoriteDao favoriteDao;
 
-    @DubboReference(version = "1.1.1")
+    @DubboReference(version = "1.2.1")
     GoodsService goodsService;
 
     @Override

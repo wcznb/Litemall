@@ -2,7 +2,7 @@ package cn.edu.xmu.footprint.service.impl;
 
 import cn.edu.xmu.footprint.dao.FootprintDao;
 import cn.edu.xmu.footprint.model.bo.Footprint;
-import cn.edu.xmu.footprint.model.po.FootprintPo;
+import cn.edu.xmu.footprint.model.po.FootPrintPo;
 import cn.edu.xmu.footprint.service.FootprintService;
 import cn.edu.xmu.footprint.util.ListToMap;
 import cn.edu.xmu.ooad.model.VoObject;
@@ -11,7 +11,6 @@ import cn.edu.xmu.ooad.util.ReturnObject;
 import cn.edu.xmu.provider.model.vo.GoodsSkuSimpleRetVo;
 import cn.edu.xmu.provider.server.GoodsService;
 import com.github.pagehelper.PageInfo;
-import net.sf.jsqlparser.expression.LongValue;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,15 +61,15 @@ public class FootprintServiceImpl implements FootprintService {
         if (bgt.isAfter(et)) {
             return new ReturnObject<>(ResponseCode.Log_Bigger);
         }
-        ReturnObject<PageInfo<FootprintPo>> ret = footprintDao.findPageOfFootprints(userId, bgt, et, page, pageSize);
+        ReturnObject<PageInfo<FootPrintPo>> ret = footprintDao.findPageOfFootprints(userId, bgt, et, page, pageSize);
         if (ret.getCode() == ResponseCode.OK) {
             //成功搜索
-            PageInfo<FootprintPo> poPageInfo = ret.getData();
-            List<FootprintPo> footprintPos = poPageInfo.getList();
-            List<VoObject> retObj = new ArrayList<>(footprintPos.size());
+            PageInfo<FootPrintPo> poPageInfo = ret.getData();
+            List<FootPrintPo> footPrintPos = poPageInfo.getList();
+            List<VoObject> retObj = new ArrayList<>(footPrintPos.size());
 
             //调用商品内部api
-            List<Long> skuIds = footprintPos.stream().map(po -> po.getGoodsSkuId()).collect(Collectors.toList());
+            List<Long> skuIds = footPrintPos.stream().map(po -> po.getGoodsSkuId()).collect(Collectors.toList());
             ReturnObject<List<GoodsSkuSimpleRetVo>> retGoodsSkus = null;
             if (skuIds.size() != 0){
                 if(did == Long.valueOf(0))
@@ -84,7 +83,7 @@ public class FootprintServiceImpl implements FootprintService {
                 if (retGoodsSkus != null) {
                     ListToMap listToMap = new ListToMap();
                     Map<Long, GoodsSkuSimpleRetVo> map = listToMap.GoodsSkuSimpleRetVoListToMap(retGoodsSkus.getData());
-                    for (FootprintPo po : footprintPos) {
+                    for (FootPrintPo po : footPrintPos) {
                         Footprint footprint = new Footprint(po);
                         footprint.setGoodsSku(map.get(po.getGoodsSkuId()));
                         retObj.add(footprint);
@@ -110,10 +109,13 @@ public class FootprintServiceImpl implements FootprintService {
     public ReturnObject<Object> insertFootprint(Long userId, Long skuId){
         ReturnObject<Object> ret = null;
         LocalDateTime now = LocalDateTime.now();
-        FootprintPo footprintPo = new FootprintPo();
+        FootPrintPo footprintPo = new FootPrintPo();
         footprintPo.setCustomerId(userId);
         footprintPo.setGoodsSkuId(skuId);
         footprintPo.setGmtCreate(now);
+        ReturnObject<Object> ret2 = goodsService.checkSkuId(skuId);
+        if(ret2.getCode() != ResponseCode.OK)
+            return new ReturnObject<>(ret2.getCode());
         ret = footprintDao.insertFootprint(footprintPo);
         return ret;
     }

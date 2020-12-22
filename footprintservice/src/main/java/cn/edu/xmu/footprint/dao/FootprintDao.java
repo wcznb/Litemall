@@ -1,10 +1,8 @@
 package cn.edu.xmu.footprint.dao;
 
-import cn.edu.xmu.footprint.mapper.FootprintPoMapper;
-import cn.edu.xmu.footprint.model.bo.Footprint;
-import cn.edu.xmu.footprint.model.po.FootprintPo;
-import cn.edu.xmu.footprint.model.po.FootprintPoExample;
-import cn.edu.xmu.ooad.model.VoObject;
+import cn.edu.xmu.footprint.mapper.FootPrintPoMapper;
+import cn.edu.xmu.footprint.model.po.FootPrintPo;
+import cn.edu.xmu.footprint.model.po.FootPrintPoExample;
 import cn.edu.xmu.ooad.util.ResponseCode;
 import cn.edu.xmu.ooad.util.ReturnObject;
 import com.github.pagehelper.PageHelper;
@@ -16,8 +14,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +26,7 @@ public class FootprintDao {
     private static final Logger logger = LoggerFactory.getLogger(FootprintDao.class);
 
     @Autowired
-    FootprintPoMapper footprintPoMapper;
+    FootPrintPoMapper footprintPoMapper;
 
     /**
      * 分页查询买家所有足迹
@@ -44,19 +40,19 @@ public class FootprintDao {
      * createdBy 陈渝璇 2020-11-25
      * modifiedBy 陈渝璇 2020-11-26
      */
-    public ReturnObject<PageInfo<FootprintPo>> findPageOfFootprints(Long userId, LocalDateTime beginTime, LocalDateTime endTime, Integer page, Integer pageSize){
-        FootprintPoExample footPrintPoExample = new FootprintPoExample();
+    public ReturnObject<PageInfo<FootPrintPo>> findPageOfFootprints(Long userId, LocalDateTime beginTime, LocalDateTime endTime, Integer page, Integer pageSize){
+        FootPrintPoExample footPrintPoExample = new FootPrintPoExample();
         //添加条件
-        FootprintPoExample.Criteria criteria = footPrintPoExample.createCriteria();
+        FootPrintPoExample.Criteria criteria = footPrintPoExample.createCriteria();
         if(userId!=null)
             criteria.andCustomerIdEqualTo(userId);
         //时间条件处理
         criteria.andGmtCreateBetween(beginTime,endTime);
         //分页查询
         PageHelper.startPage(page, pageSize);
-        List<FootprintPo> footprintPos = null;
+        List<FootPrintPo> footPrintPos = null;
         try {
-            footprintPos = footprintPoMapper.selectByExample(footPrintPoExample);
+            footPrintPos = footprintPoMapper.selectByExample(footPrintPoExample);
         } catch (DataAccessException e){
             logger.error("selectAllRole: DataAccessException:" + e.getMessage());
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR,
@@ -67,7 +63,7 @@ public class FootprintDao {
             return new ReturnObject<>(ResponseCode.INTERNAL_SERVER_ERR,
                     String.format("发生了严重的未知错误：%s", e.getMessage()));
         }
-        PageInfo<FootprintPo> footPrintsPoPage = PageInfo.of(footprintPos);
+        PageInfo<FootPrintPo> footPrintsPoPage = PageInfo.of(footPrintPos);
         return new ReturnObject<>(footPrintsPoPage);
     }
 
@@ -79,7 +75,7 @@ public class FootprintDao {
      * createdBy 陈渝璇 2020-11-26
      * modifiedBy 陈渝璇 2020-11-27
      */
-    public ReturnObject<Object> insertFootprint(FootprintPo footprintPo){
+    public ReturnObject<Object> insertFootprint(FootPrintPo footprintPo){
         ReturnObject<Object> retObj = null;
         try {
             //还应该判断这个spu_id是否存在？

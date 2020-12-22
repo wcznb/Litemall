@@ -35,7 +35,7 @@ public class test {
                 .build();
 
         this.manageClient = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:8080")
+                .baseUrl("http://114.215.198.238:4522")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
 
@@ -58,7 +58,7 @@ public class test {
         body.put("password", password);
         String requireJson = body.toJSONString();
         byte[] responseString = mallClient.post().uri("/adminusers/login").bodyValue(requireJson).exchange()
-                .expectStatus().isOk()
+                .expectStatus().isCreated()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
                 .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
@@ -116,6 +116,50 @@ public class test {
 
 
     /**
+     * 足迹服务-管理员查看浏览记录  普通测试1，查询成功
+     * @throws Exception
+     * @author yang8miao
+     * @date Created in 2020/12/9 15:28
+     */
+    @Test
+    @Order(0)
+    public void getFootprints11() throws Exception {
+
+        String token = this.adminLogin("13088admin", "123456");
+
+        byte[] responseString = manageClient.get().uri("/shops/0/footprints?userId=220&page=1&pageSize=10").header("authorization",token).exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+                .returnResult()
+                .getResponseBodyContent();
+
+        String expectedResponse = "{\n" +
+                "  \"errno\": 0,\n" +
+                "  \"data\": {\n" +
+                "    \"list\": [\n" +
+                "      {\n" +
+                "        \"id\": 1212599,\n" +
+                "        \"goodsSku\": {\n" +
+                "          \"id\": 291,\n" +
+                "          \"name\": \"+\",\n" +
+                "          \"skuSn\": null,\n" +
+                "          \"imageUrl\": \"http://47.52.88.176/file/images/201612/file_586227f3cd5c9.jpg\",\n" +
+                "          \"inventory\": 1,\n" +
+                "          \"originalPrice\": 130000,\n" +
+                "          \"price\": 130000,\n" +
+                "          \"disable\":  false\n" +
+                "        },\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}";
+        JSONAssert.assertEquals(expectedResponse, new String(responseString, StandardCharsets.UTF_8), false);
+    }
+
+
+
+    /**
      * 足迹服务-管理员查看浏览记录  普通测试2，查询成功
      * @throws Exception
      * @author yang8miao
@@ -125,7 +169,7 @@ public class test {
     @Order(0)
     public void getFootprints2() throws Exception {
 
-        String token = this.adminLogin("537300010", "123456");
+        String token = this.adminLogin("13088admin", "123456");
 
         byte[] responseString = manageClient.get().uri("/shops/0/footprints?userId=134&page=1&pageSize=1").header("authorization",token).exchange()
                 .expectStatus().isOk()
@@ -251,28 +295,5 @@ public class test {
                 .getResponseBodyContent();
 
     }
-
-    /**
-     * 足迹服务-管理员查看浏览记录 普通测试，开始时间大于结束时间,返回错误码
-     * @throws Exception
-     * @author yang8miao
-     * @date Created in 2020/12/9 15:28
-     */
-    @Test
-    @Order(0)
-    public void getFootprints6() throws Exception {
-
-        String token = this.adminLogin("13088admin", "123456");
-
-        byte[] responseString = manageClient.get().uri("/shops/0/footprints?userId=233&beginTime=2022-11-23 12:00:00&endTime=2020-11-11 12:00:00")
-                .header("authorization",token).exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.Log_Bigger.getCode())
-                .returnResult()
-                .getResponseBodyContent();
-
-    }
-
 
 }
