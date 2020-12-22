@@ -22,10 +22,10 @@ import java.util.Map;
 public class MingQiuAfterSale1Test {
 
     //    @Value("${public-test.managementgate}")
-    private String managementGate="127.0.0.1:8084";
+    private String managementGate="127.0.0.1:8094";
 
     //    @Value("${public-test.mallgate}")
-    private String mallGate="127.0.0.1:8084";
+    private String mallGate="127.0.0.1:8094";
 
     private String login_="114.215.198.238:4522";
     private WebTestClient manageClient;
