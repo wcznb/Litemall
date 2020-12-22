@@ -47,33 +47,18 @@ public class ChenyunyiTest {
                 .build();
 
     }
-    private String login(String userName, String password) throws Exception {
-        LoginVo vo = new LoginVo();
-        vo.setUserName(userName);
-        vo.setPassword(password);
-        String requireJson = JacksonUtil.toJson(vo);
 
-        byte[] ret = manageClient.post().uri("/privileges/login").bodyValue(requireJson).exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo("成功")
-                .returnResult()
-                .getResponseBodyContent();
-        return JacksonUtil.parseString(new String(ret, "UTF-8"), "data");
-
-    }
     private String Userlogin(String userName, String password) throws Exception {
         LoginVo vo = new LoginVo();
         vo.setUserName(userName);
         vo.setPassword(password);
         String requireJson = JacksonUtil.toJson(vo);
 
-        byte[] ret = manageClient.post().uri("/users/login").bodyValue(requireJson).exchange()
-                .expectStatus().isOk()
+        byte[] ret = mallClient.post().uri("/users/login").bodyValue(requireJson).exchange()
+                .expectStatus().isCreated()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo("成功")
+//                .jsonPath("$.errmsg").isEqualTo("成功")
                 .returnResult()
                 .getResponseBodyContent();
         return JacksonUtil.parseString(new String(ret, "UTF-8"), "data");
@@ -138,75 +123,6 @@ public class ChenyunyiTest {
         JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), true);
     }
 
-    /**
-     * 买家正确提交售后单
-     */
-    @Test
-    public void newSaleTest1() throws Exception {
-        String token=this.Userlogin("8606245097","123456");
-        //String token=new JwtHelper().createToken(1L, 1L, 1);
-        String requireJson="{\n" +
-                "  \"type\":1, \n" +
-                "  \"quantity\": 1,\n" +
-                "  \"reason\": \"七天无理由\",\n" +
-                "  \"regionId\": 0,\n" +
-                "  \"detail\": \"厦大学生公寓\",\n" +
-                "  \"consignee\": \"小陈\",\n" +
-                "  \"mobile\": \"18945620888\"\n" +
-                "}";
-        byte[] responseString = mallClient.post().uri("/orderItems/{id}/aftersales",39)
-                .header("authorization", token)
-                .bodyValue(requireJson)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
-                .returnResult()
-                .getResponseBodyContent();
-        String expectedResponse = "{\n" +
-                "    \"errno\": 0,\n" +
-                "    \"data\": {\n" +
-                "        \"orderId\": null,\n" +
-                "        \"orderItemId\": 39,\n" +
-                "        \"skuId\": 341,\n" +
-                "        \"skuName\":null,\n" +
-                "        \"customerId\": 1,\n" +
-                "        \"shopId\": 1,\n" +
-                "        \"type\": 1,\n" +
-                "        \"reason\": \"七天无理由\",\n" +
-                "        \"refund\": null,\n" +
-                "        \"quantity\": 1,\n" +
-                "        \"regionId\": 0,\n" +
-                "        \"detail\": \"厦大学生公寓\",\n" +
-                "        \"consignee\": \"小陈\",\n" +
-                "        \"mobile\": \"18945620888\",\n" +
-                "        \"customerLogSn\": null,\n" +
-                "        \"shopLogSn\": null,\n" +
-                "        \"state\": 0\n" +
-                "    },\n" +
-                "    \"errmsg\": \"成功\"\n" +
-                "}";
-
-        JSONAssert.assertEquals(expectedResponse, new String(responseString, "UTF-8"), false);
-
-        String temp = new String(responseString, "UTF-8");
-        int startIndex = temp.indexOf("id");
-        int endIndex = temp.indexOf("orderId");
-        String id = temp.substring(startIndex + 4, endIndex - 2);
-
-        byte[] queryResponseString = mallClient.get().uri("/aftersales/"+id).header("authorization",token)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-//                .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
-                .jsonPath("$.data").exists()
-                .returnResult()
-                .getResponseBodyContent();
-
-        JSONAssert.assertEquals(new String(responseString, "UTF-8"), new String(queryResponseString, "UTF-8"), false);
-    }
 
     /**
      * 买家提交售后单
@@ -226,7 +142,6 @@ public class ChenyunyiTest {
 //                .jsonPath("$.errmsg").isEqualTo("售后类型不能为空;")
                 .returnResult()
                 .getRequestBodyContent();
-
     }
 
     /**
@@ -235,11 +150,12 @@ public class ChenyunyiTest {
      */
     @Test
     public void newSaleTest3() throws Exception {
-
-        String requireJson="{ \"type\": 2, \"quantity\": 0, \"reason\": \"七天无理由\", \"regionId\": 1, \"detail\": \"厦大学生公寓\", \"consignee\": \"小陈\", \"mobile\": \"18912345678\"}";
+        String token=this.Userlogin("8606245097","123456");
+        String requireJson="{ \"type\": 2, \"quantity\": 2, \"reason\": \"七天无理由\", \"regionId\": 1, \"detail\": \"厦大学生公寓\", \"consignee\": \"小陈\", \"mobile\": \"18912345678\"}";
 
         byte[] ret=mallClient.post().uri( "/orderItems/{id}/aftersales",65498)
                 .bodyValue(requireJson)
+                .header("authorization", token)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
@@ -247,10 +163,7 @@ public class ChenyunyiTest {
 //                .jsonPath("$.errmsg").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getMessage())
                 .returnResult()
                 .getResponseBodyContent();
-
-
     }
-
 
     /**
      * 买家根据售后单状态和类型查询售后单
@@ -299,8 +212,8 @@ public class ChenyunyiTest {
                 "                \"detail\": \"detail\",\n" +
                 "                \"consignee\": \"string\",\n" +
                 "                \"mobile\": \"15306987163\",\n" +
-                "                \"customerLogSn\": null,\n" +
-                "                \"shopLogSn\": null,\n" +
+                "                \"customerLogSn\": \"\",\n" +
+                "                \"shopLogSn\": \"\",\n" +
                 "                \"state\": 0\n" +
                 "            },\n" +
                 "            {\n" +
@@ -318,8 +231,8 @@ public class ChenyunyiTest {
                 "                \"detail\": \"detail\",\n" +
                 "                \"consignee\": \"string\",\n" +
                 "                \"mobile\": \"15306987163\",\n" +
-                "                \"customerLogSn\": null,\n" +
-                "                \"shopLogSn\": null,\n" +
+                "                \"customerLogSn\": \"\",\n" +
+                "                \"shopLogSn\": \"\",\n" +
                 "                \"state\": 1\n" +
                 "            },\n" +
                 "            {\n" +
@@ -337,8 +250,8 @@ public class ChenyunyiTest {
                 "                \"detail\": \"detail\",\n" +
                 "                \"consignee\": \"string\",\n" +
                 "                \"mobile\": \"15306987163\",\n" +
-                "                \"customerLogSn\": null,\n" +
-                "                \"shopLogSn\": null,\n" +
+                "                \"customerLogSn\": \"\",\n" +
+                "                \"shopLogSn\": \"\",\n" +
                 "                \"state\": 2\n" +
                 "            }\n" +
                 "        ]\n" +
@@ -379,7 +292,7 @@ public class ChenyunyiTest {
                 "    \"data\": {\n" +
                 "        \"total\": 1,\n" +
                 "        \"pages\": 1,\n" +
-                "        \"pageSize\": 1,\n" +
+                "        \"pageSize\": 3,\n" +
                 "        \"page\": 1,\n" +
                 "        \"list\": [\n" +
                 "            {\n" +
@@ -406,10 +319,7 @@ public class ChenyunyiTest {
                 "    \"errmsg\": \"成功\"\n" +
                 "}";
         JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
-
     }
-
-
 
 
     /**
@@ -462,18 +372,19 @@ public class ChenyunyiTest {
 
     /**
      * 买家根据售后单id查询售后单信息
-     * 未登录
+     * 售后单Id不存在
      * @return
      */
     @Test
     public void findByIdTest2() throws Exception {
-
-        byte[] responseString = mallClient.get().uri("/aftersales/{id}",51)
+        String token=this.Userlogin("8606245097","123456");
+        byte[] responseString = mallClient.get().uri("/aftersales/{id}",987456)
+                .header("authorization", token)
                 .exchange()
-                .expectStatus().isUnauthorized()
+                .expectStatus().isNotFound()
                 .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.AUTH_NEED_LOGIN.getCode())
-//                .jsonPath("$.errmsg").isEqualTo(ResponseCode.AUTH_NEED_LOGIN.getMessage())
+                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getCode())
+//                .jsonPath("$.errmsg").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getMessage())
                 .returnResult()
                 .getResponseBodyContent();
 

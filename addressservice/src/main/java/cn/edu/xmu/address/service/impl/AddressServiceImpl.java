@@ -34,7 +34,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public ReturnObject<PageInfo<VoObject>> getAllAddressById(Long id, Integer page, Integer pagesize){
-        ReturnObject<PageInfo<AddressPo>> ret = addressDao.getALlAddressByUserid(id,page, pagesize);
+        ReturnObject<PageInfo<AddressPo>> ret = addressDao.getAllAddressByUserid(id,page, pagesize);
 
         if(ret.getCode()== ResponseCode.OK){
             //成功搜索
