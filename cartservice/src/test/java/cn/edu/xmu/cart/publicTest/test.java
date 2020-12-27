@@ -29,7 +29,7 @@ public class test {
                 .build();
 
         this.mallClient = WebTestClient.bindToServer()
-                .baseUrl("http://114.215.198.238:4600")
+                .baseUrl("http://114.215.198.238:4655")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
 
