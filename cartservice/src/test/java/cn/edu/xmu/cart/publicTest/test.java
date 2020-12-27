@@ -29,7 +29,7 @@ public class test {
                 .build();
 
         this.mallClient = WebTestClient.bindToServer()
-                .baseUrl("http://114.215.198.238:4655")
+                .baseUrl("http://114.215.198.238:4600")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
 
@@ -174,7 +174,7 @@ public class test {
     }
 
     /**
-     * 购物车服务-买家获得购物车列表  普通测试3，查询成功，购物车中无商品
+     * 购物车服务-买家获得购物车列表  普通测试3，查询成功，购物车中无商品。
      * @throws Exception
      * @author yang8miao
      * @date Created in 2020/12/9 16:18
