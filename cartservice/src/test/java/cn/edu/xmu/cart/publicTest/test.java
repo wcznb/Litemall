@@ -129,7 +129,7 @@ public class test {
     }
 
     /**
-     * 购物车服务-买家获得购物车列表  普通测试2，查询成功 page=1&pageSize=3
+     * 购物车服务-买家获得购物车列表  普通测试2，查询成功 page=1&pageSize=3。
      * @throws Exception
      * @author yang8miao
      * @date Created in 2020/12/9 16:18
