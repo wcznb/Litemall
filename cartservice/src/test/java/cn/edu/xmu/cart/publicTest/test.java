@@ -29,7 +29,7 @@ public class test {
                 .build();
 
         this.mallClient = WebTestClient.bindToServer()
-                .baseUrl("http://114.215.198.238:4600")
+                .baseUrl("http://114.215.198.238:4655")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
                 .build();
 
@@ -62,7 +62,7 @@ public class test {
     }
 
     /**
-     * 购物车服务-买家获得购物车列表  普通测试1，查询成功 page=1&pageSize=5
+     * 购物车服务-买家获得购物车列表  普通测试1，查询成功 page=1&pageSize=5。
      * @throws Exception
      * @author yang8miao
      * @date Created in 2020/12/9 16:18
@@ -129,7 +129,7 @@ public class test {
     }
 
     /**
-     * 购物车服务-买家获得购物车列表  普通测试2，查询成功 page=1&pageSize=3
+     * 购物车服务-买家获得购物车列表  普通测试2，查询成功 page=1&pageSize=3。
      * @throws Exception
      * @author yang8miao
      * @date Created in 2020/12/9 16:18
