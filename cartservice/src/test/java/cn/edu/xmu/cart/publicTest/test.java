@@ -174,7 +174,7 @@ public class test {
     }
 
     /**
-     * 购物车服务-买家获得购物车列表  普通测试3，查询成功，购物车中无商品
+     * 购物车服务-买家获得购物车列表  普通测试3，查询成功，购物车中无商品。
      * @throws Exception
      * @author yang8miao
      * @date Created in 2020/12/9 16:18
