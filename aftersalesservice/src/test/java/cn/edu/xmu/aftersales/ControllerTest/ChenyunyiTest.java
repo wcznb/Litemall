@@ -419,33 +419,33 @@ public class ChenyunyiTest {
    }
 //
 //
-//    /**
-//     * 买家根据售后单id查询售后单信息
-//     * 查询已经逻辑删除的售后单
-//     * @return
-//     */
-//    @Test
-//    public void findByIdTest4() throws Exception {
-//
-//        String token=this.Userlogin("8606245097","123456");
-//        //String token=new JwtHelper().createToken(1L,1L,1);
-//        byte[] responseString = mallClient.get().uri("/aftersales/{id}",58)
-//                .header("authorization", token)
-//                .exchange()
-//                .expectStatus().isNotFound()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getCode())
-////                .jsonPath("$.errmsg").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getMessage())
-//                .returnResult()
-//                .getResponseBodyContent();
-//
-//        String expected="{\n" +
-//                "    \"errno\": 504\n" +
-////                "    \"errmsg\": \"操作的资源id不存在\"\n" +
-//                "}";
-//        JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
-//    }
-//
+   /**
+    * 买家根据售后单id查询售后单信息
+    * 查询已经逻辑删除的售后单
+    * @return
+    */
+   @Test
+   public void findByIdTest4() throws Exception {
+
+       String token=this.Userlogin("8606245097","123456");
+       //String token=new JwtHelper().createToken(1L,1L,1);
+       byte[] responseString = mallClient.get().uri("/aftersales/{id}",58)
+               .header("authorization", token)
+               .exchange()
+               .expectStatus().isNotFound()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getCode())
+//                .jsonPath("$.errmsg").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getMessage())
+               .returnResult()
+               .getResponseBodyContent();
+
+       String expected="{\n" +
+               "    \"errno\": 504\n" +
+//                "    \"errmsg\": \"操作的资源id不存在\"\n" +
+               "}";
+       JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
+   }
+
 //    /**
 //     * 买家修改售后单信息
 //     */
