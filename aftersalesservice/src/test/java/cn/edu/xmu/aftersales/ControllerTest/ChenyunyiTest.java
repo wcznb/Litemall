@@ -613,68 +613,68 @@ public class ChenyunyiTest {
 //
 //    }
 //
-//    /**
-//     * 买家取消未完成的售后单
-//     */
-//    @Test
-//    public void cancelSaleTest1() throws Exception {
-//
-//        String token=this.Userlogin("8606245097","123456");
-//        // String token=new JwtHelper().createToken(1L,1L,1);
-//
-//        byte[] responseString = mallClient.delete().uri("aftersales/{id}",53)
-//                .header("authorization", token)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-//                .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
-//                .returnResult()
-//                .getResponseBodyContent();
-//
-//        String expectedResponse = "{\n" +
-//                "    \"errno\": 0,\n" +
-//                "    \"errmsg\": \"成功\"\n" +
-//                "}";
-//        JSONAssert.assertEquals(expectedResponse, new String(responseString, StandardCharsets.UTF_8), true);
-//
-//        byte[] queryResponseString = mallClient.get().uri("/aftersales/{id}",53).header("authorization",token)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-//                .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
-//                .returnResult()
-//                .getResponseBodyContent();
-//
-//        String expected="{\n" +
-//                "    \"errno\": 0,\n" +
-//                "    \"data\": {\n" +
-//                "        \"id\": 53,\n" +
-//                "        \"orderId\": null,\n" +
-//                "        \"orderItemId\": 39,\n" +
-//                "        \"skuId\": 341,\n" +
-//                "        \"skuName\": null,\n" +
-//                "        \"customerId\": 1,\n" +
-//                "        \"shopId\":1,\n" +
-//                "        \"serviceSn\": null,\n" +
-//                "        \"type\": 0,\n" +
-//                "        \"reason\": \"七天无理由\",\n" +
-//                "        \"refund\": null,\n" +
-//                "        \"quantity\": 1,\n" +
-//                "        \"regionId\": 1,\n" +
-//                "        \"detail\": \"厦大学生公寓\",\n" +
-//                "        \"consignee\": \"Chen\",\n" +
-//                "        \"mobile\": \"12345678900\",\n" +
-//                "        \"customerLogSn\": null,\n" +
-//                "        \"shopLogSn\": null,\n" +
-//                "        \"state\": 7\n" +
-//                "    },\n" +
-//                "    \"errmsg\": \"成功\"\n" +
-//                "}";
-//        JSONAssert.assertEquals(expected, new String(queryResponseString, "UTF-8"), false);
-//
-//    }
+   /**
+    * 买家取消未完成的售后单
+    */
+   @Test
+   public void cancelSaleTest1() throws Exception {
+
+       String token=this.Userlogin("8606245097","123456");
+       // String token=new JwtHelper().createToken(1L,1L,1);
+
+       byte[] responseString = mallClient.delete().uri("aftersales/{id}",53)
+               .header("authorization", token)
+               .exchange()
+               .expectStatus().isOk()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+               .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
+               .returnResult()
+               .getResponseBodyContent();
+
+       String expectedResponse = "{\n" +
+               "    \"errno\": 0,\n" +
+               "    \"errmsg\": \"成功\"\n" +
+               "}";
+       JSONAssert.assertEquals(expectedResponse, new String(responseString, StandardCharsets.UTF_8), true);
+
+       byte[] queryResponseString = mallClient.get().uri("/aftersales/{id}",53).header("authorization",token)
+               .exchange()
+               .expectStatus().isOk()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+               .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
+               .returnResult()
+               .getResponseBodyContent();
+
+       String expected="{\n" +
+               "    \"errno\": 0,\n" +
+               "    \"data\": {\n" +
+               "        \"id\": 53,\n" +
+               "        \"orderId\": null,\n" +
+               "        \"orderItemId\": 39,\n" +
+               "        \"skuId\": 341,\n" +
+               "        \"skuName\": null,\n" +
+               "        \"customerId\": 1,\n" +
+               "        \"shopId\":1,\n" +
+               "        \"serviceSn\": null,\n" +
+               "        \"type\": 0,\n" +
+               "        \"reason\": \"七天无理由\",\n" +
+               "        \"refund\": null,\n" +
+               "        \"quantity\": 1,\n" +
+               "        \"regionId\": 1,\n" +
+               "        \"detail\": \"厦大学生公寓\",\n" +
+               "        \"consignee\": \"Chen\",\n" +
+               "        \"mobile\": \"12345678900\",\n" +
+               "        \"customerLogSn\": null,\n" +
+               "        \"shopLogSn\": null,\n" +
+               "        \"state\": 7\n" +
+               "    },\n" +
+               "    \"errmsg\": \"成功\"\n" +
+               "}";
+       JSONAssert.assertEquals(expected, new String(queryResponseString, "UTF-8"), false);
+
+   }
 //
 //    /**
 //     * 买家删除已经完成的售后单
