@@ -289,7 +289,7 @@ public class MingQiuAfterSale2Test {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-                .jsonPath("$.data.list[?(@aftersaleId == "+ afterSaleId_9040+" && @.amount == 239900 && @.state == 1)]").exists()
+                .jsonPath("$.data.list[?(@.aftersaleId == "+ afterSaleId_9040+" && @.amount == 239900 && @.state == 1)]").exists()
                 .returnResult()
                 .getResponseBodyContent();
 
