@@ -446,64 +446,64 @@ public class ChenyunyiTest {
        JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
    }
 
-//    /**
-//     * 买家修改售后单信息
-//     */
-//    @Test
-//    public void modifySaleTest1() throws Exception {
-//
-//        String token=this.Userlogin("8606245097","123456");
-//        // String token=new JwtHelper().createToken(1L,1L,100);
-//        String requireJson="{\n" +
-//                "  \"quantity\": 1,\n" +
-//                "  \"reason\": \"修改理由\",\n" +
-//                "  \"regionId\": 0,\n" +
-//                "  \"detail\": \"修改地址\",\n" +
-//                "  \"consignee\": \"修改联系人\",\n" +
-//                "  \"mobile\": \"12345678900\"\n" +
-//                "}";
-//        byte[] responseString = mallClient.put().uri("aftersales/{id}",52)
-//                .header("authorization", token)
-//                .bodyValue(requireJson)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-//                .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
-//                .returnResult()
-//                .getResponseBodyContent();
-//        String expectedResponse = "{\n" +
-//                "    \"errno\": 0,\n" +
-//                "    \"errmsg\": \"成功\"\n" +
-//                "}";
-//        JSONAssert.assertEquals(expectedResponse, new String(responseString, StandardCharsets.UTF_8), true);
-//
-//        byte[] queryResponseString = mallClient.get().uri("/aftersales/{id}",52).header("authorization",token)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-//                .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
-//                .jsonPath("$.data").exists()
-//                .returnResult()
-//                .getResponseBodyContent();
-//
-//        String ep2="{\n" +
-//                "    \"errno\": 0,\n" +
-//                "    \"data\": {\n" +
-//                "        \"reason\": \"修改理由\",\n" +
-//                "        \"quantity\": 1,\n" +
-//                "        \"regionId\": 0,\n" +
-//                "        \"detail\": \"修改地址\",\n" +
-//                "        \"consignee\": \"修改联系人\",\n" +
-//                "        \"mobile\": \"12345678900\",\n" +
-//                "        \"state\": 0\n" +
-//                "    },\n" +
-//                "    \"errmsg\": \"成功\"\n" +
-//                "}";
-//
-//        JSONAssert.assertEquals(ep2,new String(queryResponseString, "UTF-8"), false);
-//    }
+   /**
+    * 买家修改售后单信息
+    */
+   @Test
+   public void modifySaleTest1() throws Exception {
+
+       String token=this.Userlogin("8606245097","123456");
+       // String token=new JwtHelper().createToken(1L,1L,100);
+       String requireJson="{\n" +
+               "  \"quantity\": 1,\n" +
+               "  \"reason\": \"修改理由\",\n" +
+               "  \"regionId\": 0,\n" +
+               "  \"detail\": \"修改地址\",\n" +
+               "  \"consignee\": \"修改联系人\",\n" +
+               "  \"mobile\": \"12345678900\"\n" +
+               "}";
+       byte[] responseString = mallClient.put().uri("aftersales/{id}",52)
+               .header("authorization", token)
+               .bodyValue(requireJson)
+               .exchange()
+               .expectStatus().isOk()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+               .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
+               .returnResult()
+               .getResponseBodyContent();
+       String expectedResponse = "{\n" +
+               "    \"errno\": 0,\n" +
+               "    \"errmsg\": \"成功\"\n" +
+               "}";
+       JSONAssert.assertEquals(expectedResponse, new String(responseString, StandardCharsets.UTF_8), true);
+
+       byte[] queryResponseString = mallClient.get().uri("/aftersales/{id}",52).header("authorization",token)
+               .exchange()
+               .expectStatus().isOk()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+               .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
+               .jsonPath("$.data").exists()
+               .returnResult()
+               .getResponseBodyContent();
+
+       String ep2="{\n" +
+               "    \"errno\": 0,\n" +
+               "    \"data\": {\n" +
+               "        \"reason\": \"修改理由\",\n" +
+               "        \"quantity\": 1,\n" +
+               "        \"regionId\": 0,\n" +
+               "        \"detail\": \"修改地址\",\n" +
+               "        \"consignee\": \"修改联系人\",\n" +
+               "        \"mobile\": \"12345678900\",\n" +
+               "        \"state\": 0\n" +
+               "    },\n" +
+               "    \"errmsg\": \"成功\"\n" +
+               "}";
+
+       JSONAssert.assertEquals(ep2,new String(queryResponseString, "UTF-8"), false);
+   }
 //
 //    /**
 //     * 买家修改售后单信息
