@@ -391,32 +391,32 @@ public class ChenyunyiTest {
 
    }
 
-//    /**
-//     * 买家根据售后单id查询售后单信息
-//     * 查询不是自己的售后单
-//     * @return
-//     */
-//    @Test
-//    public void findByIdTest3() throws Exception {
-//
-//        String token=this.Userlogin("36040122840","123456");
-//        //String token=new JwtHelper().createToken(2L,1L,1);
-//        byte[] responseString = mallClient.get().uri("/aftersales/{id}",51)
-//                .header("authorization", token)
-//                .exchange()
-//                .expectStatus().isForbidden()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_OUTSCOPE.getCode())
-////                .jsonPath("$.errmsg").isEqualTo(ResponseCode.RESOURCE_ID_OUTSCOPE.getMessage())
-//                .returnResult()
-//                .getResponseBodyContent();
-//
-//        String expected="{\n" +
-//                "    \"errno\": 505\n" +
-////                "    \"errmsg\": \"操作的资源id不是自己的对象\"\n" +
-//                "}";
-//        JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
-//    }
+   /**
+    * 买家根据售后单id查询售后单信息
+    * 查询不是自己的售后单
+    * @return
+    */
+   @Test
+   public void findByIdTest3() throws Exception {
+
+       String token=this.Userlogin("36040122840","123456");
+       //String token=new JwtHelper().createToken(2L,1L,1);
+       byte[] responseString = mallClient.get().uri("/aftersales/{id}",51)
+               .header("authorization", token)
+               .exchange()
+               .expectStatus().isForbidden()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_OUTSCOPE.getCode())
+//                .jsonPath("$.errmsg").isEqualTo(ResponseCode.RESOURCE_ID_OUTSCOPE.getMessage())
+               .returnResult()
+               .getResponseBodyContent();
+
+       String expected="{\n" +
+               "    \"errno\": 505\n" +
+//                "    \"errmsg\": \"操作的资源id不是自己的对象\"\n" +
+               "}";
+       JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
+   }
 //
 //
 //    /**
