@@ -71,7 +71,6 @@ public class ChenyunyiTest {
     */
    @Test
    public void getSaleStateTest1() throws Exception{
-
        byte[] responseString=mallClient.get().uri("/aftersales/states")
                .exchange()
                .expectStatus().isOk()
