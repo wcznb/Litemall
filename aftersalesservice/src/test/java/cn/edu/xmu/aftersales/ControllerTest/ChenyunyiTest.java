@@ -1,374 +1,374 @@
-//package cn.edu.xmu.aftersales.ControllerTest;
-//
-//import cn.edu.xmu.aftersales.AftersalesserviceApplication;
-//import cn.edu.xmu.ooad.util.JacksonUtil;
-//import cn.edu.xmu.ooad.util.JwtHelper;
-//import cn.edu.xmu.ooad.util.ResponseCode;
-//import cn.edu.xmu.user.model.vo.LoginVo;
-//import org.json.JSONException;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.skyscreamer.jsonassert.JSONAssert;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.http.HttpHeaders;
-//import org.springframework.test.web.reactive.server.WebTestClient;
-//import org.springframework.beans.factory.annotation.Value;
-//import java.nio.charset.StandardCharsets;
-//
-//@SpringBootTest(classes = AftersalesserviceApplication.class)
-///**
-// * 陈芸衣
-// * 24320182203182
-// */
-//
-//public class ChenyunyiTest {
-//
-//
-//   // @Value("${public-test.managementgate}")
-//    private String managementGate="http://127.0.0.1:8084";
-//
-//   // @Value("${public-test.mallgate}")
-//    private String mallGate="http://127.0.0.1:8084";
-//
-//    private WebTestClient manageClient;
-//
-//    private WebTestClient mallClient;
-//
-//    @BeforeEach
-//    public void setup(){
-//        this.manageClient = WebTestClient.bindToServer()
-//                .baseUrl(managementGate)
-//                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
-//                .build();
-//
-//        this.mallClient = WebTestClient.bindToServer()
-//                .baseUrl(mallGate)
-//                .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
-//                .build();
-//
-//    }
-//
-//    private String Userlogin(String userName, String password) throws Exception {
-//        LoginVo vo = new LoginVo();
-//        vo.setUserName(userName);
-//        vo.setPassword(password);
-//        String requireJson = JacksonUtil.toJson(vo);
-//
-//        byte[] ret = mallClient.post().uri("/users/login").bodyValue(requireJson).exchange()
-//                .expectStatus().isCreated()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-////                .jsonPath("$.errmsg").isEqualTo("成功")
-//                .returnResult()
-//                .getResponseBodyContent();
-//        return JacksonUtil.parseString(new String(ret, "UTF-8"), "data");
-//
-//    }
-//
-//    /**
-//     * 获得售后单所有状态
-//     * @throws Exception
-//     */
-//    @Test
-//    public void getSaleStateTest1() throws Exception{
-//
-//        byte[] responseString=mallClient.get().uri("/aftersales/states")
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectHeader().contentType("application/json;charset=UTF-8")
-//                .expectBody()
-//                .returnResult().getResponseBodyContent();
-//        String expected="{\n" +
-//                "    \"errno\": 0,\n" +
-//                "    \"data\": [\n" +
-//                "        {\n" +
-//                "            \"code\": 0,\n" +
-//                "            \"name\": \"待管理员审核\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"code\": 1,\n" +
-//                "            \"name\": \"待买家发货\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"code\": 2,\n" +
-//                "            \"name\": \"买家已发货\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"code\": 3,\n" +
-//                "            \"name\": \"待店家退款\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"code\": 4,\n" +
-//                "            \"name\": \"待店家发货\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"code\": 5,\n" +
-//                "            \"name\": \"店家已发货\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"code\": 6,\n" +
-//                "            \"name\": \"审核不通过\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"code\": 7,\n" +
-//                "            \"name\": \"已取消\"\n" +
-//                "        },\n" +
-//                "        {\n" +
-//                "            \"code\": 8,\n" +
-//                "            \"name\": \"已结束\"\n" +
-//                "        }\n" +
-//                "    ],\n" +
-//                "    \"errmsg\": \"成功\"\n" +
-//                "}";
-//        JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), true);
-//    }
-//
-//
-//    /**
-//     * 买家提交售后单
-//     * 售后类型为空
-//     */
-//    @Test
-//    public void newSaleTest2() throws Exception {
-//        String token=this.Userlogin("8606245097","123456");
-//        String requireJson="{ \"type\": null, \"quantity\": 0, \"reason\": \"七天无理由\", \"regionId\": 1, \"detail\": \"厦大学生公寓\", \"consignee\": \"小陈\", \"mobile\": \"18912345678\"}";
-//        byte[] ret=mallClient.post().uri( "/orderItems/{id}/aftersales",39)
-//                .header("authorization",token)
-//                .bodyValue(requireJson)
-//                .exchange()
-//                .expectStatus().isBadRequest()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.FIELD_NOTVALID.getCode())
-////                .jsonPath("$.errmsg").isEqualTo("售后类型不能为空;")
-//                .returnResult()
-//                .getRequestBodyContent();
-//    }
-//
-//    /**
-//     * 买家提交售后单
-//     * orderItemId不存在
-//     */
-//    @Test
-//    public void newSaleTest3() throws Exception {
-//        String token=this.Userlogin("8606245097","123456");
-//        String requireJson="{ \"type\": 2, \"quantity\": 2, \"reason\": \"七天无理由\", \"regionId\": 1, \"detail\": \"厦大学生公寓\", \"consignee\": \"小陈\", \"mobile\": \"18912345678\"}";
-//
-//        byte[] ret=mallClient.post().uri( "/orderItems/{id}/aftersales",65498)
-//                .bodyValue(requireJson)
-//                .header("authorization", token)
-//                .exchange()
-//                .expectStatus().isNotFound()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getCode())
-////                .jsonPath("$.errmsg").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getMessage())
-//                .returnResult()
-//                .getResponseBodyContent();
-//    }
-//
-//    /**
-//     * 买家根据售后单状态和类型查询售后单
-//     * 查询page=1,pagesize=3 售后类型为0
-//     * @return
-//     */
-//    @Test
-//    public void userGetSaleTest() throws Exception {
-//        String token=this.Userlogin("8606245097","123456");
-//
-//        byte[] responseString = mallClient.get().uri(uriBuilder -> uriBuilder.path("aftersales")
-//                .queryParam("page",1)
-//                .queryParam("pageSize",3)
-//                .queryParam("type",0)
-//                .build())
-//                .header("authorization", token)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+package cn.edu.xmu.aftersales.ControllerTest;
+
+import cn.edu.xmu.aftersales.AftersalesserviceApplication;
+import cn.edu.xmu.ooad.util.JacksonUtil;
+import cn.edu.xmu.ooad.util.JwtHelper;
+import cn.edu.xmu.ooad.util.ResponseCode;
+import cn.edu.xmu.user.model.vo.LoginVo;
+import org.json.JSONException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.beans.factory.annotation.Value;
+import java.nio.charset.StandardCharsets;
+
+@SpringBootTest(classes = AftersalesserviceApplication.class)
+/**
+* 陈芸衣
+* 24320182203182
+*/
+
+public class ChenyunyiTest {
+
+
+  // @Value("${public-test.managementgate}")
+   private String managementGate="http://127.0.0.1:8084";
+
+  // @Value("${public-test.mallgate}")
+   private String mallGate="http://127.0.0.1:8084";
+
+   private WebTestClient manageClient;
+
+   private WebTestClient mallClient;
+
+   @BeforeEach
+   public void setup(){
+       this.manageClient = WebTestClient.bindToServer()
+               .baseUrl(managementGate)
+               .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
+               .build();
+
+       this.mallClient = WebTestClient.bindToServer()
+               .baseUrl(mallGate)
+               .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8")
+               .build();
+
+   }
+
+   private String Userlogin(String userName, String password) throws Exception {
+       LoginVo vo = new LoginVo();
+       vo.setUserName(userName);
+       vo.setPassword(password);
+       String requireJson = JacksonUtil.toJson(vo);
+
+       byte[] ret = mallClient.post().uri("/users/login").bodyValue(requireJson).exchange()
+               .expectStatus().isCreated()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+//                .jsonPath("$.errmsg").isEqualTo("成功")
+               .returnResult()
+               .getResponseBodyContent();
+       return JacksonUtil.parseString(new String(ret, "UTF-8"), "data");
+
+   }
+
+   /**
+    * 获得售后单所有状态
+    * @throws Exception
+    */
+   @Test
+   public void getSaleStateTest1() throws Exception{
+
+       byte[] responseString=mallClient.get().uri("/aftersales/states")
+               .exchange()
+               .expectStatus().isOk()
+               .expectHeader().contentType("application/json;charset=UTF-8")
+               .expectBody()
+               .returnResult().getResponseBodyContent();
+       String expected="{\n" +
+               "    \"errno\": 0,\n" +
+               "    \"data\": [\n" +
+               "        {\n" +
+               "            \"code\": 0,\n" +
+               "            \"name\": \"待管理员审核\"\n" +
+               "        },\n" +
+               "        {\n" +
+               "            \"code\": 1,\n" +
+               "            \"name\": \"待买家发货\"\n" +
+               "        },\n" +
+               "        {\n" +
+               "            \"code\": 2,\n" +
+               "            \"name\": \"买家已发货\"\n" +
+               "        },\n" +
+               "        {\n" +
+               "            \"code\": 3,\n" +
+               "            \"name\": \"待店家退款\"\n" +
+               "        },\n" +
+               "        {\n" +
+               "            \"code\": 4,\n" +
+               "            \"name\": \"待店家发货\"\n" +
+               "        },\n" +
+               "        {\n" +
+               "            \"code\": 5,\n" +
+               "            \"name\": \"店家已发货\"\n" +
+               "        },\n" +
+               "        {\n" +
+               "            \"code\": 6,\n" +
+               "            \"name\": \"审核不通过\"\n" +
+               "        },\n" +
+               "        {\n" +
+               "            \"code\": 7,\n" +
+               "            \"name\": \"已取消\"\n" +
+               "        },\n" +
+               "        {\n" +
+               "            \"code\": 8,\n" +
+               "            \"name\": \"已结束\"\n" +
+               "        }\n" +
+               "    ],\n" +
+               "    \"errmsg\": \"成功\"\n" +
+               "}";
+       JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), true);
+   }
+
+
+   /**
+    * 买家提交售后单
+    * 售后类型为空
+    */
+   @Test
+   public void newSaleTest2() throws Exception {
+       String token=this.Userlogin("8606245097","123456");
+       String requireJson="{ \"type\": null, \"quantity\": 0, \"reason\": \"七天无理由\", \"regionId\": 1, \"detail\": \"厦大学生公寓\", \"consignee\": \"小陈\", \"mobile\": \"18912345678\"}";
+       byte[] ret=mallClient.post().uri( "/orderItems/{id}/aftersales",39)
+               .header("authorization",token)
+               .bodyValue(requireJson)
+               .exchange()
+               .expectStatus().isBadRequest()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.FIELD_NOTVALID.getCode())
+//                .jsonPath("$.errmsg").isEqualTo("售后类型不能为空;")
+               .returnResult()
+               .getRequestBodyContent();
+   }
+
+   /**
+    * 买家提交售后单
+    * orderItemId不存在
+    */
+   @Test
+   public void newSaleTest3() throws Exception {
+       String token=this.Userlogin("8606245097","123456");
+       String requireJson="{ \"type\": 2, \"quantity\": 2, \"reason\": \"七天无理由\", \"regionId\": 1, \"detail\": \"厦大学生公寓\", \"consignee\": \"小陈\", \"mobile\": \"18912345678\"}";
+
+       byte[] ret=mallClient.post().uri( "/orderItems/{id}/aftersales",65498)
+               .bodyValue(requireJson)
+               .header("authorization", token)
+               .exchange()
+               .expectStatus().isNotFound()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getCode())
+//                .jsonPath("$.errmsg").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getMessage())
+               .returnResult()
+               .getResponseBodyContent();
+   }
+
+   /**
+    * 买家根据售后单状态和类型查询售后单
+    * 查询page=1,pagesize=3 售后类型为0
+    * @return
+    */
+   @Test
+   public void userGetSaleTest() throws Exception {
+       String token=this.Userlogin("8606245097","123456");
+
+       byte[] responseString = mallClient.get().uri(uriBuilder -> uriBuilder.path("aftersales")
+               .queryParam("page",1)
+               .queryParam("pageSize",3)
+               .queryParam("type",0)
+               .build())
+               .header("authorization", token)
+               .exchange()
+               .expectStatus().isOk()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+               .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
+               .returnResult()
+               .getResponseBodyContent();
+
+
+       String expected=" {\n" +
+               "    \"errno\": 0,\n" +
+               "    \"data\": {\n" +
+               "        \"total\": 3,\n" +
+               "        \"pages\": 1,\n" +
+               "        \"pageSize\": 3,\n" +
+               "        \"page\": 1,\n" +
+               "        \"list\": [\n" +
+               "            {\n" +
+               "                \"id\": 1,\n" +
+               "                \"orderId\": null,\n" +
+               "                \"orderItemId\": 1,\n" +
+               "                \"customerId\": 1,\n" +
+               "                \"shopId\": 1,\n" +
+               "                \"serviceSn\": \"202012041007412AM\",\n" +
+               "                \"type\": 0,\n" +
+               "                \"reason\": \"string\",\n" +
+               "                \"refund\": 0,\n" +
+               "                \"quantity\": 0,\n" +
+               "                \"regionId\": 1,\n" +
+               "                \"detail\": \"detail\",\n" +
+               "                \"consignee\": \"string\",\n" +
+               "                \"mobile\": \"15306987163\",\n" +
+               "                \"customerLogSn\": \"\",\n" +
+               "                \"shopLogSn\": \"\",\n" +
+               "                \"state\": 0\n" +
+               "            },\n" +
+               "            {\n" +
+               "                \"id\": 2,\n" +
+               "                \"orderId\": null,\n" +
+               "                \"orderItemId\": 2,\n" +
+               "                \"customerId\": 1,\n" +
+               "                \"shopId\": 1,\n" +
+               "                \"serviceSn\": \"2020120410460306X\",\n" +
+               "                \"type\": 0,\n" +
+               "                \"reason\": \"string\",\n" +
+               "                \"refund\": 0,\n" +
+               "                \"quantity\": 0,\n" +
+               "                \"regionId\": 1,\n" +
+               "                \"detail\": \"detail\",\n" +
+               "                \"consignee\": \"string\",\n" +
+               "                \"mobile\": \"15306987163\",\n" +
+               "                \"customerLogSn\": \"\",\n" +
+               "                \"shopLogSn\": \"\",\n" +
+               "                \"state\": 1\n" +
+               "            },\n" +
+               "            {\n" +
+               "                \"id\": 3,\n" +
+               "                \"orderId\": null,\n" +
+               "                \"orderItemId\": 2,\n" +
+               "                \"customerId\": 1,\n" +
+               "                \"shopId\": 1,\n" +
+               "                \"serviceSn\": \"202012041046073SE\",\n" +
+               "                \"type\": 0,\n" +
+               "                \"reason\": \"string\",\n" +
+               "                \"refund\": 0,\n" +
+               "                \"quantity\": 0,\n" +
+               "                \"regionId\": 1,\n" +
+               "                \"detail\": \"detail\",\n" +
+               "                \"consignee\": \"string\",\n" +
+               "                \"mobile\": \"15306987163\",\n" +
+               "                \"customerLogSn\": \"\",\n" +
+               "                \"shopLogSn\": \"\",\n" +
+               "                \"state\": 2\n" +
+               "            }\n" +
+               "        ]\n" +
+               "    },\n" +
+               "    \"errmsg\": \"成功\"\n" +
+               "}";
+       JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
+
+   }
+
+   /**
+    * 买家根据售后单状态和类型查询售后单
+    * 查询售后状态为0 page=1 pagesize=3 customerId=2
+    * @return
+    */
+   @Test
+   public void userGetSaleTest2() throws Exception {
+
+       String token=this.Userlogin("36040122840","123456");
+       //String token=new JwtHelper().createToken(1L,1L,1);
+
+       byte[] responseString = mallClient.get().uri(uriBuilder -> uriBuilder.path("aftersales")
+               .queryParam("page",1)
+               .queryParam("pageSize",3)
+               .queryParam("state",0)
+               .build())
+               .header("authorization", token)
+               .exchange()
+               .expectStatus().isOk()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
+               .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
+               .returnResult()
+               .getResponseBodyContent();
+
+       String expected=" {\n" +
+               "    \"errno\": 0,\n" +
+               "    \"data\": {\n" +
+               "        \"total\": 1,\n" +
+               "        \"pages\": 1,\n" +
+               "        \"pageSize\": 3,\n" +
+               "        \"page\": 1,\n" +
+               "        \"list\": [\n" +
+               "            {\n" +
+               "                \"id\": 54,\n" +
+               "                \"orderId\": null,\n" +
+               "                \"orderItemId\": 39,\n" +
+               "                \"customerId\": 2,\n" +
+               "                \"shopId\": 1,\n" +
+               "                \"serviceSn\": null,\n" +
+               "                \"type\": 0,\n" +
+               "                \"reason\": \"七天无理由\",\n" +
+               "                \"refund\": null,\n" +
+               "                \"quantity\": 1,\n" +
+               "                \"regionId\": 1,\n" +
+               "                \"detail\": \"厦大学生公寓\",\n" +
+               "                \"consignee\": \"Chen\",\n" +
+               "                \"mobile\": \"12345678900\",\n" +
+               "                \"customerLogSn\": null,\n" +
+               "                \"shopLogSn\": null,\n" +
+               "                \"state\": 0\n" +
+               "            }\n" +
+               "        ]\n" +
+               "    },\n" +
+               "    \"errmsg\": \"成功\"\n" +
+               "}";
+       JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
+   }
+
+
+   /**
+    * 买家根据售后单id查询售后单信息
+    * @return
+    */
+   @Test
+   public void findByIdTest1() throws Exception {
+
+       String token=this.Userlogin("8606245097","123456");
+       //String token=new JwtHelper().createToken(1L,1L,1);
+
+       byte[] responseString = mallClient.get().uri("/aftersales/{id}",51)
+               .header("authorization", token)
+               .exchange()
+               .expectStatus().isOk()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
 //                .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
-//                .returnResult()
-//                .getResponseBodyContent();
-//
-//
-//        String expected=" {\n" +
-//                "    \"errno\": 0,\n" +
-//                "    \"data\": {\n" +
-//                "        \"total\": 3,\n" +
-//                "        \"pages\": 1,\n" +
-//                "        \"pageSize\": 3,\n" +
-//                "        \"page\": 1,\n" +
-//                "        \"list\": [\n" +
-//                "            {\n" +
-//                "                \"id\": 1,\n" +
-//                "                \"orderId\": null,\n" +
-//                "                \"orderItemId\": 1,\n" +
-//                "                \"customerId\": 1,\n" +
-//                "                \"shopId\": 1,\n" +
-//                "                \"serviceSn\": \"202012041007412AM\",\n" +
-//                "                \"type\": 0,\n" +
-//                "                \"reason\": \"string\",\n" +
-//                "                \"refund\": 0,\n" +
-//                "                \"quantity\": 0,\n" +
-//                "                \"regionId\": 1,\n" +
-//                "                \"detail\": \"detail\",\n" +
-//                "                \"consignee\": \"string\",\n" +
-//                "                \"mobile\": \"15306987163\",\n" +
-//                "                \"customerLogSn\": \"\",\n" +
-//                "                \"shopLogSn\": \"\",\n" +
-//                "                \"state\": 0\n" +
-//                "            },\n" +
-//                "            {\n" +
-//                "                \"id\": 2,\n" +
-//                "                \"orderId\": null,\n" +
-//                "                \"orderItemId\": 2,\n" +
-//                "                \"customerId\": 1,\n" +
-//                "                \"shopId\": 1,\n" +
-//                "                \"serviceSn\": \"2020120410460306X\",\n" +
-//                "                \"type\": 0,\n" +
-//                "                \"reason\": \"string\",\n" +
-//                "                \"refund\": 0,\n" +
-//                "                \"quantity\": 0,\n" +
-//                "                \"regionId\": 1,\n" +
-//                "                \"detail\": \"detail\",\n" +
-//                "                \"consignee\": \"string\",\n" +
-//                "                \"mobile\": \"15306987163\",\n" +
-//                "                \"customerLogSn\": \"\",\n" +
-//                "                \"shopLogSn\": \"\",\n" +
-//                "                \"state\": 1\n" +
-//                "            },\n" +
-//                "            {\n" +
-//                "                \"id\": 3,\n" +
-//                "                \"orderId\": null,\n" +
-//                "                \"orderItemId\": 2,\n" +
-//                "                \"customerId\": 1,\n" +
-//                "                \"shopId\": 1,\n" +
-//                "                \"serviceSn\": \"202012041046073SE\",\n" +
-//                "                \"type\": 0,\n" +
-//                "                \"reason\": \"string\",\n" +
-//                "                \"refund\": 0,\n" +
-//                "                \"quantity\": 0,\n" +
-//                "                \"regionId\": 1,\n" +
-//                "                \"detail\": \"detail\",\n" +
-//                "                \"consignee\": \"string\",\n" +
-//                "                \"mobile\": \"15306987163\",\n" +
-//                "                \"customerLogSn\": \"\",\n" +
-//                "                \"shopLogSn\": \"\",\n" +
-//                "                \"state\": 2\n" +
-//                "            }\n" +
-//                "        ]\n" +
-//                "    },\n" +
-//                "    \"errmsg\": \"成功\"\n" +
-//                "}";
-//        JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
-//
-//    }
-//
-//    /**
-//     * 买家根据售后单状态和类型查询售后单
-//     * 查询售后状态为0 page=1 pagesize=3 customerId=2
-//     * @return
-//     */
-//    @Test
-//    public void userGetSaleTest2() throws Exception {
-//
-//        String token=this.Userlogin("36040122840","123456");
-//        //String token=new JwtHelper().createToken(1L,1L,1);
-//
-//        byte[] responseString = mallClient.get().uri(uriBuilder -> uriBuilder.path("aftersales")
-//                .queryParam("page",1)
-//                .queryParam("pageSize",3)
-//                .queryParam("state",0)
-//                .build())
-//                .header("authorization", token)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-//                .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
-//                .returnResult()
-//                .getResponseBodyContent();
-//
-//        String expected=" {\n" +
-//                "    \"errno\": 0,\n" +
-//                "    \"data\": {\n" +
-//                "        \"total\": 1,\n" +
-//                "        \"pages\": 1,\n" +
-//                "        \"pageSize\": 3,\n" +
-//                "        \"page\": 1,\n" +
-//                "        \"list\": [\n" +
-//                "            {\n" +
-//                "                \"id\": 54,\n" +
-//                "                \"orderId\": null,\n" +
-//                "                \"orderItemId\": 39,\n" +
-//                "                \"customerId\": 2,\n" +
-//                "                \"shopId\": 1,\n" +
-//                "                \"serviceSn\": null,\n" +
-//                "                \"type\": 0,\n" +
-//                "                \"reason\": \"七天无理由\",\n" +
-//                "                \"refund\": null,\n" +
-//                "                \"quantity\": 1,\n" +
-//                "                \"regionId\": 1,\n" +
-//                "                \"detail\": \"厦大学生公寓\",\n" +
-//                "                \"consignee\": \"Chen\",\n" +
-//                "                \"mobile\": \"12345678900\",\n" +
-//                "                \"customerLogSn\": null,\n" +
-//                "                \"shopLogSn\": null,\n" +
-//                "                \"state\": 0\n" +
-//                "            }\n" +
-//                "        ]\n" +
-//                "    },\n" +
-//                "    \"errmsg\": \"成功\"\n" +
-//                "}";
-//        JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
-//    }
-//
-//
-//    /**
-//     * 买家根据售后单id查询售后单信息
-//     * @return
-//     */
-//    @Test
-//    public void findByIdTest1() throws Exception {
-//
-//        String token=this.Userlogin("8606245097","123456");
-//        //String token=new JwtHelper().createToken(1L,1L,1);
-//
-//        byte[] responseString = mallClient.get().uri("/aftersales/{id}",51)
-//                .header("authorization", token)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.OK.getCode())
-////                .jsonPath("$.errmsg").isEqualTo(ResponseCode.OK.getMessage())
-//                .returnResult()
-//                .getResponseBodyContent();
-//
-//        String expected="{\n" +
-//                "    \"errno\": 0,\n" +
-//                "    \"data\": {\n" +
-//                "        \"id\": 51,\n" +
-//                "        \"orderId\": null,\n" +
-//                "        \"orderItemId\": 39,\n" +
-//                "        \"skuId\": 341,\n" +
-//                "        \"skuName\": null,\n" +
-//                "        \"customerId\": 1,\n" +
-//                "        \"shopId\": 1,\n" +
-//                "        \"serviceSn\": null,\n" +
-//                "        \"type\": 0,\n" +
-//                "        \"reason\": \"七天无理由\",\n" +
-//                "        \"refund\": 10,\n" +
-//                "        \"quantity\": 1,\n" +
-//                "        \"regionId\": 1,\n" +
-//                "        \"detail\": \"厦大学生公寓\",\n" +
-//                "        \"consignee\": \"Chen\",\n" +
-//                "        \"mobile\": \"12345678900\",\n" +
-//                "        \"customerLogSn\": null,\n" +
-//                "        \"shopLogSn\": null,\n" +
-//                "        \"state\": 0\n" +
-//                "    },\n" +
-//                "    \"errmsg\": \"成功\"\n" +
-//                "}";
-//        JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
-//    }
+               .returnResult()
+               .getResponseBodyContent();
+
+       String expected="{\n" +
+               "    \"errno\": 0,\n" +
+               "    \"data\": {\n" +
+               "        \"id\": 51,\n" +
+               "        \"orderId\": null,\n" +
+               "        \"orderItemId\": 39,\n" +
+               "        \"skuId\": 341,\n" +
+               "        \"skuName\": null,\n" +
+               "        \"customerId\": 1,\n" +
+               "        \"shopId\": 1,\n" +
+               "        \"serviceSn\": null,\n" +
+               "        \"type\": 0,\n" +
+               "        \"reason\": \"七天无理由\",\n" +
+               "        \"refund\": 10,\n" +
+               "        \"quantity\": 1,\n" +
+               "        \"regionId\": 1,\n" +
+               "        \"detail\": \"厦大学生公寓\",\n" +
+               "        \"consignee\": \"Chen\",\n" +
+               "        \"mobile\": \"12345678900\",\n" +
+               "        \"customerLogSn\": null,\n" +
+               "        \"shopLogSn\": null,\n" +
+               "        \"state\": 0\n" +
+               "    },\n" +
+               "    \"errmsg\": \"成功\"\n" +
+               "}";
+       JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
+   }
 //
 //    /**
 //     * 买家根据售后单id查询售后单信息
@@ -1266,4 +1266,4 @@
 //
 //    }
 //
-//}
+}
