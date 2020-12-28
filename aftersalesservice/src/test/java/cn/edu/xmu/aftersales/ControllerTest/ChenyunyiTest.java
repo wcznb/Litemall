@@ -370,27 +370,27 @@ public class ChenyunyiTest {
        JSONAssert.assertEquals(expected, new String(responseString, "UTF-8"), false);
    }
 //
-//    /**
-//     * 买家根据售后单id查询售后单信息
-//     * 售后单Id不存在
-//     * @return
-//     */
-//    @Test
-//    public void findByIdTest2() throws Exception {
-//        String token=this.Userlogin("8606245097","123456");
-//        byte[] responseString = mallClient.get().uri("/aftersales/{id}",987456)
-//                .header("authorization", token)
-//                .exchange()
-//                .expectStatus().isNotFound()
-//                .expectBody()
-//                .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getCode())
-////                .jsonPath("$.errmsg").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getMessage())
-//                .returnResult()
-//                .getResponseBodyContent();
-//
-//
-//    }
-//
+   /**
+    * 买家根据售后单id查询售后单信息
+    * 售后单Id不存在
+    * @return
+    */
+   @Test
+   public void findByIdTest2() throws Exception {
+       String token=this.Userlogin("8606245097","123456");
+       byte[] responseString = mallClient.get().uri("/aftersales/{id}",987456)
+               .header("authorization", token)
+               .exchange()
+               .expectStatus().isNotFound()
+               .expectBody()
+               .jsonPath("$.errno").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getCode())
+//                .jsonPath("$.errmsg").isEqualTo(ResponseCode.RESOURCE_ID_NOTEXIST.getMessage())
+               .returnResult()
+               .getResponseBodyContent();
+
+
+   }
+
 //    /**
 //     * 买家根据售后单id查询售后单信息
 //     * 查询不是自己的售后单
